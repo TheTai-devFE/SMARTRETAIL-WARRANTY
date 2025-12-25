@@ -1,7 +1,8 @@
 import axios from 'axios';
 
+// Sử dụng biến môi trường của Vite, nếu không có sẽ lấy mặc định là URL Render của bạn
 const api = axios.create({
-  baseURL: 'https://smartretail-warranty.onrender.com',
+  baseURL: import.meta.env.VITE_API_URL || 'https://smartretail-warranty.onrender.com/api',
 });
 
 export const warrantyApi = {
