@@ -46,7 +46,13 @@ const Home = () => {
         setMultiResults(response.data);
       }
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'Không tìm thấy dữ liệu bảo hành');
+      // Ưu tiên hiển thị thông báo trả về từ Server nếu có
+      const serverMessage = err.response?.data?.message;
+      if (serverMessage === 'No warranty record found') {
+        setError('Thông tin bảo hành không tồn tại trong hệ thống. Vui lòng kiểm tra lại Serial hoặc SĐT/MST.');
+      } else {
+        setError(serverMessage || 'Có lỗi xảy ra khi kết nối tới máy chủ. Vui lòng thử lại sau.');
+      }
     } finally {
       setLoading(false);
     }
