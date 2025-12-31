@@ -1,45 +1,40 @@
 const express = require('express');
 const router = express.Router();
-const Warranty = require('../models/Warranty');
+const multer = require('multer');
+const { hardwareService } = require('../services');
 
-// Helper to calculate status and remaining days
-const getWarrantyStatus = (endDate) => {
-  const now = new Date();
-  const end = new Date(endDate);
-  const diffTime = end - now;
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  
-  return {
-    status: diffDays > 0 ? 'Active' : 'Expired',
-    remainingDays: diffDays > 0 ? diffDays : 0
-  };
-};
+const warrantyController = require('../controllers/warrantyController');
+
+const upload = multer({ storage: multer.memoryStorage() });
 
 // --- ADMIN APIs ---
 
 // Create Warranty
 router.post('/warranties', async (req, res) => {
   try {
-    const newWarranty = new Warranty(req.body);
-    await newWarranty.save();
+    const newWarranty = await hardwareService.createWarranty(req.body);
     res.status(201).json(newWarranty);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 });
 
-// List all warranties with search/filter
+// List all warranties
 router.get('/warranties', async (req, res) => {
   try {
-    const { companyName, taxCode, customerPhone, serialNumber } = req.query;
-    let query = {};
-    if (companyName) query.companyName = new RegExp(companyName, 'i');
-    if (taxCode) query.taxCode = taxCode;
-    if (customerPhone) query.customerPhone = customerPhone;
-    if (serialNumber) query.serialNumber = serialNumber;
-
-    const warranties = await Warranty.find(query).sort({ createdAt: -1 });
+    const warranties = await hardwareService.getAllWarranties(req.query);
     res.json(warranties);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Import Excel
+router.post('/warranties/import', upload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
+    const results = await hardwareService.importWarranties(req.file.buffer);
+    res.json(results);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -48,7 +43,7 @@ router.get('/warranties', async (req, res) => {
 // Update Warranty
 router.put('/warranties/:id', async (req, res) => {
   try {
-    const updated = await Warranty.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updated = await hardwareService.updateWarranty(req.params.id, req.body);
     res.json(updated);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -58,74 +53,42 @@ router.put('/warranties/:id', async (req, res) => {
 // Delete Warranty
 router.delete('/warranties/:id', async (req, res) => {
   try {
-    await Warranty.findByIdAndDelete(req.params.id);
+    await hardwareService.deleteWarranty(req.params.id);
     res.json({ message: 'Deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
+// Bulk Delete Warranties
+router.post('/warranties/bulk-delete', async (req, res) => {
+  try {
+    const { ids } = req.body;
+    await hardwareService.bulkDeleteWarranties(ids);
+    res.json({ message: 'Bulk delete successful' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// --- ACTIVATION API ---
+
+// Activate Warranty
+router.post('/warranties/:id/activate', async (req, res) => {
+  try {
+    const activated = await hardwareService.activateWarranty(req.params.id);
+    res.json(activated);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
 // --- CUSTOMER APIs ---
 
-// Public Search (Serial + MST OR Serial + Phone)
-router.post('/warranty/search', async (req, res) => {
-  try {
-    const { serialNumber, taxCode, customerPhone } = req.body;
-    
-    if (!serialNumber) {
-      return res.status(400).json({ message: 'Serial number is required' });
-    }
+// Public Search
+router.post('/warranty/search', warrantyController.searchWarranty);
 
-    let query = { serialNumber };
-    if (taxCode) {
-      query.taxCode = taxCode;
-    } else if (customerPhone) {
-      query.customerPhone = customerPhone;
-    } else {
-      return res.status(400).json({ message: 'Tax Code or Phone Number is required' });
-    }
-
-    const warranty = await Warranty.findOne(query);
-    
-    if (!warranty) {
-      return res.status(404).json({ message: 'No warranty record found' });
-    }
-
-    const info = getWarrantyStatus(warranty.endDate);
-    res.json({
-      ...warranty.toObject(),
-      status: info.status,
-      remainingDays: info.remainingDays
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// List by Phone
-router.get('/warranty/by-phone/:phone', async (req, res) => {
-  try {
-    const warranties = await Warranty.find({ customerPhone: req.params.phone });
-    res.json(warranties.map(w => ({
-      ...w.toObject(),
-      ...getWarrantyStatus(w.endDate)
-    })));
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// List by Tax Code
-router.get('/warranty/by-tax/:taxCode', async (req, res) => {
-  try {
-    const warranties = await Warranty.find({ taxCode: req.params.taxCode });
-    res.json(warranties.map(w => ({
-      ...w.toObject(),
-      ...getWarrantyStatus(w.endDate)
-    })));
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
+// Get Warranty by ID (for activation page check)
+router.get('/warranty/check/:id', warrantyController.getWarrantyById);
 
 module.exports = router;
