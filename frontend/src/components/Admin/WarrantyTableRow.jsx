@@ -44,6 +44,9 @@ const WarrantyTableRow = ({
           <p className="font-bold text-sm text-slate-700">{warranty.companyName || 'Khách lẻ'}</p>
           <p className="text-[10px] font-bold text-slate-400">{warranty.customerPhone}</p>
         </div>
+        <div>
+          <p className="text-[10px] font-bold text-slate-400">{warranty.deliveryAddress}</p>
+        </div>
       </td>
       <td className="p-4">
         <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${

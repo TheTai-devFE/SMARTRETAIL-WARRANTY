@@ -404,6 +404,7 @@ const AdminDashboard = () => {
                     />
                   </th>
                   <th className="px-6 py-4">Sản phẩm / Serial</th>
+                  <th className="px-6 py-4">Serial</th>
                   <th className="px-6 py-4">Khách hàng / Địa chỉ</th>
                   <th className="px-6 py-4">Trạng thái</th>
                   <th className="px-6 py-4">Thời hạn</th>
