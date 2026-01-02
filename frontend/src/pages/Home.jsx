@@ -3,6 +3,8 @@ import { Briefcase, Building, MapPin, Package, Phone, Search, ShieldCheck, User,
 import { useState } from 'react';
 import { warrantyApi } from '../api';
 import Navbar from '../components/Navbar';
+import WarrantyInfoBlock from '../components/Warranty/WarrantyInfoBlock';
+import WarrantyStatusBadge from '../components/Warranty/WarrantyStatusBadge';
 
 const Home = () => {
   const [customerType, setCustomerType] = useState('retail'); // 'retail' (SĐT) or 'business' (MST)
