@@ -8,7 +8,7 @@ import { warrantyPolicyData as data } from '../data/warrantyPolicyData';
 
 const PolicyPage = () => {
   return (
-    <div className="bg-white min-h-screen selection:bg-primary-100 selection:text-primary-900">
+    <div className="bg-white min-h-screen selection:bg-primary-100 selection:text-primary-900 ">
       <Navbar isDark={true} />
 
       {/* Hero */}

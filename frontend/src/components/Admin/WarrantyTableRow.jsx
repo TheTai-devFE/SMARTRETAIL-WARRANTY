@@ -1,19 +1,19 @@
 import { format } from 'date-fns';
 import { Edit2, ExternalLink, Package, QrCode, Trash2 } from 'lucide-react';
 
-const WarrantyTableRow = ({ 
-  warranty, 
-  onEdit, 
-  onDelete, 
-  onShowQR, 
-  isSelected, 
-  onToggleSelect 
+const WarrantyTableRow = ({
+  warranty,
+  onEdit,
+  onDelete,
+  onShowQR,
+  isSelected,
+  onToggleSelect
 }) => {
   return (
     <tr className={`group hover:bg-slate-50/80 transition-all border-b border-slate-100 ${isSelected ? 'bg-primary-50/30' : ''}`}>
       <td className="p-4">
-        <input 
-          type="checkbox" 
+        <input
+          type="checkbox"
           className="w-4 h-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
           checked={isSelected}
           onChange={() => onToggleSelect(warranty._id)}
@@ -29,6 +29,11 @@ const WarrantyTableRow = ({
             <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">{warranty.productCode}</p>
           </div>
         </div>
+      </td>
+      <td className="p-4">
+        <span className="font-mono text-xs font-bold bg-primary-50 text-primary-700 px-2 py-1 rounded border border-primary-200">
+          {warranty.customerCode || '—'}
+        </span>
       </td>
       <td className="p-4">
         <div className="flex flex-wrap gap-1 max-w-[200px]">
@@ -49,17 +54,11 @@ const WarrantyTableRow = ({
         </div>
       </td>
       <td className="p-4">
-        <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
-          warranty.status === 'Activated' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
-        }`}>
+        <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${warranty.status === 'Activated' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
+          }`}>
           <div className={`w-1.5 h-1.5 rounded-full ${warranty.status === 'Activated' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`}></div>
           {warranty.status === 'Activated' ? 'Đang bảo hành' : 'Chờ kích hoạt'}
         </div>
-        {/* {warranty.hasSoftware && (
-           <div className="flex items-center gap-1 mt-1 text-[9px] font-bold text-emerald-600/80 uppercase tracking-tighter">
-             <ShieldCheck size={10} /> Software Sync
-           </div>
-        )} */}
       </td>
       <td className="p-4">
         <p className="text-xs font-bold text-slate-600">{format(new Date(warranty.startDate), 'dd/MM/yyyy')}</p>

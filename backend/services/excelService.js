@@ -1,5 +1,5 @@
 const xlsx = require('xlsx');
-const Warranty = require('../models/Warranty');
+const Hardware = require('../models/Hardware');
 const softwareService = require('./softwareService');
 
 /**
@@ -50,12 +50,14 @@ const parseAndValidateExcel = async (buffer) => {
   if (results.errors.length > 0) return { toInsert: [], results };
 
   // 2. Check duplicates in Database
-  const existingInDb = await Warranty.find({ serialNumber: { $in: allSerialsInFile } });
+  const existingInDb = await Hardware.find({ serialNumber: { $in: allSerialsInFile } });
+
   if (existingInDb.length > 0) {
     const duplicateSerials = existingInDb.flatMap(w => w.serialNumber).filter(sn => allSerialsInFile.includes(sn));
     results.errors.push(`Các Serial sau đã tồn tại trong hệ thống: ${duplicateSerials.join(', ')}`);
     return { toInsert: [], results };
   }
+
 
   // 3. Format data for Insertion
   const toInsert = data.map(row => {
@@ -67,23 +69,26 @@ const parseAndValidateExcel = async (buffer) => {
     const swInfo = softwareService.formatSoftwareImport(row, serials[0]);
     const hasSW = !!swInfo;
 
-    // Split records into individual entries for maintainability
-    return serials.map(sn => ({
+    // OPTIMIZATION: Do not split serials. 
+    // Pass the array to createWarranty service to handle Project grouping automatically.
+    
+    return {
       companyName: row.companyName || row['Công ty'],
       taxCode: row.taxCode || row['Mã số thuế'],
       deliveryAddress: row.deliveryAddress || row['Địa chỉ giao hàng'] || row['Địa chỉ'],
       customerPhone: String(row.customerPhone || row['Số điện thoại'] || ''),
       productCode: row.productCode || row['Mã sản phẩm'],
       productName: row.productName || row['Tên sản phẩm'],
-      serialNumber: [sn],
+      serialNumbers: serials, // Pass Array
+      serialNumber: serials[0], // Fallback/First SN
       customerType: row.customerType || 'Retail',
       warrantyPeriod: parseInt(row.warrantyPeriod || row['Thời hạn bảo hành']) || 24,
       startDate: row.startDate ? new Date(row.startDate) : new Date(),
       status: 'Pending',
       hasSoftware: hasSW,
       softwareInfo: swInfo
-    }));
-  }).flat().filter(Boolean);
+    };
+  }).filter(Boolean);
 
   return { toInsert, results };
 };

@@ -1,92 +1,127 @@
 import { format } from 'date-fns';
-import { Building, Calendar, MapPin, Package } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Calendar, Fingerprint, MapPin, Package, ShieldCheck } from 'lucide-react';
 
-const InfoItem = ({ icon: Icon, label, value, className = "" }) => (
-  <div className={`flex items-start gap-4 ${className}`}>
-    <div className="p-3 bg-primary-50 rounded-xl text-primary-600">
-      <Icon size={24} />
-    </div>
-    <div className="flex-1 min-w-0">
-      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</p>
-      <div className="flex flex-wrap gap-1">
-        {value}
-      </div>
-    </div>
-  </div>
-);
-
-const WarrantyInfoBlock = ({ warranty }) => {
+const WarrantyInfoBlock = ({ warranty, compact = false }) => {
   const serialNumbers = Array.isArray(warranty.serialNumber) ? warranty.serialNumber : [warranty.serialNumber];
-  
-  return (
-    <div className="space-y-6 md:space-y-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 py-6 md:py-8 border-y border-slate-100">
-        <div className="space-y-6">
-          <InfoItem 
-            icon={Package} 
-            label="Số Serial Sản Phẩm" 
-            value={serialNumbers.map((sn, i) => (
-              <span key={i} className="font-bold text-sm text-slate-800 font-mono bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-                {sn}
-              </span>
-            ))}
-          />
-          <InfoItem 
-            icon={Calendar} 
-            label="Ngày Xuất Kho" 
-            value={<p className="font-bold text-xl text-slate-800">{format(new Date(warranty.startDate), 'dd/MM/yyyy')}</p>}
-          />
-        </div>
-        
-        <div className="space-y-6">
-          <InfoItem 
-            icon={Calendar} 
-            label="Hạn Bảo Hành" 
-            value={warranty.endDate ? (
-              <p className="font-bold text-xl text-slate-800">{format(new Date(warranty.endDate), 'dd/MM/yyyy')}</p>
-            ) : (
-              <p className="font-bold text-xl text-slate-400 italic">Chưa kích hoạt ({warranty.warrantyPeriod} tháng)</p>
-            )}
-          />
-          
-          {warranty.status === 'Activated' && (
-            <div className="bg-primary-600 p-5 rounded-2xl shadow-lg shadow-primary-500/20 text-white relative overflow-hidden">
-              <div className="relative z-10">
-                <p className="text-[10px] font-black opacity-70 uppercase tracking-widest mb-1">Số Ngày Còn Lại</p>
-                <p className="text-4xl font-black">{warranty.remainingDays} <span className="text-sm font-bold opacity-80 uppercase">ngày</span></p>
-              </div>
-              <Package className="absolute right-[-10px] bottom-[-10px] opacity-10 rotate-12" size={100} />
-            </div>
-          )}
-        </div>
-      </div>
 
-      <div className="bg-slate-50/50 p-6 rounded-2xl border border-slate-100">
-        <h3 className="font-black text-slate-800 text-xs uppercase tracking-widest flex items-center gap-2 mb-4">
-          <Building size={16} className="text-primary-500" /> Thông tin sở hữu
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Chủ sở hữu</p>
-            <p className="font-bold text-slate-700">{warranty.companyName || 'Khách hàng cá nhân'}</p>
-          </div>
-          <div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Mã số thuế</p>
-            <p className="font-bold text-slate-700">{warranty.taxCode || '—'}</p>
-          </div>
-          <div>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Số điện thoại</p>
-            <p className="font-bold text-slate-700">{warranty.customerPhone}</p>
-          </div>
-          {warranty.deliveryAddress && (
-            <div className="md:col-span-2 lg:col-span-1">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Địa chỉ giao hàng</p>
-              <p className="font-bold text-slate-700 text-xs leading-relaxed flex items-start gap-1.5 mt-1">
-                <MapPin size={12} className="text-primary-400 shrink-0 mt-0.5" />
-                {warranty.deliveryAddress}
+  return (
+    <div className={`space-y-${compact ? '6' : '12'}`}>
+      {/* Product Information Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Left Section: Details */}
+        <div className="lg:col-span-7 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+            {/* Serial Number */}
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 text-slate-400">
+                <Package size={16} className="stroke-[2]" />
+                <p className="text-[10px] font-black uppercase tracking-[0.1em]">Số Serial</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {serialNumbers.map((sn, i) => (
+                  <span key={i} className="text-xl md:text-2xl font-black text-slate-800 tracking-tighter">
+                    {sn}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Customer Code */}
+            {warranty.customerCode && (
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 text-slate-400">
+                  <Fingerprint size={16} className="stroke-[2]" />
+                  <p className="text-[10px] font-black uppercase tracking-[0.1em]">Mã Khách Hàng</p>
+                </div>
+                <span className="text-xl md:text-2xl font-black text-primary-600 tracking-tighter font-mono">
+                  {warranty.customerCode}
+                </span>
+              </div>
+            )}
+
+            {/* Dates */}
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 text-slate-400">
+                <Calendar size={16} className="stroke-[2]" />
+                <p className="text-[10px] font-black uppercase tracking-[0.1em]">Ngày Xuất Kho</p>
+              </div>
+              <p className="text-lg md:text-xl font-black text-slate-800 tracking-tighter">
+                {format(new Date(warranty.startDate), 'dd/MM/yyyy')}
               </p>
             </div>
+
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 text-slate-400">
+                <Calendar size={16} className="stroke-[2]" />
+                <p className="text-[10px] font-black uppercase tracking-[0.1em]">Hạn Bảo Hành</p>
+              </div>
+              {warranty.endDate ? (
+                <p className="text-lg md:text-xl font-black text-slate-800 tracking-tighter">
+                  {format(new Date(warranty.endDate), 'dd/MM/yyyy')}
+                </p>
+              ) : (
+                <div className="flex flex-col">
+                  <span className="text-sm font-bold text-slate-400 italic leading-none">Chờ kích hoạt</span>
+                  <span className="text-[9px] font-black text-primary-500 uppercase tracking-widest mt-1">({warranty.warrantyPeriod} tháng)</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Right Section: Status Card */}
+        <div className="lg:col-span-5">
+          {warranty.status === 'Activated' ? (
+            <motion.div
+              whileHover={{ y: -3 }}
+              className="h-full bg-gradient-to-br from-primary-600 to-indigo-600 p-6 md:p-8 rounded-[32px] shadow-lg text-white relative overflow-hidden group min-h-[160px] flex flex-col justify-center"
+            >
+              <div className="relative z-10">
+                <p className="text-[10px] font-black opacity-70 uppercase tracking-[0.2em] mb-2">Số ngày còn lại</p>
+                <div className="flex items-baseline gap-3">
+                  <span className="text-6xl md:text-7xl font-black tracking-tighter leading-none">{warranty.remainingDays}</span>
+                  <span className="text-lg font-black uppercase opacity-80 tracking-widest">Ngày</span>
+                </div>
+              </div>
+              <Package className="absolute right-[-5%] bottom-[-5%] opacity-10 rotate-12" size={140} />
+            </motion.div>
+          ) : (
+            <div className="h-full bg-slate-50 border-2 border-dashed border-slate-200 rounded-[32px] flex items-center justify-center p-8 text-center min-h-[160px]">
+              <div className="space-y-2">
+                <ShieldCheck size={24} className="text-slate-300 mx-auto" />
+                <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Sẵn sàng kích hoạt</p>
+              </div>
+            </div>
           )}
+        </div>
+      </div>
+
+      {/* Owner Information Tray - Compact */}
+      <div className="bg-[#F8FAFC] p-6 md:p-8 rounded-[32px] border border-slate-100 shadow-sm relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-1.5 h-full bg-primary-500"></div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 items-start">
+          <div className="space-y-0.5">
+            <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.1em]">Chủ sở hữu</p>
+            <p className="text-sm md:text-base font-black text-slate-800 leading-tight">{warranty.companyName || 'Khách lẻ'}</p>
+          </div>
+          <div className="space-y-0.5">
+            <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.1em]">Mã số thuế</p>
+            <p className="text-sm md:text-base font-black text-slate-800 leading-tight">{warranty.taxCode || '—'}</p>
+          </div>
+          <div className="space-y-0.5">
+            <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.1em]">Liên hệ</p>
+            <p className="text-sm md:text-base font-black text-slate-800 leading-tight">{warranty.customerPhone}</p>
+          </div>
+          <div className="space-y-0.5">
+            <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.1em]">Địa chỉ</p>
+            <div className="flex items-start gap-1.5">
+              <MapPin size={12} className="text-primary-500 shrink-0 mt-0.5" />
+              <p className="text-[11px] font-bold text-slate-600 leading-tight line-clamp-2">
+                {warranty.deliveryAddress || '—'}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

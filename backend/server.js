@@ -6,6 +6,7 @@ const cors = require('cors');
 const warrantyRoutes = require('./routes/warrantyRoutes');
 
 const app = express();
+console.log('Server is restarting... Loading new Hardware/Software modules...');
 const PORT = process.env.PORT || 5001;
 
 // Middleware
@@ -13,7 +14,13 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
+// Routes
+const softwareRoutes = require('./routes/softwareRoutes');
+const searchRoutes = require('./routes/searchRoutes');
+
 app.use('/api', warrantyRoutes);
+app.use('/api/software', softwareRoutes);
+app.use('/api/search', searchRoutes);
 
 // Database Connection
 const MONGODB_URI = process.env.MONGODB_URI;

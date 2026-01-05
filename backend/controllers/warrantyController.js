@@ -1,71 +1,213 @@
-const Warranty = require('../models/Warranty');
-const { hardwareService, softwareService } = require('../services');
+const Hardware = require('../models/Hardware');
+const Project = require('../models/Project'); // Import Project Model
+const Software = require('../models/Software');
+const { hardwareService } = require('../services');
 
 /**
- * Public Search API with Master-Member masking logic
+ * Public Search API (Legacy by Serial) - Optional
  */
 const searchWarranty = async (req, res) => {
   try {
-    const { serialNumber, taxCode, customerPhone } = req.body;
-    
+    const { serialNumber } = req.body;
     if (!serialNumber) {
       return res.status(400).json({ message: 'Serial number is required' });
     }
-
     const trimmedSN = serialNumber.trim();
-    // Use regex for serialNumber to be case-insensitive and robust
-    // Searching within the array: Mongoose handles this automatically if any element matches
-    let query = { serialNumber: { $regex: new RegExp(`^${trimmedSN}$`, 'i') } };
+    const hardware = await Hardware.findOne({ serialNumber: trimmedSN });
     
-    if (taxCode && taxCode.trim()) {
-      query.taxCode = taxCode.trim();
-    } else if (customerPhone && customerPhone.trim()) {
-      query.customerPhone = customerPhone.trim();
-    } else {
-      return res.status(400).json({ message: 'Tax Code or Phone Number is required' });
+    if (!hardware) {
+      return res.status(404).json({ message: 'No hardware record found' });
     }
 
-    const warranty = await Warranty.findOne(query);
-    
-    if (!warranty) {
-      return res.status(404).json({ message: 'No warranty record found' });
-    }
-
-    // Apply masking logic based on searched SN vs Master SN
-    const dataWithMasking = softwareService.getMaskedSoftwareInfo(warranty, trimmedSN);
-    
-    // Add activation status labels
-    const statusInfo = hardwareService.getHardwareStatus(warranty);
-
-    res.json({
-      ...dataWithMasking,
+    // --- LOGIC CENTRALIZED ---
+    const statusInfo = hardwareService.getHardwareStatus(hardware);
+    const responseData = {
+      ...hardware.toObject(),
       ...statusInfo
-    });
+    };
+
+    let project = null;
+    let software = null;
+    
+    // 1. Resolve Project (New Data)
+    if (hardware.projectId) {
+         project = await Project.findById(hardware.projectId);
+    }
+
+    // 2. Populate Hardware Info (Project > Hardware)
+    if (project) {
+        responseData.customerCode = project.customerCode;
+        responseData.companyName = project.companyName;
+        responseData.taxCode = project.taxCode;
+        responseData.customerPhone = project.customerPhone;
+        responseData.projectTotal = project.totalQuantity;
+        if (project.masterSerialNumber) responseData.masterSerial = project.masterSerialNumber;
+    }
+
+    // 3. Resolve Software (Robust Fallback)
+    // Strategy A: Direct Link (Retail or Master)
+    software = await Software.findOne({ relatedHardwareSerial: trimmedSN });
+    
+    // Strategy B: Project Master (New Data)
+    if (!software && project && project.masterSerialNumber) {
+        software = await Software.findOne({ relatedHardwareSerial: project.masterSerialNumber });
+    }
+    
+    // Strategy C: Customer Code Fallback (Legacy Data / Retail with unlinked Software)
+    // Only if still not found, and we have a customer code.
+    if (!software && hardware.customerCode) {
+        // Try to find ANY software for this customer.
+        // If Customer Type is Project, we assume the first found software is the Volume License.
+        software = await Software.findOne({ customerCode: hardware.customerCode });
+        
+        // Auto-fix Hardware Info from Software if missing (Legacy Data Fix)
+        if (software) {
+            if (!responseData.companyName || responseData.companyName === '-') responseData.companyName = software.companyName;
+            if (!responseData.taxCode) responseData.taxCode = software.taxCode;
+        }
+    }
+
+    // 4. Force Display Logic
+    if (software) {
+        const { getSoftwareStatus } = require('../services/softwareService');
+        const softwareStatus = getSoftwareStatus(software);
+        
+        // FORCE TRUE for Project/Group items to ensure they see the info
+        // UPDATED: Only isMaster if strictly matches. Admin needs hasSoftware=true to show form. 
+        // Public/Activation will use isMaster to decide whether to hide/show.
+        responseData.isMaster = (software.relatedHardwareSerial === (hardware.serialNumber ? hardware.serialNumber[0] : trimmedSN));
+        responseData.hasSoftware = true;
+        
+        responseData.softwareInfo = {
+            productName: software.productName,
+            softwareAccount: software.softwareAccount,
+            softwarePassword: software.softwarePassword,
+            playerId: software.playerId,
+            licenseType: software.licenseType,
+            licenseStatus: software.licenseStatus,
+            deviceLimit: software.deviceLimit,
+            activationDate: software.activationDate,
+            endDate: software.endDate,
+            startDate: software.startDate,
+            softwareEndDate: software.endDate
+        };
+        responseData.softwareStatus = {
+            swStatusLabel: softwareStatus.statusLabel,
+            swRemainingDays: softwareStatus.remainingDays,
+            swIsExpired: softwareStatus.isExpired
+        };
+    } else {
+        responseData.isMaster = false;
+        responseData.hasSoftware = false;
+    }
+    
+    res.json(responseData);
   } catch (error) {
-    console.error('Search error:', error);
     res.status(500).json({ message: error.message });
   }
 };
 
-/**
- * Get Warranty by ID (for internal/admin use or activation check)
- */
 const getWarrantyById = async (req, res) => {
   try {
-    const warranty = await Warranty.findById(req.params.id);
-    if (!warranty) return res.status(404).json({ message: 'Not found' });
+    const hardware = await Hardware.findById(req.params.id);
+    if (!hardware) return res.status(404).json({ message: 'Not found' });
     
-    // Apply masking logic based on its own serial (since records are now individual)
-    const dataWithMasking = softwareService.getMaskedSoftwareInfo(warranty, warranty.serialNumber[0]);
+    // --- LOGIC CENTRALIZED (MIRRORS SEARCH) ---
+    const statusInfo = hardwareService.getHardwareStatus(hardware);
+    const responseData = {
+      ...hardware.toObject(),
+      ...statusInfo
+    };
+
+    let project = null;
+    let software = null;
+    const serialSN = hardware.serialNumber && hardware.serialNumber[0] ? hardware.serialNumber[0] : '';
+
+    // 1. Resolve Project (New Data)
+    if (hardware.projectId) {
+         project = await Project.findById(hardware.projectId);
+    }
+
+    // 2. Populate Hardware Info (Project > Hardware)
+    if (project) {
+        responseData.customerCode = project.customerCode;
+        responseData.companyName = project.companyName;
+        responseData.taxCode = project.taxCode;
+        responseData.customerPhone = project.customerPhone;
+        responseData.projectTotal = project.totalQuantity;
+        if (project.masterSerialNumber) responseData.masterSerial = project.masterSerialNumber;
+    }
+
+    // 3. Resolve Software (Robust Fallback)
+    // Strategy A: Direct Link (Retail or Master)
+    if (serialSN) {
+        software = await Software.findOne({ relatedHardwareSerial: serialSN });
+    }
     
-    res.json({
-      ...dataWithMasking,
-      ...hardwareService.getHardwareStatus(warranty)
-    });
+    // Strategy B: Project Master (New Data)
+    if (!software && project && project.masterSerialNumber) {
+        software = await Software.findOne({ relatedHardwareSerial: project.masterSerialNumber });
+    }
+    
+    // Strategy C: Customer Code Fallback (Legacy Data)
+    if (!software && hardware.customerCode) {
+        software = await Software.findOne({ customerCode: hardware.customerCode });
+        // Auto-fix info
+        if (software) {
+            if (!responseData.companyName || responseData.companyName === '-') responseData.companyName = software.companyName;
+            if (!responseData.taxCode) responseData.taxCode = software.taxCode;
+        }
+    }
+
+    // 4. Force Display Logic
+    if (software) {
+        const { getSoftwareStatus } = require('../services/softwareService');
+        const softwareStatus = getSoftwareStatus(software);
+        
+        // FORCE TRUE for Project/Group items to ensure they see the info
+        // UPDATED for ID Lookup: Only isMaster if strictly matches.
+        responseData.isMaster = (software.relatedHardwareSerial === (hardware.serialNumber ? hardware.serialNumber[0] : '')); 
+        responseData.hasSoftware = true;
+        
+        responseData.softwareInfo = {
+            productName: software.productName,
+            softwareAccount: software.softwareAccount,
+            softwarePassword: software.softwarePassword,
+            playerId: software.playerId,
+            licenseType: software.licenseType,
+            licenseStatus: software.licenseStatus,
+            deviceLimit: software.deviceLimit,
+            activationDate: software.activationDate,
+            endDate: software.endDate,
+            startDate: software.startDate,
+            softwareEndDate: software.endDate
+        };
+        responseData.softwareStatus = {
+            swStatusLabel: softwareStatus.statusLabel,
+            swRemainingDays: softwareStatus.remainingDays,
+            swIsExpired: softwareStatus.isExpired
+        };
+    } else {
+        responseData.isMaster = false;
+        responseData.hasSoftware = false;
+    }
+    
+    res.json(responseData);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
+// Admin handlers likely used by routes but handled via services? 
+// The routes usually call controller methods. 
+// I need checking generic methods.
+// The previous controller didn't have create/update/delete?
+// Ah, `warrantyRoutes.js` likely maps to `warrantyController` or uses services directly?
+// Let's check `warrantyRoutes.js` in next step.
+// `warrantyController` had `searchWarranty`, `getWarrantyById`.
+// Where are Create/Update/Delete?
+// `warrantyRoutes` might define them using `hardwareService` directly or controller methods?
+// `warrantyRoutes` likely has: router.post('/', ...);
 
 module.exports = {
   searchWarranty,

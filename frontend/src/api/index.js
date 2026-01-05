@@ -1,26 +1,38 @@
 import axios from 'axios';
 
-// Sử dụng biến môi trường của Vite, nếu không có sẽ lấy mặc định là URL Render của bạn
 const api = axios.create({
-  // baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5001/api',
-  baseURL: import.meta.env.VITE_API_URL || 'https://smartretail-warranty.onrender.com/api'
+  baseURL: import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5001/api' : 'https://smartretail-warranty.onrender.com/api')
 });
 
-
-export const warrantyApi = {
+export const hardwareApi = {
   create: (data) => api.post('/warranties', data),
   getAll: (params) => api.get('/warranties', { params }),
   update: (id, data) => api.put(`/warranties/${id}`, data),
   delete: (id) => api.delete(`/warranties/${id}`),
   bulkDelete: (ids) => api.post('/warranties/bulk-delete', { ids }),
+  getById: (id) => api.get(`/warranty/check/${id}`),
+  check: (id) => api.get(`/warranty/check/${id}`),
   search: (data) => api.post('/warranty/search', data),
-  getByPhone: (phone) => api.get(`/warranty/by-phone/${phone}`),
-  getByTax: (taxCode) => api.get(`/warranty/by-tax/${taxCode}`),
+  activate: (id) => api.post(`/warranties/${id}/activate`),
   import: (formData) => api.post('/warranties/import', formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   }),
-  check: (id) => api.get(`/warranty/check/${id}`),
-  activate: (id) => api.post(`/warranties/${id}/activate`),
+};
+
+export const warrantyApi = hardwareApi;
+
+export const softwareApi = {
+  create: (data) => api.post('/software', data),
+  getAll: (params) => api.get('/software', { params }),
+  getById: (id) => api.get(`/software/${id}`),
+  update: (id, data) => api.put(`/software/${id}`, data),
+  delete: (id) => api.delete(`/software/${id}`),
+  bulkDelete: (ids) => api.post('/software/bulk-delete', { ids }),
+  activate: (id) => api.post(`/software/${id}/activate`),
+};
+
+export const searchApi = {
+  searchProducts: (data) => api.post('/search', data),
 };
 
 export default api;
