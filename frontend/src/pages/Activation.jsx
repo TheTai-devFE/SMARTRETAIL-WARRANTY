@@ -56,26 +56,28 @@ const Activation = () => {
   if (!warranty) return null;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] relative overflow-hidden font-sans flex flex-col">
-      <Navbar />
+    <div className="min-h-screen bg-slate-50 relative overflow-hidden font-sans flex flex-col">
+      {/* Animated background elements */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-gradient-to-b from-primary-50/50 via-accent-50/30 to-transparent -z-10 blur-3xl opacity-60 animate-pulse"></div>
+      <div className="absolute top-40 right-0 w-96 h-96 bg-gradient-to-l from-accent-100/40 to-transparent -z-10 blur-3xl rounded-full float-animation"></div>
+      <div className="absolute bottom-40 left-0 w-96 h-96 bg-gradient-to-r from-primary-100/40 to-transparent -z-10 blur-3xl rounded-full float-animation" style={{ animationDelay: '1s' }}></div>
 
-      {/* Background Decor */}
-      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-primary-50/30 to-transparent -z-10"></div>
+      <Navbar />
 
       <div className="flex-1 flex items-center justify-center py-20 px-4 md:py-24">
         <div className="w-full max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-[40px] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.06)] overflow-hidden border border-slate-100/50"
+            className="glass-card overflow-hidden"
           >
             <div className="p-6 md:p-10 lg:p-12">
               {/* Header Section - Compact */}
-              <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-6 mb-8 border-b border-slate-50 pb-8">
+              <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-6 mb-8 border-b border-slate-100 pb-8">
                 <div className="space-y-2 text-center md:text-left flex-1">
-                  <div className="inline-flex items-center gap-2 px-2.5 py-0.5 bg-primary-50 rounded-full">
-                    <ShieldCheck size={12} className="text-primary-600" />
-                    <span className="text-[9px] font-black text-primary-600 uppercase tracking-[0.2em]">Sản phẩm chính hãng</span>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-gradient-to-r from-primary-50 to-accent-50 rounded-full border border-primary-200/50">
+                    <ShieldCheck size={14} className="text-primary-600" />
+                    <span className="text-xs font-bold text-primary-700 uppercase tracking-wider">Sản phẩm chính hãng</span>
                   </div>
                   <h1 className="text-3xl md:text-5xl font-black text-slate-900 leading-tight tracking-tight">
                     {warranty.productName}
@@ -85,9 +87,9 @@ const Activation = () => {
                   </p>
                 </div>
 
-                <div className={`shrink-0 flex items-center gap-3 px-6 py-4 rounded-3xl border-2 ${warranty.status === 'Activated'
-                  ? 'bg-emerald-50/50 border-emerald-100 text-emerald-600'
-                  : 'bg-amber-50/50 border-amber-100 text-amber-600'
+                <div className={`shrink-0 flex items-center gap-3 px-6 py-4 rounded-2xl border-2 ${warranty.status === 'Activated'
+                  ? 'bg-gradient-to-br from-emerald-50 to-emerald-100/50 border-emerald-200 text-emerald-700'
+                  : 'bg-gradient-to-br from-amber-50 to-amber-100/50 border-amber-200 text-amber-700'
                   }`}>
                   <div className={`w-2.5 h-2.5 rounded-full animate-pulse ${warranty.status === 'Activated' ? 'bg-emerald-500' : 'bg-amber-500'
                     }`}></div>
@@ -107,7 +109,7 @@ const Activation = () => {
                   <div className="space-y-4">
                     <div className="flex items-center gap-3 px-1">
                       <ShieldCheck size={18} className="text-emerald-500" />
-                      <h3 className="font-black text-slate-800 text-xs uppercase tracking-[0.15em]">Bản quyền phần mềm</h3>
+                      <h3 className="font-black text-slate-800 text-xs uppercase tracking-wider">Bản quyền phần mềm</h3>
                     </div>
 
                     <SoftwareInfoCard
@@ -118,9 +120,9 @@ const Activation = () => {
                 )}
 
                 {/* Action Section - Inline & Compact */}
-                <div className="pt-8 border-t border-slate-50">
+                <div className="pt-8 border-t border-slate-100">
                   {warranty.status !== 'Activated' ? (
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-6 bg-slate-50/50 p-6 rounded-3xl border border-slate-100">
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-6 bg-gradient-to-br from-slate-50 to-white p-6 rounded-2xl border border-slate-200">
                       <div className="space-y-1">
                         <p className="font-black text-lg text-slate-900 tracking-tight">Xác nhận kích hoạt</p>
                         <p className="text-slate-500 text-xs md:text-sm font-medium leading-relaxed">
@@ -130,7 +132,7 @@ const Activation = () => {
                       <button
                         onClick={handleActivate}
                         disabled={activating}
-                        className="w-full md:w-auto bg-primary-600 hover:bg-primary-700 text-white font-black py-4 px-10 rounded-2xl shadow-xl shadow-primary-500/30 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 flex items-center justify-center gap-2 text-sm uppercase tracking-wider"
+                        className="gradient-button w-full md:w-auto text-white font-black py-4 px-10 rounded-2xl shadow-xl shadow-primary-500/30 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 flex items-center justify-center gap-2 text-sm uppercase tracking-wider"
                       >
                         {activating ? (
                           <div className="w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -156,7 +158,7 @@ const Activation = () => {
           </motion.div>
 
           <div className="text-center mt-6">
-            <p className="text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em]">SmartRetail Warranty Management</p>
+            <p className="text-slate-400 text-xs font-bold uppercase tracking-wider">SmartRetail Warranty Management</p>
           </div>
         </div>
       </div>

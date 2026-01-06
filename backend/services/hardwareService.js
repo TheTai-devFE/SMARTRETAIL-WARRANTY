@@ -80,12 +80,27 @@ const createWarranty = async (data) => {
     projectId = newProject._id;
   }
 
+  // Handle Date Logic for Manual/Upload Creation
+  let finalStatus = rest.status || 'Pending';
+  let finalActivationDate = rest.activationDate ? new Date(rest.activationDate) : null;
+  let finalEndDate = rest.endDate ? new Date(rest.endDate) : null;
+  let period = parseInt(rest.warrantyPeriod) || 24;
+
+  if (finalActivationDate && !finalEndDate) {
+      if (!finalActivationDate) finalActivationDate = new Date();
+      finalEndDate = new Date(finalActivationDate);
+      finalEndDate.setMonth(finalEndDate.getMonth() + period);
+      finalStatus = 'Activated'; // Ensure status matches date
+  }
+
   // Create Hardware Records
   const toInsert = finalSerialNumbers.map(sn => ({
     ...rest,
     customerCode: finalCustomerCode,
     serialNumber: [sn],
-    status: 'Pending',
+    status: finalStatus,
+    activationDate: finalActivationDate,
+    endDate: finalEndDate,
     projectId: projectId, // Link to Project
     deliveryAddress: rest.deliveryAddress // Specific address
   }));
@@ -141,7 +156,17 @@ const createWarranty = async (data) => {
 };
 
 const activateWarranty = async (id) => {
-  const hardware = await Hardware.findById(id);
+  let hardware;
+  const isObjectId = /^[0-9a-fA-F]{24}$/.test(id);
+  
+  if (isObjectId) {
+    hardware = await Hardware.findById(id);
+  }
+  
+  if (!hardware) {
+    hardware = await Hardware.findOne({ serialNumber: id });
+  }
+
   if (!hardware) throw new Error('Không tìm thấy bản ghi bảo hành');
   if (hardware.status === 'Activated') throw new Error('Bảo hành đã được kích hoạt trước đó');
 
@@ -221,6 +246,19 @@ const updateWarranty = async (id, data) => {
         ...rest 
     } = data;
     
+    // Auto-calculate EndDate if Updating Activation
+    if (rest.activationDate && !rest.endDate) {
+        // We try to use provided period, or default to 24 if missing. 
+        // For accurate update without period in payload, we'd need to fetch DB, 
+        // but assuming Edit Form sends all fields or default is acceptable.
+        const period = parseInt(rest.warrantyPeriod) || 24; 
+        const actDate = new Date(rest.activationDate);
+        const end = new Date(actDate);
+        end.setMonth(end.getMonth() + period);
+        rest.endDate = end;
+        rest.status = 'Activated';
+    }
+    
     // Update Hardware
     const updated = await Hardware.findByIdAndUpdate(id, rest, { new: true });
     if (!updated) throw new Error('Không tìm thấy bản ghi');
@@ -276,7 +314,7 @@ const updateWarranty = async (id, data) => {
     } else if (!hasSoftware) {
         // If hasSoftware is false, delete existing software
         await Software.deleteMany({ 
-            relatedHardwareSerial: serial,
+            relatedHardwareSerial: targetSerial,
             customerCode: updated.customerCode 
         });
     }

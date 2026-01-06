@@ -5,5 +5,6 @@ const excelService = require('./excelService');
 module.exports = {
   hardwareService,
   softwareService,
-  excelService
+  excelService,
+  repairService: require('./repairService')
 };

@@ -69,8 +69,13 @@ const parseAndValidateExcel = async (buffer) => {
     const swInfo = softwareService.formatSoftwareImport(row, serials[0]);
     const hasSW = !!swInfo;
 
-    // OPTIMIZATION: Do not split serials. 
-    // Pass the array to createWarranty service to handle Project grouping automatically.
+    // Support Activation Date and End Date from Excel
+    const activationDate = row.activationDate || row['Ngày kích hoạt'];
+    const endDate = row.endDate || row['Ngày hết hạn'];
+    const warrantyPeriod = parseInt(row.warrantyPeriod || row['Thời hạn bảo hành']) || 24;
+    
+    let status = row.status || 'Pending';
+    if (activationDate) status = 'Activated';
     
     return {
       companyName: row.companyName || row['Công ty'],
@@ -79,12 +84,14 @@ const parseAndValidateExcel = async (buffer) => {
       customerPhone: String(row.customerPhone || row['Số điện thoại'] || ''),
       productCode: row.productCode || row['Mã sản phẩm'],
       productName: row.productName || row['Tên sản phẩm'],
-      serialNumbers: serials, // Pass Array
-      serialNumber: serials[0], // Fallback/First SN
+      serialNumbers: serials, 
+      serialNumber: serials[0], 
       customerType: row.customerType || 'Retail',
-      warrantyPeriod: parseInt(row.warrantyPeriod || row['Thời hạn bảo hành']) || 24,
+      warrantyPeriod: warrantyPeriod,
       startDate: row.startDate ? new Date(row.startDate) : new Date(),
-      status: 'Pending',
+      activationDate: activationDate ? new Date(activationDate) : null,
+      endDate: endDate ? new Date(endDate) : null,
+      status: status,
       hasSoftware: hasSW,
       softwareInfo: swInfo
     };

@@ -1,5 +1,5 @@
 import { format } from 'date-fns';
-import { Calendar, Key, RefreshCcw, Shield, User } from 'lucide-react';
+import { Calendar, LucideTimer, RefreshCcw, Shield, User } from 'lucide-react';
 
 const InfoItem = ({ icon: Icon, label, value, className = "" }) => (
     <div className={`flex items-start gap-4 ${className}`}>
@@ -25,7 +25,7 @@ const SoftwareInfoBlock = ({ software }) => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <InfoItem
-                        icon={Key}
+                        icon={LucideTimer}
                         label="Loại Bản Quyền"
                         value={<span className="font-bold text-lg">{software.licenseType?.replace('_', ' ') || 'Standard'}</span>}
                     />

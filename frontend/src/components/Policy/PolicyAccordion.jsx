@@ -15,13 +15,12 @@ const PolicyAccordion = ({ data }) => {
 
         <div className="space-y-4">
           {data.map((item, idx) => (
-            <div 
-              key={idx} 
-              className={`rounded-2xl overflow-hidden border transition-all ${
-                activeIndex === idx 
-                  ? 'border-primary-200 bg-white shadow-xl shadow-primary-500/5' 
-                  : 'border-slate-200 bg-slate-50 hover:bg-white'
-              }`}
+            <div
+              key={idx}
+              className={`rounded-2xl overflow-hidden border transition-all ${activeIndex === idx
+                ? 'border-primary-200 bg-white shadow-xl shadow-primary-500/5'
+                : 'border-slate-200 bg-slate-50 hover:bg-white'
+                }`}
             >
               <button
                 onClick={() => setActiveIndex(activeIndex === idx ? -1 : idx)}
@@ -47,6 +46,7 @@ const PolicyAccordion = ({ data }) => {
                     transition={{ duration: 0.3 }}
                   >
                     <div className="px-8 pb-8 space-y-4 border-t border-slate-50 pt-6">
+
                       {item.content.map((point, pIdx) => (
                         <div key={pIdx} className="flex gap-4 items-start group">
                           <CheckCircle2 size={18} className="mt-1 text-primary-500 shrink-0 opacity-60 group-hover:opacity-100 transition-opacity" />

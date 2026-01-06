@@ -4,6 +4,7 @@ import Activation from './pages/Activation';
 import AdminDashboard from './pages/AdminDashboard';
 import Home from './pages/Home';
 import PolicyPage from './pages/PolicyPage';
+import RepairRequestPage from './pages/RepairRequestPage';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/chinh-sach" element={<PolicyPage />} />
+          <Route path="/yeu-cau-sua-chua" element={<RepairRequestPage />} />
           <Route path="/activate/:id" element={<Activation />} />
         </Routes>
       </div>

@@ -23,7 +23,7 @@ const ActivateWarranty = () => {
     const fetchInfo = async () => {
       try {
         setLoading(true);
-        const res = await warrantyApi.getInfo(serial);
+        const res = await warrantyApi.check(serial);
         setWarranty(res.data);
       } catch (err) {
         setError(err.response?.data?.message || 'Không tìm thấy thông tin sản phẩm');
@@ -65,7 +65,7 @@ const ActivateWarranty = () => {
       <Navbar />
       <div className="max-w-2xl mx-auto px-4 mt-12 space-y-8">
         <div className="text-center space-y-4">
-          <motion.div 
+          <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             className="inline-block p-4 bg-primary-50 rounded-3xl text-primary-600 mb-2"
@@ -81,7 +81,7 @@ const ActivateWarranty = () => {
         </div>
 
         {error ? (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             className="glass-card p-12 text-center space-y-4 border-rose-100"
           >
@@ -93,7 +93,7 @@ const ActivateWarranty = () => {
             <a href="/" className="inline-block pt-4 text-primary-600 font-bold hover:underline">Về trang chủ</a>
           </motion.div>
         ) : success ? (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
             className="glass-card p-8 md:p-12 text-center space-y-6 border-emerald-100"
           >
@@ -104,7 +104,7 @@ const ActivateWarranty = () => {
               <h2 className="text-3xl font-black text-slate-800 tracking-tight">Kích Hoạt Thành Công!</h2>
               <p className="text-slate-500 font-medium">Bảo hành điện tử đã được thiết lập cho thiết bị của bạn.</p>
             </div>
-            
+
             <div className="bg-slate-50 rounded-2xl p-6 text-left space-y-4 border border-slate-100">
               <div className="flex justify-between items-center border-b border-slate-200/60 pb-3">
                 <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Sản phẩm</span>
@@ -120,7 +120,7 @@ const ActivateWarranty = () => {
               </div>
             </div>
 
-            <button 
+            <button
               onClick={() => window.location.href = '/'}
               className="w-full bg-slate-900 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-slate-800 transition-all uppercase tracking-widest text-sm"
             >
@@ -129,7 +129,7 @@ const ActivateWarranty = () => {
           </motion.div>
         ) : (
           <div className="space-y-6">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
               className="glass-card p-6 border-primary-100 bg-primary-50/30"
             >
@@ -145,9 +145,9 @@ const ActivateWarranty = () => {
               </div>
             </motion.div>
 
-            <motion.div 
-               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-               className="glass-card p-8 space-y-8"
+            <motion.div
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+              className="glass-card p-8 space-y-8"
             >
               <div className="space-y-2">
                 <h3 className="text-xl font-black text-slate-800">Thông tin kích hoạt</h3>
@@ -160,13 +160,13 @@ const ActivateWarranty = () => {
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Số điện thoại liên hệ *</label>
                     <div className="relative group">
                       <Phone className="absolute left-4 top-3.5 text-slate-400 group-focus-within:text-primary-500 transition-colors" size={18} />
-                      <input 
+                      <input
                         required
                         type="tel"
                         placeholder="Nhập số điện thoại của bạn..."
                         className="w-full pl-12 pr-4 py-3.5 rounded-2xl border border-slate-200 outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500 transition-all bg-slate-50/50 font-semibold"
                         value={formData.customerPhone}
-                        onChange={e => setFormData({...formData, customerPhone: e.target.value})}
+                        onChange={e => setFormData({ ...formData, customerPhone: e.target.value })}
                       />
                     </div>
                   </div>
@@ -175,12 +175,12 @@ const ActivateWarranty = () => {
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Tên khách hàng / Đơn vị</label>
                     <div className="relative group">
                       <User className="absolute left-4 top-3.5 text-slate-400 group-focus-within:text-primary-500 transition-colors" size={18} />
-                      <input 
+                      <input
                         type="text"
                         placeholder="Tên cá nhân hoặc công ty sở hữu..."
                         className="w-full pl-12 pr-4 py-3.5 rounded-2xl border border-slate-200 outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500 transition-all bg-slate-50/50 font-semibold"
                         value={formData.companyName}
-                        onChange={e => setFormData({...formData, companyName: e.target.value})}
+                        onChange={e => setFormData({ ...formData, companyName: e.target.value })}
                       />
                     </div>
                   </div>
@@ -190,12 +190,12 @@ const ActivateWarranty = () => {
                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Mã số thuế (nếu có)</label>
                       <div className="relative group">
                         <Building className="absolute left-4 top-3.5 text-slate-400 group-focus-within:text-primary-500 transition-colors" size={18} />
-                        <input 
+                        <input
                           type="text"
                           placeholder="Nhập mã số thuế doanh nghiệp..."
                           className="w-full pl-12 pr-4 py-3.5 rounded-2xl border border-slate-200 outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500 transition-all bg-slate-50/50 font-semibold"
                           value={formData.taxCode}
-                          onChange={e => setFormData({...formData, taxCode: e.target.value})}
+                          onChange={e => setFormData({ ...formData, taxCode: e.target.value })}
                         />
                       </div>
                     </motion.div>
@@ -209,12 +209,12 @@ const ActivateWarranty = () => {
                   </p>
                 </div>
 
-                <button 
+                <button
                   disabled={activating}
                   className="w-full bg-primary-600 hover:bg-primary-700 text-white font-black py-4 rounded-2xl shadow-xl shadow-primary-500/20 transition-all flex items-center justify-center gap-3 disabled:opacity-50 active:scale-[0.98]"
                 >
                   {activating ? (
-                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                   ) : (
                     <>
                       <ShieldCheck size={20} className="stroke-[3]" />

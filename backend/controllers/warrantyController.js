@@ -109,8 +109,20 @@ const searchWarranty = async (req, res) => {
 
 const getWarrantyById = async (req, res) => {
   try {
-    const hardware = await Hardware.findById(req.params.id);
-    if (!hardware) return res.status(404).json({ message: 'Not found' });
+    let hardware;
+    // Check if valid ObjectId
+    const isObjectId = /^[0-9a-fA-F]{24}$/.test(req.params.id);
+    
+    if (isObjectId) {
+      hardware = await Hardware.findById(req.params.id);
+    } 
+    
+    // If not ObjectId or not found by ID, try finding by Serial Number
+    if (!hardware) {
+       hardware = await Hardware.findOne({ serialNumber: req.params.id });
+    }
+
+    if (!hardware) return res.status(404).json({ message: 'Không tìm thấy thông tin bảo hành' });
     
     // --- LOGIC CENTRALIZED (MIRRORS SEARCH) ---
     const statusInfo = hardwareService.getHardwareStatus(hardware);

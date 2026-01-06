@@ -17,10 +17,12 @@ app.use(express.json());
 // Routes
 const softwareRoutes = require('./routes/softwareRoutes');
 const searchRoutes = require('./routes/searchRoutes');
+const repairRoutes = require('./routes/repairRequestRoutes');
 
 app.use('/api', warrantyRoutes);
 app.use('/api/software', softwareRoutes);
 app.use('/api/search', searchRoutes);
+app.use('/api/repair-requests', repairRoutes);
 
 // Database Connection
 const MONGODB_URI = process.env.MONGODB_URI;

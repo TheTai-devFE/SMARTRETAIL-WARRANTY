@@ -14,9 +14,12 @@ export const warrantyPolicyData = {
         id: "main",
         label: "Thiết bị chính",
         items: [
-          { name: "Màn hình tương tác", period: "24 Tháng", type: "Sửa chữa/Thay thế", scope: "Lỗi phần cứng từ nhà sản xuất" },
-          { name: "Máy tính OPS", period: "12 Tháng", type: "Sửa chữa", scope: "Lỗi linh kiện, nguồn, bo mạch" },
-          { name: "Kiosk tra cứu", period: "24 Tháng", type: "Tại chỗ", scope: "Khung sườn và thiết bị hiển thị" }
+          { name: "Màn Hình Quảng Cáo", period: "24 Tháng", type: "Sửa chữa/Thay thế", scope: "Lỗi từ nhà sản xuất" },
+          { name: "Màn Hình Treo Tường", period: "24 Tháng", type: "Sửa chữa/Thay thế", scope: "Lỗi từ nhà sản xuất" },
+          { name: "Màn Hình Tương Tác", period: "24 Tháng", type: "Sửa chữa/Thay thế", scope: "Lỗi từ nhà sản xuất" },
+          { name: "Màn Hình Chân Quỳ", period: "24 Tháng", type: "Sửa chữa/Thay thế", scope: "Lỗi từ nhà sản xuất" },
+          { name: "Màn Hình Ghép", period: "24 Tháng", type: "Sửa chữa/Thay thế", scope: "Lỗi từ nhà sản xuất" },
+          { name: "Màn Hình LED", period: "24 Tháng", type: "Sửa chữa/Thay thế", scope: "Lỗi từ nhà sản xuất" },
         ]
       },
       {
@@ -25,14 +28,17 @@ export const warrantyPolicyData = {
         items: [
           { name: "Bút tương tác", period: "06 Tháng", type: "Đổi mới", scope: "Lỗi cảm ứng, không nhận tín hiệu" },
           { name: "Giá treo/Chân đế", period: "12 Tháng", type: "Thay thế", scope: "Lỗi kết cấu, mối hàn" },
-          { name: "Cáp kết nối", period: "03 Tháng", type: "Đổi mới", scope: "Đứt ngầm, không truyền dữ liệu" }
+          { name: "Cáp kết nối", period: "03 Tháng", type: "Đổi mới", scope: "Đứt ngầm, không truyền dữ liệu" },
+          { name: "Máy tính OPS", period: "12 Tháng", type: "Sửa chữa", scope: "Lỗi linh kiện, nguồn, bo mạch" },
+          { name: "Tấm nền", period: "24 Tháng", type: "Thay", scope: "Sọc màn, Đen màn" },
+
         ]
       },
       {
         id: "parts",
         label: "Linh kiện tiêu hao",
         items: [
-          { name: "Pin/Acquy", period: "06 Tháng", type: "Thay thế", scope: "Chai pin > 50%, phồng pin" },
+          { name: "Dây nguồn, Ăngten", period: "06 Tháng", type: "Thay thế", scope: "Hư hỏng" },
           { name: "Điều khiển (Remote)", period: "06 Tháng", type: "Đổi mới", scope: "Lỗi phím bấm, mắt nhận" }
         ]
       }
@@ -41,6 +47,7 @@ export const warrantyPolicyData = {
   policies: [
     {
       title: "Điều kiện được bảo hành",
+      subtitle:"Thời gian bảo hành: 12 tháng cho toàn hệ thống và/hoặc cho từng thiết bị theo qui định của Nhà sản xuất. Chúng tôi căn cứ vào PHIẾU BẢO HÀNH để quản lý bảo hành cho Quý khách hàng. Ngoài ra chúng tôi căn cứ vào các chứng từ liên quan khác tùy vào Hợp đồng; Đơn hàng; Dự án; Công trình thực hiện, như:",
       content: [
         "Sản phẩm còn trong thời hạn bảo hành tính đến thời điểm yêu cầu.",
         "Sản phẩm có số Serial/IMEI trùng khớp với hệ thống quản lý.",
@@ -69,8 +76,9 @@ export const warrantyPolicyData = {
     }
   ],
   support: [
-    { title: "Tổng đài hỗ trợ", desc: "1900 xxxx (8:00 - 17:30)", icon: "PhoneCall", cta: "Gọi ngay" },
-    { title: "Chat trực tuyến", desc: "Hỗ trợ kỹ thuật qua Zalo/Facebook", icon: "MessageSquare", cta: "Chat ngay" },
-    { title: "Trung tâm bảo hành", desc: "Hệ thống điểm tiếp nhận toàn quốc", icon: "MapPin", cta: "Tìm kiếm" }
+    { title: "Hotline Liên hệ", desc: "Hotline: 0935888489", icon: "PhoneCall", cta: "Gọi ngay", link: "tel:0935888489" },
+    { title: "Hỗ trợ trực tuyến ", desc: "Liên hệ (Zalo/SĐT): 0909 045 663", icon: "MessageSquare", cta: "Chat ngay", link: "https://zalo.me/0909045663" },
+    { title: "Trung tâm bảo hành", desc: "A60 Tô Ký, P. Đông Hưng Thuận, Quận 12, TP.HCM ", icon: "MapPin", cta: "Tìm kiếm", link: "https://maps.google.com/?q=A60 Tô Ký, P. Đông Hưng Thuận, Quận 12, TP.HCM" },
+    { title: "Gửi Yêu Cầu", desc: "Tạo phiếu yêu cầu sủa chữa trực tuyến.", icon: "PenTool", cta: "Gửi ngay", link: "/yeu-cau-sua-chua" }
   ]
 };

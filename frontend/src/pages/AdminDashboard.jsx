@@ -1,12 +1,13 @@
 import { format } from 'date-fns';
 import { AnimatePresence, motion } from 'framer-motion';
-import { AppWindow, Building, ChevronRight, ExternalLink, Fingerprint, HardDrive, Phone, Plus, QrCode, Search, Trash2, Upload, X } from 'lucide-react';
+import { AppWindow, Building, ChevronRight, ExternalLink, Fingerprint, HardDrive, Phone, Plus, QrCode, Search, Trash2, Upload, Wrench, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import QRCode from 'react-qr-code';
 import { Link } from 'react-router-dom';
-import { softwareApi, warrantyApi } from '../api';
+import { repairApi, softwareApi, warrantyApi } from '../api';
 import logo from '../assets/logo-white.png';
+import RepairTableRow from '../components/Admin/RepairTableRow';
 import SoftwareForm from '../components/Admin/SoftwareForm';
 import SoftwareTableRow from '../components/Admin/SoftwareTableRow';
 import WarrantyForm from '../components/Admin/WarrantyForm';
@@ -17,6 +18,7 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('Hardware'); // 'Hardware' | 'Software'
   const [warranties, setWarranties] = useState([]);
   const [softwareList, setSoftwareList] = useState([]);
+  const [repairRequests, setRepairRequests] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [confirmConfig, setConfirmConfig] = useState({ isOpen: false, title: '', message: '', onConfirm: () => { }, type: 'danger' });
@@ -85,10 +87,14 @@ const AdminDashboard = () => {
         const res = await warrantyApi.getAll(cleanFilters);
         setWarranties(res.data.data);
         setPagination(res.data.pagination);
-      } else {
+      } else if (activeTab === 'Software') {
         const res = await softwareApi.getAll(cleanFilters);
         setSoftwareList(res.data.data);
         setPagination(res.data.pagination);
+      } else if (activeTab === 'Repair') {
+        const res = await repairApi.getAll();
+        setRepairRequests(res.data);
+        setPagination({ total: res.data.length, page: 1, totalPages: 1 });
       }
     } catch (err) {
       console.error(err);
@@ -240,8 +246,10 @@ const AdminDashboard = () => {
         try {
           if (activeTab === 'Hardware') {
             await warrantyApi.delete(id);
-          } else {
+          } else if (activeTab === 'Software') {
             await softwareApi.delete(id);
+          } else {
+            await repairApi.delete(id);
           }
           toast.success('Đã xóa bản ghi', { id: loadingToast });
           fetchData();
@@ -250,6 +258,34 @@ const AdminDashboard = () => {
         }
       }
     });
+  };
+
+  const [statusUpdate, setStatusUpdate] = useState({ id: null, status: '', showModal: false, duration: '0' });
+
+  const handleUpdateRepairStatus = async (id, status) => {
+    if (status === 'completed') {
+      setStatusUpdate({ id, status, showModal: true, duration: '0' });
+    } else {
+      await updateStatusAPI(id, status);
+    }
+  };
+
+  const updateStatusAPI = async (id, status, warrantyDuration) => {
+    const loadingToast = toast.loading('Đang cập nhật...');
+    try {
+      await repairApi.updateStatus(id, status, warrantyDuration);
+      toast.success('Cập nhật trạng thái thành công', { id: loadingToast });
+      fetchData();
+    } catch (error) {
+      toast.error('Lỗi cập nhật trạng thái', { id: loadingToast });
+    }
+  };
+
+  const confirmWarrantyUpdate = async () => {
+    const { id, status, duration } = statusUpdate;
+    if (!id) return;
+    setStatusUpdate({ ...statusUpdate, showModal: false }); // Close modal
+    await updateStatusAPI(id, status, duration);
   };
 
   const handlePageChange = (newPage) => {
@@ -283,7 +319,11 @@ const AdminDashboard = () => {
   };
 
   const handleSelectAll = (e) => {
-    const list = activeTab === 'Hardware' ? warranties : softwareList;
+    let list = [];
+    if (activeTab === 'Hardware') list = warranties;
+    else if (activeTab === 'Software') list = softwareList;
+    else list = repairRequests;
+
     if (e.target.checked) {
       setSelectedIds(list.map(w => w._id));
     } else {
@@ -308,8 +348,12 @@ const AdminDashboard = () => {
         try {
           if (activeTab === 'Hardware') {
             await warrantyApi.bulkDelete(selectedIds);
-          } else {
+          } else if (activeTab === 'Software') {
             await softwareApi.bulkDelete(selectedIds);
+          } else {
+            // Maybe implement bulk delete for repair later
+            // For now just loop delete or warn
+            await Promise.all(selectedIds.map(id => repairApi.delete(id)));
           }
           setSelectedIds([]);
           toast.success('Đã xóa các bản ghi được chọn', { id: loadingToast });
@@ -327,12 +371,17 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-20 ">
+    <div className="min-h-screen bg-slate-50 pb-20 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-gradient-to-b from-primary-50/50 via-accent-50/30 to-transparent -z-10 blur-3xl opacity-60 animate-pulse"></div>
+      <div className="absolute top-40 right-0 w-96 h-96 bg-gradient-to-l from-accent-100/40 to-transparent -z-10 blur-3xl rounded-full float-animation"></div>
+      <div className="absolute bottom-40 left-0 w-96 h-96 bg-gradient-to-r from-primary-100/40 to-transparent -z-10 blur-3xl rounded-full float-animation" style={{ animationDelay: '1s' }}></div>
+
       <nav className="bg-slate-900 text-white sticky top-0 z-50 mb-8">
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-4">
             <Link to="/" className="flex items-center gap-2 font-black text-2xl tracking-tighter group transition-transform active:scale-95">
-              <img src={logo} alt="Logo" className="h-8 md:h-10 w-auto" />
+              <img src={logo} alt="Smart Retail Logo" className="h-8 md:h-10 w-auto" />
             </Link>
             <span className="h-6 w-px bg-slate-700"></span>
             <span className="text-xs font-black uppercase tracking-[0.2em] text-primary-400">Technician Portal</span>
@@ -369,12 +418,14 @@ const AdminDashboard = () => {
                 </button>
               </>
             )}
-            <button
-              onClick={() => { resetForm(); setIsModalOpen(true); }}
-              className="bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-all flex items-center gap-2"
-            >
-              <Plus size={20} /> Thêm {activeTab === 'Hardware' ? 'Phần Cứng' : 'Phần Mềm'}
-            </button>
+            {activeTab !== 'Repair' && (
+              <button
+                onClick={() => { resetForm(); setIsModalOpen(true); }}
+                className="bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-all flex items-center gap-2"
+              >
+                <Plus size={20} /> Thêm {activeTab === 'Hardware' ? 'Phần Cứng' : 'Phần Mềm'}
+              </button>
+            )}
           </div>
         </div>
 
@@ -393,6 +444,13 @@ const AdminDashboard = () => {
               }`}
           >
             <AppWindow size={18} /> Phần Mềm
+          </button>
+          <button
+            onClick={() => setActiveTab('Repair')}
+            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === 'Repair' ? 'bg-white text-slate-900 shadow-md' : 'text-slate-500 hover:text-slate-700'
+              }`}
+          >
+            <Wrench size={18} /> Sửa Chữa
           </button>
         </div>
 
@@ -436,7 +494,7 @@ const AdminDashboard = () => {
                   onChange={(e) => setFilters({ ...filters, serialNumber: e.target.value.toUpperCase(), page: 1 })}
                 />
               </div>
-            ) : (
+            ) : activeTab === 'Software' ? (
               // Software Filters
               <div className="relative group">
                 <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors" />
@@ -448,38 +506,42 @@ const AdminDashboard = () => {
                   onChange={(e) => setFilters({ ...filters, customerCode: e.target.value, page: 1 })}
                 />
               </div>
-            )}
+            ) : null}
 
-            <div className="relative group">
-              <Phone size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors" />
-              <input
-                type="text"
-                placeholder="Số điện thoại..."
-                className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 text-sm outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500 transition-all font-medium bg-white placeholder:text-slate-300"
-                value={filters.customerPhone}
-                onChange={(e) => setFilters({ ...filters, customerPhone: e.target.value, page: 1 })}
-              />
-            </div>
-            <div className="relative group">
-              <Fingerprint size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors" />
-              <input
-                type="text"
-                placeholder="Mã số thuế..."
-                className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 text-sm outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500 transition-all font-mono font-bold bg-white placeholder:text-slate-300"
-                value={filters.taxCode}
-                onChange={(e) => setFilters({ ...filters, taxCode: e.target.value, page: 1 })}
-              />
-            </div>
-            <div className="relative group">
-              <Building size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors" />
-              <input
-                type="text"
-                placeholder="Tên khách hàng..."
-                className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 text-sm outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500 transition-all font-medium bg-white placeholder:text-slate-300"
-                value={filters.companyName}
-                onChange={(e) => setFilters({ ...filters, companyName: e.target.value, page: 1 })}
-              />
-            </div>
+            {activeTab !== 'Repair' && (
+              <>
+                <div className="relative group">
+                  <Phone size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors" />
+                  <input
+                    type="text"
+                    placeholder="Số điện thoại..."
+                    className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 text-sm outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500 transition-all font-medium bg-white placeholder:text-slate-300"
+                    value={filters.customerPhone}
+                    onChange={(e) => setFilters({ ...filters, customerPhone: e.target.value, page: 1 })}
+                  />
+                </div>
+                <div className="relative group">
+                  <Fingerprint size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors" />
+                  <input
+                    type="text"
+                    placeholder="Mã số thuế..."
+                    className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 text-sm outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500 transition-all font-mono font-bold bg-white placeholder:text-slate-300"
+                    value={filters.taxCode}
+                    onChange={(e) => setFilters({ ...filters, taxCode: e.target.value, page: 1 })}
+                  />
+                </div>
+                <div className="relative group">
+                  <Building size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors" />
+                  <input
+                    type="text"
+                    placeholder="Tên khách hàng..."
+                    className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 text-sm outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500 transition-all font-medium bg-white placeholder:text-slate-300"
+                    value={filters.companyName}
+                    onChange={(e) => setFilters({ ...filters, companyName: e.target.value, page: 1 })}
+                  />
+                </div>
+              </>
+            )}
           </div>
 
           {activeTab === 'Hardware' && (
@@ -519,30 +581,42 @@ const AdminDashboard = () => {
                       type="checkbox"
                       className="rounded border-slate-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
                       onChange={handleSelectAll}
-                      checked={(activeTab === 'Hardware' ? warranties : softwareList).length > 0 && selectedIds.length === (activeTab === 'Hardware' ? warranties : softwareList).length}
+                      checked={((activeTab === 'Hardware' ? warranties : activeTab === 'Software' ? softwareList : repairRequests).length > 0) && (selectedIds.length === (activeTab === 'Hardware' ? warranties : activeTab === 'Software' ? softwareList : repairRequests).length)}
                     />
                   </th>
-                  <th className="px-6 py-4">Sản Phẩm / {activeTab === 'Hardware' ? 'Model' : 'Mã KH'}</th>
-                  <th
-                    className={`px-6 py-4 ${activeTab === 'Hardware' ? '' : 'hidden'}`}
-                  >
-                    Mã Khách Hàng
-                  </th>
-                  <th className="px-6 py-4">{activeTab === 'Hardware' ? 'Serial' : 'Loại License'}</th>
-                  {activeTab === 'Software' && <th className="px-6 py-4">Số lượng</th>}
-                  <th className="px-6 py-4">Khách hàng / Địa chỉ / SĐT</th>
-                  <th className="px-6 py-4">Trạng Thái</th>
-                  <th className="px-6 py-4">Thời Hạn</th>
+                  {activeTab === 'Repair' ? (
+                    <>
+                      <th className="px-6 py-4">Sản Phẩm</th>
+                      <th className="px-6 py-4">Khách Hàng</th>
+                      <th className="px-6 py-4">Mô Tả Lỗi</th>
+                      <th className="px-6 py-4">Trạng Thái</th>
+                      <th className="px-6 py-4">Ngày Tạo</th>
+                    </>
+                  ) : (
+                    <>
+                      <th className="px-6 py-4">Sản Phẩm / {activeTab === 'Hardware' ? 'Model' : 'Mã KH'}</th>
+                      <th
+                        className={`px-6 py-4 ${activeTab === 'Hardware' ? '' : 'hidden'}`}
+                      >
+                        Mã Khách Hàng
+                      </th>
+                      <th className="px-6 py-4">{activeTab === 'Hardware' ? 'Serial' : 'Loại License'}</th>
+                      {activeTab === 'Software' && <th className="px-6 py-4">Số lượng</th>}
+                      <th className="px-6 py-4">Khách hàng / Địa chỉ / SĐT</th>
+                      <th className="px-6 py-4">Trạng Thái</th>
+                      <th className="px-6 py-4">Thời Hạn</th>
+                    </>
+                  )}
                   <th className="px-6 py-4 text-center">Thao Tác</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {loading ? (
-                  <tr><td colSpan={activeTab === 'Hardware' ? "7" : "8"} className="px-6 py-20 text-center text-slate-400">Đang tải dữ liệu...</td></tr>
-                ) : (activeTab === 'Hardware' ? warranties : softwareList).length === 0 ? (
-                  <tr><td colSpan="7" className="px-6 py-20 text-center text-slate-400 font-medium">Không tìm thấy bản ghi nào.</td></tr>
+                  <tr><td colSpan={activeTab === 'Hardware' ? "7" : activeTab === 'Software' ? "8" : "7"} className="px-6 py-20 text-center text-slate-400">Đang tải dữ liệu...</td></tr>
+                ) : (activeTab === 'Hardware' ? warranties : activeTab === 'Software' ? softwareList : repairRequests).length === 0 ? (
+                  <tr><td colSpan={activeTab === 'Hardware' ? "7" : activeTab === 'Software' ? "8" : "7"} className="px-6 py-20 text-center text-slate-400 font-medium">Không tìm thấy bản ghi nào.</td></tr>
                 ) : (
-                  (activeTab === 'Hardware' ? warranties : softwareList).map((item) => (
+                  (activeTab === 'Hardware' ? warranties : activeTab === 'Software' ? softwareList : repairRequests).map((item) => (
                     activeTab === 'Hardware' ? (
                       <WarrantyTableRow
                         key={item._id}
@@ -553,7 +627,7 @@ const AdminDashboard = () => {
                         onDelete={handleDelete}
                         onShowQR={setQrModal}
                       />
-                    ) : (
+                    ) : activeTab === 'Software' ? (
                       <SoftwareTableRow
                         key={item._id}
                         software={item}
@@ -561,6 +635,13 @@ const AdminDashboard = () => {
                         onToggleSelect={handleSelectItem}
                         onEdit={handleEdit}
                         onDelete={handleDelete}
+                      />
+                    ) : (
+                      <RepairTableRow
+                        key={item._id}
+                        request={item}
+                        onDelete={handleDelete}
+                        onUpdateStatus={handleUpdateRepairStatus}
                       />
                     )
                   ))
@@ -572,7 +653,7 @@ const AdminDashboard = () => {
           {/* Pagination */}
           <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
             <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">
-              Hiển thị {(activeTab === 'Hardware' ? warranties : softwareList).length} của {pagination.total} bản ghi
+              Hiển thị {(activeTab === 'Hardware' ? warranties : activeTab === 'Software' ? softwareList : repairRequests).length} của {pagination.total} bản ghi
             </p>
             <div className="flex gap-2">
               <button
@@ -730,6 +811,58 @@ const AdminDashboard = () => {
                   >
                     Hủy bỏ
                   </button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* Status Update Warranty Modal */}
+        <AnimatePresence>
+          {statusUpdate.showModal && (
+            <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
+              <motion.div
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"
+                onClick={() => setStatusUpdate({ ...statusUpdate, showModal: false })}
+              ></motion.div>
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                className="bg-white rounded-3xl shadow-2xl p-8 max-w-sm w-full relative z-10"
+              >
+                <h3 className="text-xl font-black text-slate-900 mb-4">Bảo Hành Sau Sửa Chữa</h3>
+                <p className="text-slate-500 text-sm mb-6">
+                  Vui lòng nhập thời gian bảo hành (tháng) cho thiết bị sau khi hoàn tất sửa chữa.
+                </p>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Thời gian (Tháng)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500 font-bold text-slate-900"
+                      value={statusUpdate.duration}
+                      onChange={(e) => setStatusUpdate({ ...statusUpdate, duration: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="flex gap-3 pt-2">
+                    <button
+                      onClick={() => setStatusUpdate({ ...statusUpdate, showModal: false })}
+                      className="flex-1 py-3 font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-50 rounded-xl transition-all"
+                    >
+                      Hủy
+                    </button>
+                    <button
+                      onClick={confirmWarrantyUpdate}
+                      className="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-primary-500/30 transition-all"
+                    >
+                      Xác Nhận
+                    </button>
+                  </div>
                 </div>
               </motion.div>
             </div>

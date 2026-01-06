@@ -57,11 +57,13 @@ const WarrantyTableRow = ({
         <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${warranty.status === 'Activated' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
           }`}>
           <div className={`w-1.5 h-1.5 rounded-full ${warranty.status === 'Activated' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`}></div>
-          {warranty.status === 'Activated' ? 'Đang bảo hành' : 'Chờ kích hoạt'}
+          {warranty.status === 'Activated' ? 'Active' : 'Pending'}
         </div>
       </td>
       <td className="p-4">
-        <p className="text-xs font-bold text-slate-600">{format(new Date(warranty.startDate), 'dd/MM/yyyy')}</p>
+        <p className="text-xs font-bold text-slate-600">
+          {warranty.endDate ? format(new Date(warranty.endDate), 'dd/MM/yyyy') : '---'}
+        </p>
         <p className="text-[10px] font-bold text-slate-400">{warranty.warrantyPeriod} tháng</p>
       </td>
       <td className="p-4">

@@ -35,4 +35,11 @@ export const searchApi = {
   searchProducts: (data) => api.post('/search', data),
 };
 
+export const repairApi = {
+  getAll: () => api.get('/repair-requests'),
+  updateStatus: (id, status, warrantyDuration) => api.put(`/repair-requests/${id}`, { status, warrantyDuration }),
+  delete: (id) => api.delete(`/repair-requests/${id}`),
+  search: (data) => api.post('/repair-requests/search', data)
+};
+
 export default api;
