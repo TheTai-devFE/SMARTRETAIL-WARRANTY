@@ -14,12 +14,12 @@ const PolicyPage = () => {
 
       <Navbar isDark={false} />
 
-      <div className="container mx-auto px-4 py-12 md:py-20 max-w-6xl">
+      <div className="container mx-auto px-4 py-12 md:py-20  max-w-6xl">
         {/* Hero Section - Modern */}
         <motion.header
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-16 space-y-6"
+          className="text-center mb-16 mt-16 sm:mt-8 space-y-6"
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-50 to-accent-50 rounded-full border border-primary-200/50 mb-4">
             <ShieldCheck size={16} className="text-primary-600 animate-pulse" />

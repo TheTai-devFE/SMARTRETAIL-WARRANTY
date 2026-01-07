@@ -100,7 +100,7 @@ const RepairRequestPage = () => {
 
             <div className="container mx-auto px-4 py-12 md:py-24 max-w-4xl">
                 {/* Hero Section - SEO Optimized */}
-                <header className="text-center mb-12">
+                <header className="text-center mb-12 mt-16 sm:mt-8">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}

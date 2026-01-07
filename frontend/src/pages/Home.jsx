@@ -112,7 +112,7 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen pb-20 pt-24 mt-16 relative overflow-hidden">
+    <div className="min-h-screen pb-20 pt-24  relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-gradient-to-b from-primary-50/50 via-accent-50/30 to-transparent -z-10 blur-3xl opacity-60 animate-pulse"></div>
       <div className="absolute top-40 right-0 w-96 h-96 bg-gradient-to-l from-accent-100/40 to-transparent -z-10 blur-3xl rounded-full float-animation"></div>
@@ -122,7 +122,7 @@ const Home = () => {
 
       <div className="max-w-4xl mx-auto px-4 space-y-12">
         {/* Hero Section - SEO Optimized */}
-        <header className="text-center space-y-6 relative">
+        <header className="text-center space-y-6 mt-16 sm:mt-8 relative">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
