@@ -139,7 +139,7 @@ const RepairRequestPage = () => {
                         {[
                             { icon: '⚡', text: 'Xử lý nhanh chóng' },
                             { icon: '🔧', text: 'Kỹ thuật chuyên nghiệp' },
-                            { icon: '✅', text: 'Bảo hành sau sửa' },
+                            { icon: '✅', text: 'Bảo hành sau sửa chữa' },
                         ].map((feature, idx) => (
                             <div
                                 key={idx}
@@ -235,17 +235,7 @@ const RepairRequestPage = () => {
                 </motion.form>
             </div>
 
-            <footer className="py-12 bg-slate-900 text-center mt-24">
-                <div className="container mx-auto px-6">
-                    <div className="flex flex-col items-center space-y-4">
-                        <div className="flex items-center gap-2 font-black text-3xl tracking-tighter text-white opacity-20 filter grayscale">
-                            <span className="bg-white text-slate-900 px-2 py-0.5 rounded-lg">S</span>
-                            SMARTRETAIL
-                        </div>
-                        <p className="text-slate-500 text-sm font-medium">© 2024 SMARTRETAIL Warranty System. Bản quyền thuộc về SMARTRETAIL.</p>
-                    </div>
-                </div>
-            </footer>
+
         </div>
     );
 };

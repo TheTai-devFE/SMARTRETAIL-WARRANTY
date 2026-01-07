@@ -82,8 +82,8 @@ const PolicyPage = () => {
               >
                 <div className="flex items-center gap-3 mb-6">
                   <div className={`p-3 rounded-2xl ${idx === 0 ? 'bg-gradient-to-br from-blue-100 to-blue-200' :
-                      idx === 1 ? 'bg-gradient-to-br from-purple-100 to-purple-200' :
-                        'bg-gradient-to-br from-amber-100 to-amber-200'
+                    idx === 1 ? 'bg-gradient-to-br from-purple-100 to-purple-200' :
+                      'bg-gradient-to-br from-amber-100 to-amber-200'
                     }`}>
                     {idx === 0 ? <Package size={24} className="text-blue-600" /> :
                       idx === 1 ? <Wrench size={24} className="text-purple-600" /> :
@@ -135,8 +135,8 @@ const PolicyPage = () => {
               >
                 <div className="flex items-center gap-3 mb-4">
                   <div className={`p-3 rounded-2xl ${idx === 0 ? 'bg-gradient-to-br from-emerald-100 to-emerald-200' :
-                      idx === 1 ? 'bg-gradient-to-br from-rose-100 to-rose-200' :
-                        'bg-gradient-to-br from-indigo-100 to-indigo-200'
+                    idx === 1 ? 'bg-gradient-to-br from-rose-100 to-rose-200' :
+                      'bg-gradient-to-br from-indigo-100 to-indigo-200'
                     }`}>
                     {idx === 0 ? <CheckCircle size={24} className="text-emerald-600" /> :
                       idx === 1 ? <XCircle size={24} className="text-rose-600" /> :
@@ -153,8 +153,8 @@ const PolicyPage = () => {
                   {policy.content.map((item, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
                       <span className={`mt-1 w-1.5 h-1.5 rounded-full flex-shrink-0 ${idx === 0 ? 'bg-emerald-500' :
-                          idx === 1 ? 'bg-rose-500' :
-                            'bg-indigo-500'
+                        idx === 1 ? 'bg-rose-500' :
+                          'bg-indigo-500'
                         }`}></span>
                       <span className="leading-relaxed">{item}</span>
                     </li>
@@ -220,18 +220,7 @@ const PolicyPage = () => {
         </motion.section>
       </div>
 
-      {/* Footer */}
-      <footer className="py-12 bg-slate-900 text-center">
-        <div className="container mx-auto px-6">
-          <div className="flex flex-col items-center space-y-4">
-            <div className="flex items-center gap-2 font-black text-3xl tracking-tighter text-white opacity-20 filter grayscale">
-              <span className="bg-white text-slate-900 px-2 py-0.5 rounded-lg">S</span>
-              SMARTRETAIL
-            </div>
-            <p className="text-slate-500 text-sm font-medium">© 2024 SMARTRETAIL Warranty System. Bản quyền thuộc về SMARTRETAIL.</p>
-          </div>
-        </div>
-      </footer>
+
     </div>
   );
 };
