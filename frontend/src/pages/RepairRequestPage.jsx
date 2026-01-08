@@ -1,10 +1,9 @@
-import axios from 'axios';
 import { motion } from 'framer-motion';
 import { CheckCircle, Loader2, Send, Wrench } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { Link } from 'react-router-dom';
-import baseUrl from '../api/index';
+import { repairApi } from '../api/index';
 import Navbar from '../components/Navbar';
 
 const RepairRequestPage = () => {
@@ -20,8 +19,6 @@ const RepairRequestPage = () => {
     const [loading, setLoading] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [submittedData, setSubmittedData] = useState(null);
-
-    const API_URL = baseUrl
 
     // SEO: Update document title
     useEffect(() => {
@@ -40,7 +37,7 @@ const RepairRequestPage = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            const res = await axios.post(`${API_URL}/repair-requests`, formData);
+            const res = await repairApi.create(formData);
             setSubmittedData(res.data); // Save the response including the code
             setSubmitted(true);
             toast.success('Gửi yêu cầu thành công!');
