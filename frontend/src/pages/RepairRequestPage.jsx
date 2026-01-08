@@ -4,6 +4,7 @@ import { CheckCircle, Loader2, Send, Wrench } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { Link } from 'react-router-dom';
+import baseUrl from '../api/index';
 import Navbar from '../components/Navbar';
 
 const RepairRequestPage = () => {
@@ -20,7 +21,7 @@ const RepairRequestPage = () => {
     const [submitted, setSubmitted] = useState(false);
     const [submittedData, setSubmittedData] = useState(null);
 
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
+    const API_URL = baseUrl
 
     // SEO: Update document title
     useEffect(() => {
