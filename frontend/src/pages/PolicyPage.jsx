@@ -1,10 +1,13 @@
 import { motion } from 'framer-motion';
-import { CheckCircle, Clock, MapPin, MessageSquare, Package, PenTool, PhoneCall, ShieldCheck, Sparkles, Wrench, XCircle } from 'lucide-react';
+import { MapPin, MessageSquare, PenTool, PhoneCall, ShieldCheck } from 'lucide-react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { warrantyPolicyData as data } from '../data/warrantyPolicyData';
 
 const PolicyPage = () => {
+  const [activeTab, setActiveTab] = useState(0);
+
   return (
     <div className="bg-slate-50 min-h-screen selection:bg-primary-100 selection:text-primary-900 relative overflow-hidden">
       {/* Animated background elements */}
@@ -54,14 +57,14 @@ const PolicyPage = () => {
           </div>
         </motion.header>
 
-        {/* Warranty Coverage - Modern Grid */}
+        {/* Warranty Coverage - Tab Layout */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           className="mb-20"
         >
-          <div className="text-center mb-12">
+          <div className="text-center mb-8">
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
               Phạm Vi <span className="text-primary-600">Bảo Hành</span>
             </h2>
@@ -70,47 +73,75 @@ const PolicyPage = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {data.coverage.categories.map((category, idx) => (
-              <motion.div
-                key={category.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.1 }}
-                className="glass-card p-6 hover:shadow-xl transition-all"
-              >
-                <div className="flex items-center gap-3 mb-6">
-                  <div className={`p-3 rounded-2xl ${idx === 0 ? 'bg-gradient-to-br from-blue-100 to-blue-200' :
-                    idx === 1 ? 'bg-gradient-to-br from-purple-100 to-purple-200' :
-                      'bg-gradient-to-br from-amber-100 to-amber-200'
-                    }`}>
-                    {idx === 0 ? <Package size={24} className="text-blue-600" /> :
-                      idx === 1 ? <Wrench size={24} className="text-purple-600" /> :
-                        <Sparkles size={24} className="text-amber-600" />}
-                  </div>
-                  <h3 className="text-xl font-black text-slate-900">{category.label}</h3>
-                </div>
-
-                <div className="space-y-3">
-                  {category.items.map((item, i) => (
-                    <div key={i} className="bg-slate-50/50 p-4 rounded-xl border border-slate-100 hover:border-primary-200 transition-all">
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <p className="font-bold text-slate-800 text-sm">{item.name}</p>
-                        <span className="px-2 py-1 bg-primary-100 text-primary-700 rounded-lg text-xs font-black whitespace-nowrap">
-                          {item.period}
-                        </span>
-                      </div>
-                      <p className="text-xs text-slate-500 font-medium">{item.scope}</p>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
+          {/* Tab Navigation - Dark Style */}
+          <div className="bg-slate-800 rounded-t-2xl overflow-hidden">
+            <div className="flex flex-wrap">
+              {data.coverage.categories.map((category, idx) => (
+                <button
+                  key={category.id}
+                  onClick={() => setActiveTab(idx)}
+                  className={`flex-1 min-w-[200px] px-6 py-4 font-bold text-sm uppercase tracking-wide transition-all ${activeTab === idx
+                    ? 'bg-primary-600 text-white border-b-4 border-primary-400'
+                    : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'
+                    }`}
+                >
+                  {category.label}
+                </button>
+              ))}
+            </div>
           </div>
+
+          {/* Tab Content - Grid 4 columns */}
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="bg-white rounded-b-2xl border-2 border-slate-200 p-8"
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {data.coverage.categories[activeTab].items.map((item, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                  className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-primary-300 hover:shadow-lg transition-all"
+                >
+                  <h3 className="text-center font-bold text-slate-900 text-base mb-6 pb-4 border-b-2 border-slate-100">
+                    {item.name}
+                  </h3>
+
+                  <div className="space-y-4">
+                    <div className="text-center">
+                      <p className="text-xs text-slate-600 mb-2">Thời hạn bảo hành</p>
+                      <p className="text-4xl font-black text-slate-900">
+                        {item.period.split(' ')[0]}
+                        <span className="text-sm font-normal text-slate-600 ml-1">
+                          {item.period.split(' ')[1]}
+                        </span>
+                      </p>
+                    </div>
+
+                    <div className="pt-4 border-t border-slate-100">
+                      <p className="text-xs text-slate-600 font-semibold mb-2">Loại dịch vụ bảo hành</p>
+                      <p className="text-xs text-slate-500 leading-relaxed">{item.scope}</p>
+                    </div>
+
+                    {item.coverage && (
+                      <div className="pt-4 border-t border-slate-100">
+                        <p className="text-xs text-slate-600 font-semibold mb-2">Phạm vi bảo hành</p>
+                        <p className="text-xs text-slate-500 leading-relaxed">{item.coverage}</p>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
         </motion.section>
 
-        {/* Policies - Modern Cards */}
+        {/* Policies - Document Style */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -119,50 +150,52 @@ const PolicyPage = () => {
         >
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
-              Điều Khoản <span className="text-primary-600">Bảo Hành</span>
+              Chính sách bảo hành
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {data.policies.map((policy, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.1 }}
-                className="glass-card p-6 hover:shadow-xl transition-all"
-              >
-                <div className="flex items-center gap-3 mb-4">
-                  <div className={`p-3 rounded-2xl ${idx === 0 ? 'bg-gradient-to-br from-emerald-100 to-emerald-200' :
-                    idx === 1 ? 'bg-gradient-to-br from-rose-100 to-rose-200' :
-                      'bg-gradient-to-br from-indigo-100 to-indigo-200'
-                    }`}>
-                    {idx === 0 ? <CheckCircle size={24} className="text-emerald-600" /> :
-                      idx === 1 ? <XCircle size={24} className="text-rose-600" /> :
-                        <Clock size={24} className="text-indigo-600" />}
+          {/* Single Document Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="bg-white rounded-2xl border-2 border-slate-200 p-8 md:p-12 max-w-5xl mx-auto"
+          >
+            {/* Date */}
+            <p className="text-sm text-slate-500 mb-6">
+              Ngày hiệu lực: {new Date().toLocaleDateString('vi-VN')}
+            </p>
+
+            {/* Content Sections */}
+            <div className="space-y-8">
+              {data.policies.map((policy, idx) => (
+                <div key={idx} className="space-y-4">
+                  <h3 className="text-xl font-bold text-slate-900 mb-4">
+                    {policy.title}
+                  </h3>
+
+                  {policy.subtitle && (
+                    <p className="text-sm text-slate-700 leading-relaxed mb-4">
+                      {policy.subtitle}
+                    </p>
+                  )}
+
+                  <div className="space-y-3">
+                    {policy.content.map((item, i) => (
+                      <p key={i} className="text-sm text-slate-700 leading-relaxed pl-4">
+                        {item}
+                      </p>
+                    ))}
                   </div>
-                  <h3 className="text-lg font-black text-slate-900">{policy.title}</h3>
+
+                  {/* Divider between sections except last */}
+                  {idx < data.policies.length - 1 && (
+                    <hr className="mt-8 border-slate-200" />
+                  )}
                 </div>
-
-                {policy.subtitle && (
-                  <p className="text-sm text-slate-600 mb-4 leading-relaxed">{policy.subtitle}</p>
-                )}
-
-                <ul className="space-y-2">
-                  {policy.content.map((item, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
-                      <span className={`mt-1 w-1.5 h-1.5 rounded-full flex-shrink-0 ${idx === 0 ? 'bg-emerald-500' :
-                        idx === 1 ? 'bg-rose-500' :
-                          'bg-indigo-500'
-                        }`}></span>
-                      <span className="leading-relaxed">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </motion.div>
         </motion.section>
 
         {/* Support Section - Modern Grid */}
