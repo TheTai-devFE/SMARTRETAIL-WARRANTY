@@ -1,18 +1,21 @@
 import { format } from 'date-fns';
 import { AnimatePresence, motion } from 'framer-motion';
-import { AppWindow, Building, ChevronRight, ExternalLink, Fingerprint, HardDrive, Phone, Plus, QrCode, Search, Trash2, Upload, Wrench, X } from 'lucide-react';
+import { AppWindow, Building, ChevronRight, Copy, Fingerprint, HardDrive, Phone, Plus, Printer, QrCode, Search, Trash2, Upload, Wrench, X } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
-import QRCode from 'react-qr-code';
 import { Link } from 'react-router-dom';
 import { repairApi, softwareApi, warrantyApi } from '../api';
+import logoSR from '../assets/LOGO SR.png';
 import logo from '../assets/logo-white.png';
 import RepairTableRow from '../components/Admin/RepairTableRow';
 import SoftwareForm from '../components/Admin/SoftwareForm';
 import SoftwareTableRow from '../components/Admin/SoftwareTableRow';
 import WarrantyForm from '../components/Admin/WarrantyForm';
 import WarrantyTableRow from '../components/Admin/WarrantyTableRow';
+import QRLabelPrint from '../components/QRLabelPrint';
 import ConfirmModal from '../components/Shared/ConfirmModal';
+import { createRoundedLogoDataURL } from '../utils/qrLogo';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('Hardware'); // 'Hardware' | 'Software'
@@ -23,6 +26,7 @@ const AdminDashboard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [confirmConfig, setConfirmConfig] = useState({ isOpen: false, title: '', message: '', onConfirm: () => { }, type: 'danger' });
   const [qrModal, setQrModal] = useState(null);
+  const [roundedLogo, setRoundedLogo] = useState(null);
   const [pagination, setPagination] = useState({
     page: 1,
     totalPages: 1,
@@ -103,6 +107,11 @@ const AdminDashboard = () => {
       setLoading(false);
     }
   };
+
+  // Create rounded logo on mount
+  useEffect(() => {
+    createRoundedLogoDataURL(logoSR).then(setRoundedLogo);
+  }, []);
 
   useEffect(() => {
     // Reset page on tab change
@@ -704,7 +713,6 @@ const AdminDashboard = () => {
                 className="bg-white rounded-3xl shadow-2xl p-8 max-w-sm w-full relative z-10 text-center"
               >
                 {/* QR Content */}
-                {/* ... Same as before ... */}
                 <div className="mb-6">
                   <div className="bg-primary-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <QrCode className="text-primary-600" size={32} />
@@ -714,25 +722,61 @@ const AdminDashboard = () => {
                 </div>
 
                 <div className="bg-white p-6 rounded-2xl border-2 border-slate-100 shadow-inner inline-block mb-6">
-                  <QRCode value={getActivationUrl(qrModal._id)} size={200} />
+                  {roundedLogo ? (
+                    <QRCodeSVG
+                      value={getActivationUrl(qrModal._id)}
+                      size={200}
+                      level="H"
+                      includeMargin={false}
+                      imageSettings={{
+                        src: roundedLogo,
+                        height: 64,
+                        width: 64,
+                        excavate: true,
+                      }}
+                    />
+                  ) : (
+                    <div className="w-[200px] h-[200px] flex items-center justify-center">
+                      <p className="text-slate-400">Đang tải...</p>
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-3">
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(getActivationUrl(qrModal._id));
-                      toast.success('Đã sao chép link kích hoạt!');
-                    }}
-                    className="w-full bg-slate-900 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-slate-800 transition-all"
-                  >
-                    <ExternalLink size={18} /> Sao chép link
-                  </button>
+                  {/* Two buttons side by side */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(getActivationUrl(qrModal._id));
+                        toast.success('Đã sao chép link kích hoạt!');
+                      }}
+                      className="bg-slate-900 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-slate-800 transition-all"
+                    >
+                      <Copy size={18} /> Sao chép
+                    </button>
+                    <button
+                      onClick={() => {
+                        window.print();
+                      }}
+                      className="bg-primary-600 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-primary-700 transition-all"
+                    >
+                      <Printer size={18} /> In tem
+                    </button>
+                  </div>
                   <button
                     onClick={() => setQrModal(null)}
                     className="w-full py-3 font-bold text-slate-500 hover:text-slate-700 transition-all"
                   >
                     Đóng
                   </button>
+                </div>
+
+                {/* Hidden Print Component */}
+                <div className="hidden print:block">
+                  <QRLabelPrint
+                    activationUrl={getActivationUrl(qrModal._id)}
+                    productName={qrModal.productName}
+                  />
                 </div>
               </motion.div>
             </div>
