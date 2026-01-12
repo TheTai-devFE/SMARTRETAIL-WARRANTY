@@ -241,29 +241,24 @@ export const warrantyPolicyData = {
   ],
   support: [
     {
-      title: "Hotline Liên Hệ",
-      desc: "Hotline: 0935888489",
+      title: "Hotline kinh doanh",
       icon: "PhoneCall",
-      cta: "Gọi ngay",
-      link: "tel:0935888489",
+      contacts: [
+        { label: "Hotline/Zalo: 0935 888 489", link: "tel:0935888489" },
+        { label: "Hotline/Zalo: 0967 049 018", link: "tel:0967049018" }
+      ]
     },
     {
-      title: "Hỗ Trợ Trực Tuyến ",
-      desc: "Zalo/Mobile: 0909 045 663",
+      title: "Hỗ trợ kỹ thuật",
       icon: "MessageSquare",
-      cta: "Chat ngay",
-      link: "https://zalo.me/0909045663",
+      contacts: [
+        { label: "Zalo: 0909 045 663", link: "https://zalo.me/0909045663" },
+        { label: "Zalo: 0936 817 781", link: "https://zalo.me/0936817781" }
+      ]
     },
     {
-      title: "Trung Tâm Bảo Hành",
-      desc: "A60 Tô Ký, P. Đông Hưng Thuận, Quận 12, TP.HCM ",
-      icon: "MapPin",
-      cta: "Tìm kiếm",
-      link: "https://maps.google.com/?q=A60 Tô Ký, P. Đông Hưng Thuận, Quận 12, TP.HCM",
-    },
-    {
-      title: "Gửi Yêu Cầu",
-      desc: "Tạo phiếu yêu cầu sủa chữa trực tuyến.",
+      title: "Yêu cầu bảo hành",
+      desc: "Tạo phiếu yêu cầu bảo hành trực tuyến",
       icon: "PenTool",
       cta: "Gửi ngay",
       link: "/yeu-cau-sua-chua",

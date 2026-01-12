@@ -407,7 +407,7 @@ const AdminDashboard = () => {
       <div className="container mx-auto px-4 space-y-6">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-extrabold text-slate-900">Quản Lý <span className="text-primary-600">Bảo Hành</span></h1>
+            <h1 className="text-3xl font-extrabold text-slate-900">Quản lý <span className="text-primary-600">bảo hành</span></h1>
           </div>
           <div className="flex flex-wrap gap-3">
             {activeTab === 'Hardware' && (
@@ -445,21 +445,21 @@ const AdminDashboard = () => {
             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === 'Hardware' ? 'bg-white text-slate-900 shadow-md' : 'text-slate-500 hover:text-slate-700'
               }`}
           >
-            <HardDrive size={18} /> Phần Cứng
+            <HardDrive size={18} /> Phần cứng
           </button>
           <button
             onClick={() => setActiveTab('Software')}
             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === 'Software' ? 'bg-white text-slate-900 shadow-md' : 'text-slate-500 hover:text-slate-700'
               }`}
           >
-            <AppWindow size={18} /> Phần Mềm
+            <AppWindow size={18} /> Phần mềm
           </button>
           <button
             onClick={() => setActiveTab('Repair')}
             className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === 'Repair' ? 'bg-white text-slate-900 shadow-md' : 'text-slate-500 hover:text-slate-700'
               }`}
           >
-            <Wrench size={18} /> Sửa Chữa
+            <Wrench size={18} /> Sửa chữa
           </button>
         </div>
 
@@ -482,7 +482,7 @@ const AdminDashboard = () => {
                 onClick={handleBulkDelete}
                 className="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-lg text-xs font-black flex items-center gap-2 transition-all shadow-md active:scale-95"
               >
-                <Trash2 size={14} /> XÓA HÀNG LOẠT
+                <Trash2 size={14} /> Xóa hàng loạt
               </button>
             </motion.div>
           )}
@@ -595,15 +595,15 @@ const AdminDashboard = () => {
                   </th>
                   {activeTab === 'Repair' ? (
                     <>
-                      <th className="px-6 py-4">Sản Phẩm</th>
-                      <th className="px-6 py-4">Khách Hàng</th>
-                      <th className="px-6 py-4">Mô Tả Lỗi</th>
-                      <th className="px-6 py-4">Trạng Thái</th>
-                      <th className="px-6 py-4">Ngày Tạo</th>
+                      <th className="px-6 py-4">Sản phẩm</th>
+                      <th className="px-6 py-4">Khách hàng</th>
+                      <th className="px-6 py-4">Mô tả lỗi</th>
+                      <th className="px-6 py-4">Trạng thái</th>
+                      <th className="px-6 py-4">Ngày tạo</th>
                     </>
                   ) : (
                     <>
-                      <th className="px-6 py-4">Sản Phẩm / {activeTab === 'Hardware' ? 'Model' : 'Mã KH'}</th>
+                      <th className="px-6 py-4">Sản phẩm / {activeTab === 'Hardware' ? 'Model' : 'Mã KH'}</th>
                       <th
                         className={`px-6 py-4 ${activeTab === 'Hardware' ? '' : 'hidden'}`}
                       >
@@ -612,8 +612,8 @@ const AdminDashboard = () => {
                       <th className="px-6 py-4">{activeTab === 'Hardware' ? 'Serial' : 'Loại License'}</th>
                       {activeTab === 'Software' && <th className="px-6 py-4">Số lượng</th>}
                       <th className="px-6 py-4">Khách hàng / Địa chỉ / SĐT</th>
-                      <th className="px-6 py-4">Trạng Thái</th>
-                      <th className="px-6 py-4">Thời Hạn</th>
+                      <th className="px-6 py-4">Trạng thái</th>
+                      <th className="px-6 py-4">Thời hạn</th>
                     </>
                   )}
                   <th className="px-6 py-4 text-center">Thao Tác</th>
@@ -717,7 +717,7 @@ const AdminDashboard = () => {
                   <div className="bg-primary-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <QrCode className="text-primary-600" size={32} />
                   </div>
-                  <h3 className="text-xl font-black text-slate-900 leading-tight">Mã QR Kích Hoạt</h3>
+                  <h3 className="text-xl font-black text-slate-900 leading-tight">Mã QR kích hoạt</h3>
                   <p className="text-slate-500 text-sm mt-2">Dán mã này lên thiết bị để khách hàng quét và tự kích hoạt bảo hành.</p>
                 </div>
 

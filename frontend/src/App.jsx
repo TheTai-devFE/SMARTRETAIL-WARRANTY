@@ -13,7 +13,7 @@ function App() {
       <div className="min-h-screen bg-slate-50">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/quantri-kythuat" element={<AdminDashboard />} />
           <Route path="/chinh-sach" element={<PolicyPage />} />
           <Route path="/yeu-cau-sua-chua" element={<RepairRequestPage />} />
           <Route path="/activate/:id" element={<Activation />} />

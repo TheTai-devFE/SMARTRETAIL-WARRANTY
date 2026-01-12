@@ -3,6 +3,7 @@ import { MapPin, MessageSquare, PenTool, PhoneCall, ShieldCheck } from 'lucide-r
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import PolicyAccordion from '../components/Policy/PolicyAccordion';
+import WarrantyCenter from '../components/Policy/WarrantyCenter';
 import WarrantyTabs from '../components/Policy/WarrantyTabs';
 import { warrantyPolicyData as data } from '../data/warrantyPolicyData';
 
@@ -71,14 +72,14 @@ const PolicyPage = () => {
         >
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
-              Liên hệ <span className="text-primary-600">hỗ trợ</span>
+              Thông tin <span className="text-primary-600">liên hệ</span>
             </h2>
             <p className="text-slate-600 max-w-2xl mx-auto">
               Đội ngũ hỗ trợ của chúng tôi luôn sẵn sàng giúp đỡ bạn
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {data.support.map((item, idx) => {
               const icons = {
                 PhoneCall: PhoneCall,
@@ -88,6 +89,39 @@ const PolicyPage = () => {
               };
               const Icon = icons[item.icon];
 
+              // Nếu có contacts array (format mới)
+              if (item.contacts) {
+                return (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: idx * 0.1 }}
+                    className="card-hover glass-card p-6 text-center group"
+                  >
+                    <div className="mb-4 inline-flex p-4 rounded-2xl bg-gradient-to-br from-primary-100 to-accent-100 group-hover:scale-110 transition-transform">
+                      <Icon size={32} className="text-primary-600" />
+                    </div>
+                    <h3 className="text-lg font-black text-slate-900 mb-4">{item.title}</h3>
+                    <div className="space-y-2">
+                      {item.contacts.map((contact, i) => (
+                        <a
+                          key={i}
+                          href={contact.link}
+                          target={contact.link.startsWith('http') ? '_blank' : undefined}
+                          rel={contact.link.startsWith('http') ? 'noopener noreferrer' : undefined}
+                          className="block text-sm text-slate-600 hover:text-primary-600 font-semibold transition-colors"
+                        >
+                          {contact.label}
+                        </a>
+                      ))}
+                    </div>
+                  </motion.div>
+                );
+              }
+
+              // Format cũ (desc/link)
               return (
                 <motion.a
                   key={idx}
@@ -104,7 +138,15 @@ const PolicyPage = () => {
                     <Icon size={32} className="text-primary-600" />
                   </div>
                   <h3 className="text-lg font-black text-slate-900 mb-2">{item.title}</h3>
-                  <p className="text-sm text-slate-600 mb-4 leading-relaxed">{item.desc}</p>
+                  {Array.isArray(item.desc) ? (
+                    <div className="text-sm text-slate-600 mb-4 leading-relaxed">
+                      {item.desc.map((line, i) => (
+                        <p key={i} className="font-semibold">{line}</p>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-slate-600 mb-4 leading-relaxed">{item.desc}</p>
+                  )}
                   <span className="inline-flex items-center gap-2 text-sm font-bold text-primary-600 group-hover:gap-3 transition-all">
                     {item.cta}
                     <span className="group-hover:translate-x-1 transition-transform">→</span>
@@ -114,10 +156,13 @@ const PolicyPage = () => {
             })}
           </div>
         </motion.section>
-      </div>
+
+        {/* Warranty Center Component */}
+        <WarrantyCenter />
+      </div >
 
 
-    </div>
+    </div >
   );
 };
 
