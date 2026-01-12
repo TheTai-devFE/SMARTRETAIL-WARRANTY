@@ -70,12 +70,6 @@ export const warrantyPolicyData = {
             scope: "Thay thế, sữa chữa linh kiện ",
             coverage: "Lỗi do nhà sản xuất",
           },
-        ],
-      },
-      {
-        id: "lcd-cam-ung",
-        label: "LCD Cảm Ứng",
-        items: [
           {
             name: "Chân Đứng Cảm Ứng",
             period: "24 tháng",
@@ -118,6 +112,25 @@ export const warrantyPolicyData = {
             scope: "Thay thế, sữa chữa linh kiện ",
             coverage: "Lỗi do nhà sản xuất",
           },
+        ],
+      },
+      {
+        id: "LED",
+        label: "LED",
+        items: [
+          {
+            name: "Màn hình LED trong nhà ",
+            period: "24 tháng",
+            scope: "Thay thế, sữa chữa linh kiện ",
+            coverage: "Lỗi do nhà sản xuất",
+          },
+          {
+            name: "Màn hình LED ngoài trời",
+            period: "24 tháng",
+            scope: "Thay thế, sữa chữa linh kiện ",
+            coverage: "Lỗi do nhà sản xuất",
+          },
+
         ],
       },
       {

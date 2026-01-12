@@ -86,7 +86,7 @@ const RepairInfoBlock = ({ repair }) => {
                         </div>
                         <div>
                             <p className="text-xs font-bold opacity-70 uppercase tracking-wider mb-1">Trạng Thái Hiện Tại</p>
-                            <p className={`text-2xl font-black ${displayStatus.color.split(' ')[0]} font-display`}>{displayStatus.label}</p>
+                            <p className={`text-2xl font-black ${displayStatus.color.split(' ')[0]}`}>{displayStatus.label}</p>
                         </div>
                     </div>
 

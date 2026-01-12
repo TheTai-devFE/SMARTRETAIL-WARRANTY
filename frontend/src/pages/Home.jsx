@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { repairApi, searchApi } from '../api';
 import Navbar from '../components/Navbar';
 import RepairInfoBlock from '../components/Repair/RepairInfoBlock';
+import ServiceHighlights from '../components/ServiceHighlights';
 import SoftwareInfoBlock from '../components/Software/SoftwareInfoBlock';
 import WarrantyInfoBlock from '../components/Warranty/WarrantyInfoBlock';
 import WarrantyStatusBadge from '../components/Warranty/WarrantyStatusBadge';
@@ -83,7 +84,7 @@ const Home = () => {
               {product.productCode && (
                 <div className="flex items-center gap-2 mt-2">
                   <span className="bg-slate-100 text-slate-600 px-3 py-1 rounded-lg text-xs font-bold font-mono tracking-wider uppercase border border-slate-200">
-                    MOD: {product.productCode}
+                    MODE: {product.productCode}
                   </span>
                 </div>
               )}
@@ -112,7 +113,7 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen pb-20 pt-24  relative overflow-hidden">
+    <div className="min-h-screen pb-20 pt-24 font-sans relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-gradient-to-b from-primary-50/50 via-accent-50/30 to-transparent -z-10 blur-3xl opacity-60 animate-pulse"></div>
       <div className="absolute top-40 right-0 w-96 h-96 bg-gradient-to-l from-accent-100/40 to-transparent -z-10 blur-3xl rounded-full float-animation"></div>
@@ -123,7 +124,7 @@ const Home = () => {
       <div className="max-w-4xl mx-auto px-4 space-y-12">
         {/* Hero Section - SEO Optimized */}
         <header className="text-center space-y-6 mt-16 sm:mt-8 relative">
-          <motion.div
+          {/* <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
@@ -136,52 +137,31 @@ const Home = () => {
               </span>
               <span className="text-xs font-bold text-primary-700 uppercase tracking-wider">Dịch vụ chuyên nghiệp</span>
             </div>
-          </motion.div>
+          </motion.div>*/}
 
           <motion.h1
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-4xl md:text-6xl font-extrabold tracking-tight leading-tight"
+            className=" font-extrabold tracking-tight leading-8 "
           >
-            TRA CỨU <span className="gradient-text">BẢO HÀNH</span>
+            <span className="text-3xl md:text-8xl gradient-text ">TRA CỨU</span>
             <br />
-            <span className="text-2xl md:text-4xl text-slate-600 font-semibold">& Dịch Vụ Sửa Chữa</span>
+            <span className="text-2xl md:text-4xl text-slate-600 font-semibold"> Bảo hành & dịch vụ sửa chữa</span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="text-slate-600 max-w-2xl text-base md:text-lg mx-auto leading-relaxed"
+            className="text-slate-600 max-w-3xl text-base md:text-lg mx-auto leading-relaxed"
           >
-            Tra cứu thông tin bảo hành <strong>Phần cứng & Phần mềm</strong>, theo dõi tiến độ <strong>sửa chữa thiết bị</strong> nhanh chóng và tiện lợi
+            Hệ thống tra cứu thông tin bảo hành; <strong> Dịch vụ sửa chữa</strong>, bao gồm tất cả sản phẩm, dịch vụ liên quan đến <strong> Phần cứng & Phần mềm</strong>. Phục vụ công tác theo dõi tiến độ bảo hành và sửa chữa.
+
           </motion.p>
 
           {/* Service Highlights - SEO Friendly */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="flex flex-wrap justify-center gap-4 pt-4"
-            role="list"
-            aria-label="Dịch vụ chính"
-          >
-            {[
-              { icon: '🔍', text: 'Tra cứu bảo hành', color: 'from-blue-500 to-cyan-500' },
-              { icon: '🔧', text: 'Sửa chữa thiết bị', color: 'from-indigo-500 to-purple-500' },
-              { icon: '⚡', text: 'Xử lý nhanh chóng', color: 'from-purple-500 to-pink-500' },
-            ].map((service, idx) => (
-              <div
-                key={idx}
-                role="listitem"
-                className="group flex items-center gap-2 px-4 py-2 bg-white/60 backdrop-blur-sm rounded-xl border border-slate-200/50 hover:border-primary-300 transition-all hover:shadow-lg hover:scale-105"
-              >
-                <span className="text-2xl group-hover:scale-110 transition-transform">{service.icon}</span>
-                <span className="text-sm font-bold text-slate-700 group-hover:text-primary-600 transition-colors">{service.text}</span>
-              </div>
-            ))}
-          </motion.div>
+          <ServiceHighlights delay={0.3} />
         </header>
 
         {/* Search Form Section */}
@@ -231,7 +211,7 @@ const Home = () => {
                       }`}
                   >
                     <Wrench size={14} className="inline mr-1" />
-                    Sửa Chữa (Mã + SĐT)
+                    Sửa chữa (Mã + SĐT)
                   </button>
                 </div>
               </div>

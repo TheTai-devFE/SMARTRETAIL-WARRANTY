@@ -1,12 +1,12 @@
 import { motion } from 'framer-motion';
 import { MapPin, MessageSquare, PenTool, PhoneCall, ShieldCheck } from 'lucide-react';
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import PolicyAccordion from '../components/Policy/PolicyAccordion';
+import WarrantyTabs from '../components/Policy/WarrantyTabs';
 import { warrantyPolicyData as data } from '../data/warrantyPolicyData';
 
 const PolicyPage = () => {
-  const [activeTab, setActiveTab] = useState(0);
 
   return (
     <div className="bg-slate-50 min-h-screen selection:bg-primary-100 selection:text-primary-900 relative overflow-hidden">
@@ -24,19 +24,18 @@ const PolicyPage = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16 mt-16 sm:mt-8 space-y-6"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-50 to-accent-50 rounded-full border border-primary-200/50 mb-4">
+          {/* <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary-50 to-accent-50 rounded-full border border-primary-200/50 mb-4">
             <ShieldCheck size={16} className="text-primary-600 animate-pulse" />
             <span className="text-xs font-bold text-primary-700 uppercase tracking-wider">Chính sách bảo hành</span>
-          </div>
+          </div> */}
 
           <h1 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight leading-tight">
-            Thông Tin & <span className="gradient-text">Chính Sách</span>
-            <br />
-            <span className="text-3xl md:text-5xl text-slate-600 font-bold">Bảo Hành</span>
+            CHÍNH SÁCH
+            <span className=" font-bold gradient-text"> BẢO HÀNH</span>
           </h1>
 
           <p className="text-slate-600 text-base md:text-lg max-w-3xl mx-auto leading-relaxed">
-            Chúng tôi cam kết mang đến <strong>dịch vụ hậu mãi tốt nhất</strong>, đảm bảo quyền lợi và sự an tâm tuyệt đối cho khách hàng sử dụng <strong>sản phẩm chính hãng</strong> của SMARTRETAIL.
+            <strong> Công ty TNHH Giải Pháp Công Nghệ Thành Phát - MST: 0314763940</strong>, chúng tôi cung cấp dịch vụ bảo hành cho tất cả sản phẩm, được công bố và  phân phối chính thức trên thị trường. Vui lòng liên hệ với chúng tôi nếu bạn cần bạn cần hỗ trợ .
           </p>
 
           <div className="flex flex-wrap justify-center gap-4 pt-4">
@@ -57,146 +56,11 @@ const PolicyPage = () => {
           </div>
         </motion.header>
 
-        {/* Warranty Coverage - Tab Layout */}
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mb-20"
-        >
-          <div className="text-center mb-8">
-            <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
-              Phạm Vi <span className="text-primary-600">Bảo Hành</span>
-            </h2>
-            <p className="text-slate-600 max-w-2xl mx-auto">
-              Danh sách sản phẩm và thời hạn bảo hành áp dụng
-            </p>
-          </div>
+        {/* Warranty Coverage - Component */}
+        <WarrantyTabs data={data.coverage} />
 
-          {/* Tab Navigation - Dark Style */}
-          <div className="bg-slate-800 rounded-t-2xl overflow-hidden">
-            <div className="flex flex-wrap">
-              {data.coverage.categories.map((category, idx) => (
-                <button
-                  key={category.id}
-                  onClick={() => setActiveTab(idx)}
-                  className={`flex-1 min-w-[200px] px-6 py-4 font-bold text-sm uppercase tracking-wide transition-all ${activeTab === idx
-                    ? 'bg-primary-600 text-white border-b-4 border-primary-400'
-                    : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'
-                    }`}
-                >
-                  {category.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Tab Content - Grid 4 columns */}
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="bg-white rounded-b-2xl border-2 border-slate-200 p-8"
-          >
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {data.coverage.categories[activeTab].items.map((item, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-primary-300 hover:shadow-lg transition-all"
-                >
-                  <h3 className="text-center font-bold text-slate-900 text-base mb-6 pb-4 border-b-2 border-slate-100">
-                    {item.name}
-                  </h3>
-
-                  <div className="space-y-4">
-                    <div className="text-center">
-                      <p className="text-xs text-slate-600 mb-2">Thời hạn bảo hành</p>
-                      <p className="text-4xl font-black text-slate-900">
-                        {item.period.split(' ')[0]}
-                        <span className="text-sm font-normal text-slate-600 ml-1">
-                          {item.period.split(' ')[1]}
-                        </span>
-                      </p>
-                    </div>
-
-                    <div className="pt-4 border-t border-slate-100">
-                      <p className="text-xs text-slate-600 font-semibold mb-2">Loại dịch vụ bảo hành</p>
-                      <p className="text-xs text-slate-500 leading-relaxed">{item.scope}</p>
-                    </div>
-
-                    {item.coverage && (
-                      <div className="pt-4 border-t border-slate-100">
-                        <p className="text-xs text-slate-600 font-semibold mb-2">Phạm vi bảo hành</p>
-                        <p className="text-xs text-slate-500 leading-relaxed">{item.coverage}</p>
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-        </motion.section>
-
-        {/* Policies - Document Style */}
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mb-20"
-        >
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
-              Chính sách bảo hành
-            </h2>
-          </div>
-
-          {/* Single Document Card */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="bg-white rounded-2xl border-2 border-slate-200 p-8 md:p-12 max-w-5xl mx-auto"
-          >
-            {/* Date */}
-            <p className="text-sm text-slate-500 mb-6">
-              Ngày hiệu lực: {new Date().toLocaleDateString('vi-VN')}
-            </p>
-
-            {/* Content Sections */}
-            <div className="space-y-8">
-              {data.policies.map((policy, idx) => (
-                <div key={idx} className="space-y-4">
-                  <h3 className="text-xl font-bold text-slate-900 mb-4">
-                    {policy.title}
-                  </h3>
-
-                  {policy.subtitle && (
-                    <p className="text-sm text-slate-700 leading-relaxed mb-4">
-                      {policy.subtitle}
-                    </p>
-                  )}
-
-                  <div className="space-y-3">
-                    {policy.content.map((item, i) => (
-                      <p key={i} className="text-sm text-slate-700 leading-relaxed pl-4">
-                        {item}
-                      </p>
-                    ))}
-                  </div>
-
-                  {/* Divider between sections except last */}
-                  {idx < data.policies.length - 1 && (
-                    <hr className="mt-8 border-slate-200" />
-                  )}
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </motion.section>
+        {/* Policies - Component */}
+        <PolicyAccordion data={data.policies} />
 
         {/* Support Section - Modern Grid */}
         <motion.section
@@ -208,7 +72,7 @@ const PolicyPage = () => {
         >
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
-              Liên Hệ <span className="text-primary-600">Hỗ Trợ</span>
+              Liên hệ <span className="text-primary-600">hỗ trợ</span>
             </h2>
             <p className="text-slate-600 max-w-2xl mx-auto">
               Đội ngũ hỗ trợ của chúng tôi luôn sẵn sàng giúp đỡ bạn

@@ -1,83 +1,132 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { Clock, Settings, ShieldCheck } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import { useState } from 'react';
 
 const WarrantyTabs = ({ data }) => {
-  const [activeTab, setActiveTab] = useState(data.categories[0].id);
+  const [activeTab, setActiveTab] = useState(0);
+  const [showAll, setShowAll] = useState({});
+
+  // Get current category items
+  const currentCategory = data.categories[activeTab];
+  const items = currentCategory?.items || [];
+  const isExpanded = showAll[activeTab];
+  const displayItems = isExpanded ? items : items.slice(0, 4);
+  const hasMore = items.length > 4;
+
+  // Reset showAll when changing tabs
+  const handleTabChange = (tabIdx) => {
+    setActiveTab(tabIdx);
+  };
+
+  const toggleShowAll = () => {
+    setShowAll(prev => ({
+      ...prev,
+      [activeTab]: !prev[activeTab]
+    }));
+  };
 
   return (
-    <section className="py-24 bg-white">
-      <div className="container mx-auto px-6 max-w-6xl">
-        <div className="text-center mb-16 space-y-4">
-          <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tight">Phạm Vi Bảo Hành</h2>
-          <div className="h-1.5 w-20 bg-primary-600 mx-auto rounded-full"></div>
-        </div>
+    <motion.section
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      className="mb-20"
+    >
+      <div className="text-center mb-8">
+        <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
+          Phạm Vi <span className="text-primary-600">Bảo Hành</span>
+        </h2>
+        <p className="text-slate-600 max-w-2xl mx-auto">
+          Danh sách sản phẩm và thời hạn bảo hành áp dụng
+        </p>
+      </div>
 
-        {/* Custom Tabs */}
-        <div className="flex flex-wrap justify-center gap-2 mb-12 p-1.5 bg-slate-100 rounded-2xl w-fit mx-auto">
-          {data.categories.map((cat) => (
+      {/* Tab Navigation - Dark Style */}
+      <div className="bg-slate-800 rounded-t-2xl overflow-hidden">
+        <div className="flex flex-wrap">
+          {data.categories.map((category, idx) => (
             <button
-              key={cat.id}
-              onClick={() => setActiveTab(cat.id)}
-              className={`px-8 py-3 rounded-xl font-bold text-sm transition-all ${
-                activeTab === cat.id 
-                  ? 'bg-white text-primary-600 shadow-md scale-105' 
-                  : 'text-slate-500 hover:text-slate-700'
-              }`}
+              key={category.id}
+              onClick={() => handleTabChange(idx)}
+              className={`flex-1 min-w-[200px] px-6 py-4 font-bold text-sm uppercase tracking-wide transition-all ${activeTab === idx
+                  ? 'bg-primary-600 text-white border-b-4 border-primary-400'
+                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'
+                }`}
             >
-              {cat.label}
+              {category.label}
             </button>
           ))}
         </div>
+      </div>
 
-        {/* Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {/* Tab Content - Grid 4 columns */}
+      <motion.div
+        key={activeTab}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="bg-white rounded-b-2xl border-2 border-slate-200 p-8"
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <AnimatePresence mode="wait">
-            {data.categories.find(c => c.id === activeTab).items.map((item, idx) => (
+            {displayItems.map((item, i) => (
               <motion.div
-                key={`${activeTab}-${idx}`}
-                initial={{ opacity: 0, y: 20 }}
+                key={`${activeTab}-${i}`}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ delay: idx * 0.1 }}
-                className="group relative bg-slate-50 rounded-3xl p-8 border border-slate-100 hover:border-primary-200 hover:bg-white transition-all hover:shadow-2xl hover:shadow-primary-500/5"
+                transition={{ delay: i * 0.05 }}
+                className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-primary-300 hover:shadow-lg transition-all"
               >
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between">
-                    <div className="p-3 bg-white rounded-2xl text-primary-600 shadow-sm group-hover:bg-primary-600 group-hover:text-white transition-colors duration-500">
-                      <Settings size={28} />
-                    </div>
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">SMARTRETAIL CARE</span>
-                  </div>
-                  
-                  <div>
-                    <h3 className="text-xl font-black text-slate-900 mb-1">{item.name}</h3>
-                    <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{item.scope}</p>
+                <h3 className="text-center font-bold text-slate-900 text-base mb-6 pb-4 border-b-2 border-slate-100">
+                  {item.name}
+                </h3>
+
+                <div className="space-y-4">
+                  <div className="text-center">
+                    <p className="text-xs text-slate-600 mb-2">Thời hạn bảo hành</p>
+                    <p className="text-4xl font-black text-slate-900">
+                      {item.period.split(' ')[0]}
+                      <span className="text-sm font-normal text-slate-600 ml-1">
+                        {item.period.split(' ')[1]}
+                      </span>
+                    </p>
                   </div>
 
-                  <div className="space-y-4 pt-4 border-t border-slate-200/60">
-                    <div className="flex items-center gap-3">
-                      <Clock className="text-primary-500" size={20} />
-                      <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Thời hạn</p>
-                        <p className="text-xl font-black text-primary-600 leading-none">{item.period}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <ShieldCheck className="text-primary-500" size={20} />
-                      <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Dịch vụ</p>
-                        <p className="font-bold text-slate-700">{item.type}</p>
-                      </div>
-                    </div>
+                  <div className="pt-4 border-t border-slate-100">
+                    <p className="text-xs text-slate-600 font-semibold mb-2">Loại dịch vụ bảo hành</p>
+                    <p className="text-xs text-slate-500 leading-relaxed">{item.scope}</p>
                   </div>
+
+                  {item.coverage && (
+                    <div className="pt-4 border-t border-slate-100">
+                      <p className="text-xs text-slate-600 font-semibold mb-2">Phạm vi bảo hành</p>
+                      <p className="text-xs text-slate-500 leading-relaxed">{item.coverage}</p>
+                    </div>
+                  )}
                 </div>
               </motion.div>
             ))}
           </AnimatePresence>
         </div>
-      </div>
-    </section>
+
+        {/* Show More/Less Button */}
+        {hasMore && (
+          <div className="flex justify-center mt-8">
+            <button
+              onClick={toggleShowAll}
+              className="text-slate-600 hover:text-primary-600 font-bold py-3 px-6 transition-all flex items-center gap-2 group"
+            >
+              <span>{isExpanded ? 'Thu gọn' : `Hiển thị thêm (${items.length - 4})`}</span>
+              {isExpanded ? (
+                <ChevronUp size={20} className="group-hover:-translate-y-0.5 transition-transform" />
+              ) : (
+                <ChevronDown size={20} className="group-hover:translate-y-0.5 transition-transform" />
+              )}
+            </button>
+          </div>
+        )}
+      </motion.div>
+    </motion.section>
   );
 };
 

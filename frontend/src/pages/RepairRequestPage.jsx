@@ -1,10 +1,11 @@
 import { motion } from 'framer-motion';
-import { CheckCircle, Loader2, Send, Wrench } from 'lucide-react';
+import { CheckCircle, Loader2, Send } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 import { repairApi } from '../api/index';
 import Navbar from '../components/Navbar';
+import ServiceHighlights from '../components/ServiceHighlights';
 
 const RepairRequestPage = () => {
     const [formData, setFormData] = useState({
@@ -99,14 +100,14 @@ const RepairRequestPage = () => {
             <div className="container mx-auto px-4 py-12 md:py-24 max-w-4xl">
                 {/* Hero Section - SEO Optimized */}
                 <header className="text-center mb-12 mt-16 sm:mt-8">
-                    <motion.div
+                    {/* <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700 font-semibold text-sm mb-6 border border-indigo-200/50"
                     >
                         <Wrench size={16} className="animate-pulse" />
                         <span>Dịch Vụ Sửa Chữa Chuyên Nghiệp</span>
-                    </motion.div>
+                    </motion.div> */}
 
                     <motion.h1
                         initial={{ opacity: 0, y: 20 }}
@@ -114,40 +115,20 @@ const RepairRequestPage = () => {
                         transition={{ delay: 0.1 }}
                         className="text-4xl md:text-6xl font-black text-slate-900 mb-6 tracking-tight leading-tight"
                     >
-                        Gửi Yêu Cầu <span className="gradient-text">Sửa Chữa</span>
+                        GỬI YÊU CẦU <span className="gradient-text">SỬA CHỮA</span>
                     </motion.h1>
 
                     <motion.p
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.2 }}
-                        className="text-slate-600 text-base md:text-lg max-w-2xl mx-auto leading-relaxed"
+                        className="text-slate-600 text-base md:text-lg max-w-3xl mx-auto leading-relaxed"
                     >
-                        Hãy điền thông tin chi tiết về <strong>sự cố thiết bị</strong> bạn đang gặp phải.
-                        Đội ngũ kỹ thuật chuyên nghiệp sẽ <strong>hỗ trợ bạn khắc phục nhanh chóng</strong>.
+                        Vui lòng cung cấp theo  thông tin bên dưới. Đội ngũ kỹ thuật của <strong> Công ty TNHH Giải Pháp Công Nghệ Thành Phát - MST:0314763940</strong>, sẽ hỗ trợ bạn nhanh nhất có thể.
                     </motion.p>
 
                     {/* Service Features */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3 }}
-                        className="flex flex-wrap justify-center gap-4 mt-8"
-                    >
-                        {[
-                            { icon: '⚡', text: 'Xử lý nhanh chóng' },
-                            { icon: '🔧', text: 'Kỹ thuật chuyên nghiệp' },
-                            { icon: '✅', text: 'Bảo hành sau sửa chữa' },
-                        ].map((feature, idx) => (
-                            <div
-                                key={idx}
-                                className="flex items-center gap-2 px-4 py-2 bg-white/60 backdrop-blur-sm rounded-xl border border-slate-200/50 hover:border-indigo-300 transition-all hover:shadow-md"
-                            >
-                                <span className="text-xl">{feature.icon}</span>
-                                <span className="text-sm font-bold text-slate-700">{feature.text}</span>
-                            </div>
-                        ))}
-                    </motion.div>
+                    <ServiceHighlights delay={0.3} />
                 </header>
 
                 <motion.form
@@ -163,17 +144,17 @@ const RepairRequestPage = () => {
                         <section className="space-y-6">
                             <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
                                 <span className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 text-white flex items-center justify-center text-sm font-black shadow-lg">1</span>
-                                Thông Tin Liên Hệ
+                                Thông tin liên hệ
                             </h2>
 
                             <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-2">Họ và Tên *</label>
+                                <label className="block text-sm font-semibold text-slate-700 mb-2">Họ và tên *</label>
                                 <input required name="customerName" value={formData.customerName} onChange={handleChange}
                                     className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 outline-none transition-all bg-white/50"
                                     placeholder="Nhập họ tên của bạn" />
                             </div>
                             <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-2">Số Điện Thoại *</label>
+                                <label className="block text-sm font-semibold text-slate-700 mb-2">Số điện thoại *</label>
                                 <input required name="phoneNumber" value={formData.phoneNumber} onChange={handleChange}
                                     className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 outline-none transition-all bg-white/50"
                                     placeholder="Nhập số điện thoại" />
@@ -185,7 +166,7 @@ const RepairRequestPage = () => {
                                     placeholder="example@email.com" />
                             </div>
                             <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-2">Địa Chỉ *</label>
+                                <label className="block text-sm font-semibold text-slate-700 mb-2">Địa chỉ *</label>
                                 <textarea required name="address" value={formData.address} onChange={handleChange}
                                     rows="3"
                                     className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 outline-none transition-all resize-none bg-white/50"
@@ -194,13 +175,13 @@ const RepairRequestPage = () => {
                         </section>
 
                         <section className="space-y-6">
-                            <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2 font-display">
+                            <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
                                 <span className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 text-white flex items-center justify-center text-sm font-black shadow-lg">2</span>
-                                Thông Tin Sản Phẩm
+                                Thông tin sản phẩm
                             </h2>
 
                             <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-2">Tên Sản Phẩm *</label>
+                                <label className="block text-sm font-semibold text-slate-700 mb-2">Tên sản phẩm *</label>
                                 <input required name="productName" value={formData.productName} onChange={handleChange}
                                     className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all bg-white/50"
                                     placeholder="Ví dụ: Màn hình quảng cáo 55 inch" />
@@ -212,7 +193,7 @@ const RepairRequestPage = () => {
                                     placeholder="Nhập số serial thiết bị" />
                             </div>
                             <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-2">Mô Tả Sự Cố *</label>
+                                <label className="block text-sm font-semibold text-slate-700 mb-2">Mô tả sự cố *</label>
                                 <textarea required name="issueDescription" value={formData.issueDescription} onChange={handleChange}
                                     rows="5"
                                     className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all resize-none bg-white/50"
@@ -227,7 +208,7 @@ const RepairRequestPage = () => {
                             aria-label="Gửi yêu cầu sửa chữa"
                         >
                             {loading ? <Loader2 className="animate-spin" /> : <Send size={20} />}
-                            {loading ? 'Đang Gửi...' : 'Gửi Yêu Cầu'}
+                            {loading ? 'Đang Gửi...' : 'Gửi yêu cầu'}
                         </button>
                     </div>
                 </motion.form>

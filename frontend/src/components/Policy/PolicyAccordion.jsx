@@ -1,67 +1,62 @@
-import { AnimatePresence, motion } from 'framer-motion';
-import { CheckCircle2, ChevronDown } from 'lucide-react';
-import { useState } from 'react';
+import { motion } from 'framer-motion';
 
 const PolicyAccordion = ({ data }) => {
-  const [activeIndex, setActiveIndex] = useState(0);
-
   return (
-    <section className="py-24 bg-slate-50">
-      <div className="container mx-auto px-6 max-w-4xl">
-        <div className="text-center mb-16 space-y-4">
-          <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tight">Chi Tiết Chính Sách</h2>
-          <p className="text-slate-500 font-medium italic italic">Cập nhật mới nhất: 01/2024</p>
-        </div>
+    <motion.section
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      className="mb-20"
+    >
+      <div className="text-center mb-12">
+        <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
+          Chính sách <span className="text-primary-600">bảo hành</span>
+        </h2>
+      </div>
 
-        <div className="space-y-4">
-          {data.map((item, idx) => (
-            <div
-              key={idx}
-              className={`rounded-2xl overflow-hidden border transition-all ${activeIndex === idx
-                ? 'border-primary-200 bg-white shadow-xl shadow-primary-500/5'
-                : 'border-slate-200 bg-slate-50 hover:bg-white'
-                }`}
-            >
-              <button
-                onClick={() => setActiveIndex(activeIndex === idx ? -1 : idx)}
-                className="w-full px-8 py-6 flex items-center justify-between text-left"
-              >
-                <span className={`text-lg font-black tracking-tight transition-colors ${activeIndex === idx ? 'text-primary-600' : 'text-slate-800'}`}>
-                  {idx + 1}. {item.title}
-                </span>
-                <motion.div
-                  animate={{ rotate: activeIndex === idx ? 180 : 0 }}
-                  className={`${activeIndex === idx ? 'text-primary-500' : 'text-slate-400'}`}
-                >
-                  <ChevronDown size={24} strokeWidth={3} />
-                </motion.div>
-              </button>
+      {/* Single Document Card */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="bg-white rounded-2xl border-2 border-slate-200 p-8 md:p-12 max-w-5xl mx-auto"
+      >
+        {/* Date */}
+        <p className="text-sm text-slate-500 mb-6">
+          Ngày hiệu lực: {new Date().toLocaleDateString('vi-VN')}
+        </p>
 
-              <AnimatePresence>
-                {activeIndex === idx && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <div className="px-8 pb-8 space-y-4 border-t border-slate-50 pt-6">
+        {/* Content Sections */}
+        <div className="space-y-8">
+          {data.map((policy, idx) => (
+            <div key={idx} className="space-y-4">
+              <h3 className="text-xl font-bold text-slate-900 mb-4">
+                {policy.title}
+              </h3>
 
-                      {item.content.map((point, pIdx) => (
-                        <div key={pIdx} className="flex gap-4 items-start group">
-                          <CheckCircle2 size={18} className="mt-1 text-primary-500 shrink-0 opacity-60 group-hover:opacity-100 transition-opacity" />
-                          <p className="text-slate-600 font-medium leading-relaxed">{point}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              {policy.subtitle && (
+                <p className="text-sm text-slate-700 leading-relaxed mb-4">
+                  {policy.subtitle}
+                </p>
+              )}
+
+              <div className="space-y-3">
+                {policy.content.map((item, i) => (
+                  <p key={i} className="text-sm text-slate-700 leading-relaxed pl-4">
+                    {item}
+                  </p>
+                ))}
+              </div>
+
+              {/* Divider between sections except last */}
+              {idx < data.length - 1 && (
+                <hr className="mt-8 border-slate-200" />
+              )}
             </div>
           ))}
         </div>
-      </div>
-    </section>
+      </motion.div>
+    </motion.section>
   );
 };
 

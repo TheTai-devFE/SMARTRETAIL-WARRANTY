@@ -61,7 +61,7 @@ const ActivateWarranty = () => {
   }
 
   return (
-    <div className="min-h-screen pb-20 pt-20 bg-slate-50">
+    <div className="min-h-screen pb-20 pt-20 bg-slate-50 font-sans">
       <Navbar />
       <div className="max-w-2xl mx-auto px-4 mt-12 space-y-8">
         <div className="text-center space-y-4">
