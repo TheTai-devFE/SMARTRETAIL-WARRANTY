@@ -26,8 +26,8 @@ const Navbar = ({ isDark = false }) => {
           <Link
             to="/"
             className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all ${isActive('/')
-                ? 'bg-primary-100 text-primary-700'
-                : 'hover:bg-black/5'
+              ? 'bg-primary-100 text-primary-700'
+              : 'hover:bg-black/5'
               }`}
             aria-label="Trang tra cứu bảo hành"
           >
@@ -38,8 +38,8 @@ const Navbar = ({ isDark = false }) => {
           <Link
             to="/yeu-cau-sua-chua"
             className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all ${isActive('/yeu-cau-sua-chua')
-                ? 'bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 shadow-sm'
-                : 'hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50'
+              ? 'bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 shadow-sm'
+              : 'hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50'
               }`}
             aria-label="Yêu cầu dịch vụ sửa chữa"
           >
@@ -50,18 +50,26 @@ const Navbar = ({ isDark = false }) => {
           <Link
             to="/chinh-sach"
             className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all ${isActive('/chinh-sach')
-                ? 'bg-primary-100 text-primary-700'
-                : 'hover:bg-black/5'
+              ? 'bg-primary-100 text-primary-700'
+              : 'hover:bg-black/5'
               }`}
             aria-label="Chính sách bảo hành"
           >
             <ShieldCheck size={18} className={isActive('/chinh-sach') ? 'text-primary-600' : 'text-primary-500'} />
             <span className="hidden sm:inline">Chính sách</span>
           </Link>
-          {/* <Link to="/admin" className="flex items-center gap-2 px-3 py-2 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 transition-all border border-slate-200 ml-2">
-            <LayoutDashboard size={18} />
-            <span className="hidden sm:inline">Quản trị</span>
-          </Link> */}
+          <Link
+            to="#"
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all ${isActive('/chinh-sach')
+              ? 'bg-primary-100 text-primary-700'
+              : 'hover:bg-black/5'
+              }`}
+            aria-label="Chính sách bảo hành"
+          >
+            <ShieldCheck size={18} className={isActive('/chinh-sach') ? 'text-primary-600' : 'text-primary-500'} />
+            <span className="hidden sm:inline">Tài liệu </span>
+          </Link>
+
         </div>
       </div>
     </nav>
