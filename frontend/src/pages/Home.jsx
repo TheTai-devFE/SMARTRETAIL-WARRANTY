@@ -143,21 +143,19 @@ const Home = () => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className=" font-extrabold tracking-tight leading-8 "
+            className="font-extrabold tracking-tight leading-tight"
           >
-            <span className="text-3xl md:text-8xl gradient-text ">TRA CỨU</span>
-            <br />
-            <span className="text-2xl md:text-4xl text-slate-600 font-semibold"> Bảo hành & dịch vụ sửa chữa</span>
+            <span className="text-5xl md:text-8xl gradient-text block mb-2">TRA CỨU</span>
+            <span className="text-xl md:text-3xl text-slate-600 font-semibold">Bảo hành & dịch vụ sửa chữa</span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            className="text-slate-600 max-w-3xl text-base md:text-lg mx-auto leading-relaxed"
+            className="text-slate-600 max-w-2xl text-sm md:text-base mx-auto leading-relaxed"
           >
-            Hệ thống tra cứu thông tin bảo hành; <strong> Dịch vụ sửa chữa</strong>, bao gồm tất cả sản phẩm, dịch vụ liên quan đến <strong> Phần cứng & Phần mềm</strong>. Phục vụ công tác theo dõi tiến độ bảo hành và sửa chữa.
-
+            Hệ thống tra cứu thông tin bảo hành; <strong>Dịch vụ sửa chữa</strong>, bao gồm tất cả sản phẩm, dịch vụ liên quan đến <strong>Phần cứng & Phần mềm</strong>. Phục vụ công tác theo dõi tiến độ bảo hành và sửa chữa.
           </motion.p>
 
           {/* Service Highlights - SEO Friendly */}

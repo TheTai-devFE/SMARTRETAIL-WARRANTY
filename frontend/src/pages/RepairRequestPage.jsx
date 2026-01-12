@@ -113,7 +113,7 @@ const RepairRequestPage = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
-                        className="text-4xl md:text-6xl font-black text-slate-900 mb-6 tracking-tight leading-tight"
+                        className="text-4xl md:text-7xl font-black text-slate-900 mb-6 tracking-tight leading-tight"
                     >
                         GỬI YÊU CẦU <span className="gradient-text">SỬA CHỮA</span>
                     </motion.h1>
@@ -122,9 +122,9 @@ const RepairRequestPage = () => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.2 }}
-                        className="text-slate-600 text-base md:text-lg max-w-3xl mx-auto leading-relaxed"
+                        className="text-slate-600 text-sm md:text-base max-w-2xl mx-auto leading-relaxed"
                     >
-                        Vui lòng cung cấp theo  thông tin bên dưới. Đội ngũ kỹ thuật của <strong> Công ty TNHH Giải Pháp Công Nghệ Thành Phát - MST:0314763940</strong>, sẽ hỗ trợ bạn nhanh nhất có thể.
+                        Vui lòng cung cấp theo thông tin bên dưới. Đội ngũ kỹ thuật của <strong>Công ty TNHH Giải Pháp Công Nghệ Thành Phát - MST:0314763940</strong>, sẽ hỗ trợ bạn nhanh nhất có thể.
                     </motion.p>
 
                     {/* Service Features */}

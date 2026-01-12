@@ -34,7 +34,7 @@ const WarrantyTabs = ({ data }) => {
     >
       <div className="text-center mb-8">
         <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-4">
-          Phạm Vi <span className="text-primary-600">Bảo Hành</span>
+          Phạm vi <span className="text-primary-600">bảo hành</span>
         </h2>
         <p className="text-slate-600 max-w-2xl mx-auto">
           Danh sách sản phẩm và thời hạn bảo hành áp dụng
@@ -49,8 +49,8 @@ const WarrantyTabs = ({ data }) => {
               key={category.id}
               onClick={() => handleTabChange(idx)}
               className={`flex-1 min-w-[200px] px-6 py-4 font-bold text-sm uppercase tracking-wide transition-all ${activeTab === idx
-                  ? 'bg-primary-600 text-white border-b-4 border-primary-400'
-                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'
+                ? 'bg-primary-600 text-white border-b-4 border-primary-400'
+                : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'
                 }`}
             >
               {category.label}

@@ -29,13 +29,12 @@ const PolicyPage = () => {
             <span className="text-xs font-bold text-primary-700 uppercase tracking-wider">Chính sách bảo hành</span>
           </div> */}
 
-          <h1 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight leading-tight">
-            CHÍNH SÁCH
-            <span className=" font-bold gradient-text"> BẢO HÀNH</span>
+          <h1 className="text-4xl md:text-7xl font-black text-slate-900 tracking-tight leading-tight mb-6">
+            CHÍNH SÁCH <span className="gradient-text">BẢO HÀNH</span>
           </h1>
 
-          <p className="text-slate-600 text-base md:text-lg max-w-3xl mx-auto leading-relaxed">
-            <strong> Công ty TNHH Giải Pháp Công Nghệ Thành Phát - MST: 0314763940</strong>, chúng tôi cung cấp dịch vụ bảo hành cho tất cả sản phẩm, được công bố và  phân phối chính thức trên thị trường. Vui lòng liên hệ với chúng tôi nếu bạn cần bạn cần hỗ trợ .
+          <p className="text-slate-600 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
+            <strong>Công ty TNHH Giải Pháp Công Nghệ Thành Phát - MST: 0314763940</strong>, chúng tôi cung cấp dịch vụ bảo hành cho tất cả sản phẩm, được công bố và phân phối chính thức trên thị trường. Vui lòng liên hệ với chúng tôi nếu bạn cần hỗ trợ.
           </p>
 
           <div className="flex flex-wrap justify-center gap-4 pt-4">
