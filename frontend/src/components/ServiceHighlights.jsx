@@ -6,7 +6,7 @@ const ServiceHighlights = ({ delay = 0.3 }) => {
         { icon: '🔧', text: 'Sửa chữa thiết bị' },
         { icon: '⚡', text: 'Tiện lợi - Nhanh chóng' },
         { icon: '🏆', text: 'Dịch vụ chuyên nghiệp' },
-        { icon: '👥', text: '8000+ Customer & Reseller' },
+        { icon: '👥', text: '8000+ Customers & Resellers' },
         { icon: '🌏', text: 'Hỗ trợ toàn quốc' },
         { icon: '🛡️', text: 'An toàn, minh bạch' },
     ];

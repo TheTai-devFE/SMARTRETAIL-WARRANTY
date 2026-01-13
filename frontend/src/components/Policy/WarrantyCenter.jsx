@@ -4,19 +4,19 @@ import { MapPin } from 'lucide-react';
 const WarrantyCenter = () => {
     const centers = [
         {
-            name: "Văn phòng HCM",
+            name: "Trung tâm HCM",
             address: "A60 Tô Ký, P. Đông Hưng Thuận, Quận 12, TP.HCM",
             mapLink: "https://maps.app.goo.gl/1bWKPcp3VFRxKZXv5",
             available: true
         },
         {
-            name: "Văn phòng HN",
+            name: "Trung tâm HN",
             address: "66 P. Hồng Đô, làng Phú Đô, Nam Từ Liêm, Hà Nội",
             mapLink: "https://maps.app.goo.gl/P5JDd2vH5dqm8sBX8",
             available: true
         },
         {
-            name: "Văn phòng miền trung",
+            name: "Trung tâm ĐN",
             address: "Coming soon",
             mapLink: null,
             available: false

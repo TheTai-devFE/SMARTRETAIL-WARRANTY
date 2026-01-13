@@ -241,19 +241,19 @@ export const warrantyPolicyData = {
   ],
   support: [
     {
-      title: "Hotline kinh doanh",
+      title: "Hotline/Zalo",
       icon: "PhoneCall",
       contacts: [
-        { label: "Hotline/Zalo: 0935 888 489", link: "tel:0935888489" },
-        { label: "Hotline/Zalo: 0967 049 018", link: "tel:0967049018" }
+        { label: "0935 888 489", link: "tel:0935888489" },
+        { label: "0967 049 018", link: "tel:0967049018" }
       ]
     },
     {
-      title: "Hỗ trợ kỹ thuật",
+      title: "Hỗ trợ kỹ thuật (24/7)",
       icon: "MessageSquare",
       contacts: [
-        { label: "Zalo: 0909 045 663", link: "https://zalo.me/0909045663" },
-        { label: "Zalo: 0936 817 781", link: "https://zalo.me/0936817781" }
+        { label: "0909 045 663", link: "https://zalo.me/0909045663" },
+        { label: "0936 817 781", link: "https://zalo.me/0936817781" }
       ]
     },
     {
