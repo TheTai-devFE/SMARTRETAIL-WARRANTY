@@ -179,7 +179,7 @@ const Home = () => {
 
             <div className="md:col-span-2 space-y-4">
               <div className="flex items-center gap-2 mb-4">
-                <label className="text-sm font-bold text-slate-700">Loại khách hàng:</label>
+                <label className="text-sm font-bold text-slate-700">Tìm kiếm:</label>
                 <div className="flex gap-2 bg-slate-100 p-1 rounded-lg">
                   <button
                     type="button"
@@ -188,7 +188,7 @@ const Home = () => {
                       }`}
                   >
                     <Building size={14} className="inline mr-1" />
-                    Doanh nghiệp (MST)
+                    Doanh nghiệp
                   </button>
                   <button
                     type="button"
@@ -197,7 +197,7 @@ const Home = () => {
                       }`}
                   >
                     <User size={14} className="inline mr-1" />
-                    Cá nhân (SĐT)
+                    Cá nhân
                   </button>
                   <button
                     type="button"
@@ -209,7 +209,7 @@ const Home = () => {
                       }`}
                   >
                     <Wrench size={14} className="inline mr-1" />
-                    Sửa chữa (Mã + SĐT)
+                    Sửa chữa
                   </button>
                 </div>
               </div>

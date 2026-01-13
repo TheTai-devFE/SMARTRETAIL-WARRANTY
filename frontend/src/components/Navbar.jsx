@@ -1,4 +1,4 @@
-import { Search, ShieldCheck, Wrench } from 'lucide-react';
+import { File, Search, ShieldCheck, Wrench } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import LOGO_DARK from '../assets/LOGO SR.png';
 import LOGO_LIGHT from '../assets/logo-white.png';
@@ -60,13 +60,13 @@ const Navbar = ({ isDark = false }) => {
           </Link>
           <Link
             to="#"
-            className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all ${isActive('/chinh-sach')
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all ${isActive('/tai-lieu')
               ? 'bg-primary-100 text-primary-700'
               : 'hover:bg-black/5'
               }`}
             aria-label="Chính sách bảo hành"
           >
-            <ShieldCheck size={18} className={isActive('/chinh-sach') ? 'text-primary-600' : 'text-primary-500'} />
+            <File size={18} className={isActive('/chinh-sach') ? 'text-primary-600' : 'text-primary-500'} />
             <span className="hidden sm:inline">Tài liệu </span>
           </Link>
 
