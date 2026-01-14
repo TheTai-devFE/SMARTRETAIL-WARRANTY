@@ -2,7 +2,9 @@ import axios from 'axios';
 
 const api = axios.create({
   // baseURL: import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5001/api' : 'https://smartretail-warranty.onrender.com/api')
-  baseURL: 'https://smartretail-warranty.onrender.com/api',
+  // baseURL: 'https://smartretail-warranty.onrender.com/api',
+  // baseURL: 'http://localhost:5001/api',
+  baseUrl: 'smartretail-warranty-efvg.vercel.app/api'
 
 });
 
@@ -38,7 +40,13 @@ export const searchApi = {
 };
 
 export const repairApi = {
-  create: (data) => api.post('/repair-requests', data),
+  create: (data) => {
+    // Auto-detect FormData and set appropriate headers
+    const config = data instanceof FormData
+      ? { headers: { 'Content-Type': 'multipart/form-data' } }
+      : {};
+    return api.post('/repair-requests', data, config);
+  },
   getAll: () => api.get('/repair-requests'),
   updateStatus: (id, status, warrantyDuration) => api.put(`/repair-requests/${id}`, { status, warrantyDuration }),
   delete: (id) => api.delete(`/repair-requests/${id}`),

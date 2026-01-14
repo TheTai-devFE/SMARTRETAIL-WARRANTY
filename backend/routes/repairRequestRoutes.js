@@ -2,12 +2,37 @@ const express = require('express');
 const router = express.Router();
 const { repairService } = require('../services');
 
-// Create Repair Request
-router.post('/', async (req, res) => {
+const upload = require('../middlewares/upload');
+
+// Create Repair Request with Images
+router.post('/', (req, res, next) => {
+  const uploadHandler = upload.array('images', 5);
+
+  uploadHandler(req, res, (err) => {
+    if (err) {
+      console.error('Upload error:', err.message);
+      return res.status(400).json({
+        message: 'Lỗi khi upload ảnh: ' + err.message
+      });
+    }
+    next();
+  });
+}, async (req, res) => {
   try {
-    const result = await repairService.createRequest(req.body);
+    const data = req.body;
+
+    if (req.files && req.files.length > 0) {
+      data.images = req.files.map(file => {
+        return file.path.startsWith('http')
+          ? file.path
+          : `/uploads/repairs/${file.filename}`;
+      });
+    }
+
+    const result = await repairService.createRequest(data);
     res.status(201).json(result);
   } catch (error) {
+    console.error('Error creating repair request:', error.message);
     res.status(400).json({ message: error.message });
   }
 });

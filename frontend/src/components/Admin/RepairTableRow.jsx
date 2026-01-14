@@ -1,7 +1,10 @@
 import { format } from 'date-fns';
-import { Trash2 } from 'lucide-react';
+import { Image, Printer, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 
-const RepairTableRow = ({ request, onDelete, onUpdateStatus }) => {
+const RepairTableRow = ({ request, onDelete, onUpdateStatus, onPrint }) => {
+    const [showImages, setShowImages] = useState(false);
+
     const statusColors = {
         pending: 'bg-yellow-100 text-yellow-700',
         contacted: 'bg-cyan-100 text-cyan-700',
@@ -20,6 +23,8 @@ const RepairTableRow = ({ request, onDelete, onUpdateStatus }) => {
         cancelled: 'Hủy bỏ'
     };
 
+    const hasImages = request.images && request.images.length > 0;
+
     return (
         <tr className="hover:bg-slate-50 transition-colors group">
             <td className="px-6 py-4">
@@ -34,6 +39,9 @@ const RepairTableRow = ({ request, onDelete, onUpdateStatus }) => {
             </td>
             <td className="px-6 py-4">
                 <div className="font-bold text-slate-900">{request.customerName}</div>
+                {request.companyName && (
+                    <div className="text-sm text-slate-600 font-medium">{request.companyName}</div>
+                )}
                 <div className="text-sm text-slate-500">{request.phoneNumber}</div>
                 <div className="text-xs text-slate-400 mt-1 max-w-[200px] truncate" title={request.address}>
                     {request.address}
@@ -43,6 +51,39 @@ const RepairTableRow = ({ request, onDelete, onUpdateStatus }) => {
                 <p className="text-sm text-slate-600 max-w-[250px] line-clamp-2" title={request.issueDescription}>
                     {request.issueDescription}
                 </p>
+
+                {/* Image Thumbnails */}
+                {hasImages && (
+                    <div className="mt-2">
+                        <button
+                            onClick={() => setShowImages(!showImages)}
+                            className="flex items-center gap-1 text-xs text-primary-600 hover:text-primary-700 font-semibold"
+                        >
+                            <Image size={14} />
+                            {request.images.length} ảnh
+                        </button>
+
+                        {showImages && (
+                            <div className="flex gap-2 mt-2 flex-wrap">
+                                {request.images.map((img, idx) => (
+                                    <a
+                                        key={idx}
+                                        href={img}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="block w-16 h-16 rounded-lg overflow-hidden border border-slate-200 hover:border-primary-500 transition-all"
+                                    >
+                                        <img
+                                            src={img}
+                                            alt={` ${idx + 1}`}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </a>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
             </td>
             <td className="px-6 py-4">
                 <div className="relative inline-block">
@@ -65,14 +106,23 @@ const RepairTableRow = ({ request, onDelete, onUpdateStatus }) => {
                     </div>
                 )}
             </td>
-            <td className="px-6 py-4 text-center">
-                <button
-                    onClick={() => onDelete(request._id)}
-                    className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
-                    title="Xóa"
-                >
-                    <Trash2 size={16} />
-                </button>
+            <td className="px-6 py-4">
+                <div className="flex items-center gap-2 justify-center">
+                    <button
+                        onClick={() => onPrint(request)}
+                        className="p-2 text-slate-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all"
+                        title="In phiếu"
+                    >
+                        <Printer size={16} />
+                    </button>
+                    <button
+                        onClick={() => onDelete(request._id)}
+                        className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
+                        title="Xóa"
+                    >
+                        <Trash2 size={16} />
+                    </button>
+                </div>
             </td>
         </tr>
     );

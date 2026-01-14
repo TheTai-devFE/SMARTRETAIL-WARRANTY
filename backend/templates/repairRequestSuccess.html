@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác Nhận Yêu Cầu Sửa Chữa</title>
+</head>
+
+<body
+    style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f9fafb; margin: 0; padding: 0; line-height: 1.6;">
+    <div
+        style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; margin-top: 40px; margin-bottom: 40px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); border: 1px solid #e5e7eb;">
+
+        <!-- Header -->
+        <div
+            style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); padding: 40px 20px; text-align: center;">
+            <img src="https://warranty.thanhphattech.com/assets/logo-white-D8VOmfuU.png" alt="SMART RETAIL"
+                style="max-width: 200px; height: auto;  padding: 10px; border-radius: 8px;">
+            <p style="color: #bfdbfe; margin: 16px 0 0 0; font-size: 14px; font-weight: 500;">DỊCH VỤ SỬA CHỮA CHUYÊN
+                NGHIỆP</p>
+        </div>
+
+        <!-- Content -->
+        <div style="padding: 40px 32px;">
+            <h2 style="color: #111827; margin-top: 0; font-size: 20px; font-weight: 700;">Xin chào {{customerName}},
+            </h2>
+            <p style="color: #4b5563; margin-bottom: 24px;">
+                Chúng tôi đã nhận được yêu cầu sửa chữa của bạn. Đội ngũ kỹ thuật sẽ sớm xem xét và liên hệ để hỗ trợ
+                bạn trong thời gian nhanh nhất.
+            </p>
+
+            <!-- Ticket Card -->
+            <div
+                style="background-color: #f3f4f6; border-radius: 12px; padding: 24px; text-align: center; border: 1px dashed #9ca3af; margin-bottom: 24px;">
+                <p
+                    style="color: #6b7280; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; margin: 0 0 8px 0; font-weight: 600;">
+                    Mã Tra Cứu Của Bạn</p>
+                <div
+                    style="color: #2563eb; font-size: 32px; font-family: 'Courier New', Courier, monospace; font-weight: 800; letter-spacing: 0.05em;">
+                    {{code}}</div>
+            </div>
+
+            <!-- Details -->
+            <div style="margin-bottom: 32px;">
+                <h3
+                    style="color: #111827; font-size: 16px; font-weight: 600; margin-bottom: 16px; border-bottom: 1px solid #e5e7eb; padding-bottom: 8px;">
+                    Chi Tiết Yêu Cầu</h3>
+
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 8px 0; color: #6b7280; font-size: 14px; width: 35%; vertical-align: top;">
+                            Sản phẩm:</td>
+                        <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600;">{{productName}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 0; color: #6b7280; font-size: 14px; vertical-align: top;">Số Serial:
+                        </td>
+                        <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 500;">{{serialNumber}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 0; color: #6b7280; font-size: 14px; vertical-align: top;">Tên công ty:
+                        </td>
+                        <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 500;">{{companyName}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 0; color: #6b7280; font-size: 14px; vertical-align: top;">Số điện thoại:
+                        </td>
+                        <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 500;">{{phoneNumber}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 0; color: #6b7280; font-size: 14px; vertical-align: top;">Địa chỉ:</td>
+                        <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 500;">{{address}}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 0; color: #6b7280; font-size: 14px; vertical-align: top;">Mô tả sự cố:
+                        </td>
+                        <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 500; color: #ef4444;">
+                            {{issueDescription}}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px 0; color: #6b7280; font-size: 14px; vertical-align: top;">Ngày gửi:</td>
+                        <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 500;">{{date}}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Call to Action -->
+            <div style="text-align: center; margin-top: 32px;">
+                <a href="https://smartretail-warranty.onrender.com"
+                    style="display: inline-block; background-color: #2563eb; color: #ffffff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);">Tra
+                    Cứu Tiến Độ</a>
+            </div>
+
+            <p style="text-align: center; margin-top: 24px; font-size: 13px; color: #ef4444;">
+                * Vui lòng lưu lại mã này để tra cứu tình trạng sửa chữa bất cứ lúc nào.
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div style="background-color: #f9fafb; padding: 24px; text-align: center; border-top: 1px solid #e5e7eb;">
+            <p style="color: #9ca3af; font-size: 12px; margin: 0;">
+                © 2024 Smart Retail. All rights reserved.<br>
+                Đây là email tự động, vui lòng không trả lời email này.
+            </p>
+        </div>
+    </div>
+</body>
+
+</html>

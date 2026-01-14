@@ -10,13 +10,16 @@ import ServiceHighlights from '../components/ServiceHighlights';
 const RepairRequestPage = () => {
     const [formData, setFormData] = useState({
         customerName: '',
+        companyName: '',
         phoneNumber: '',
         email: '',
         address: '',
         productName: '',
         serialNumber: '',
-        issueDescription: ''
+        issueDescription: '',
+        images: []
     });
+    const [previewImages, setPreviewImages] = useState([]);
     const [loading, setLoading] = useState(false);
     const [submitted, setSubmitted] = useState(false);
     const [submittedData, setSubmittedData] = useState(null);
@@ -34,11 +37,42 @@ const RepairRequestPage = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const handleImageChange = (e) => {
+        const files = Array.from(e.target.files);
+        if (files.length + formData.images.length > 5) {
+            toast.error('Chỉ được upload tối đa 5 ảnh');
+            return;
+        }
+
+        // Create previews
+        const newPreviews = files.map(file => URL.createObjectURL(file));
+        setPreviewImages(prev => [...prev, ...newPreviews]);
+
+        // Update state
+        setFormData(prev => ({
+            ...prev,
+            images: [...prev.images, ...files]
+        }));
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         try {
-            const res = await repairApi.create(formData);
+
+            const data = new FormData();
+            Object.keys(formData).forEach(key => {
+                if (key === 'images') {
+                    formData.images.forEach(image => {
+                        data.append('images', image);
+                    });
+                } else {
+                    data.append(key, formData[key]);
+                }
+            });
+
+
+            const res = await repairApi.create(data);
             setSubmittedData(res.data); // Save the response including the code
             setSubmitted(true);
             toast.success('Gửi yêu cầu thành công!');
@@ -78,7 +112,12 @@ const RepairRequestPage = () => {
                             Về Trang Chủ
                         </Link>
                         <button
-                            onClick={() => { setSubmittedData(null); setSubmitted(false); setFormData({ customerName: '', phoneNumber: '', email: '', address: '', productName: '', serialNumber: '', issueDescription: '' }); }}
+                            onClick={() => {
+                                setSubmittedData(null);
+                                setSubmitted(false);
+                                setFormData({ customerName: '', companyName: '', phoneNumber: '', email: '', address: '', productName: '', serialNumber: '', issueDescription: '', images: [] });
+                                setPreviewImages([]);
+                            }}
                             className="px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all hover:scale-105"
                         >
                             Gửi yêu cầu khác
@@ -154,6 +193,12 @@ const RepairRequestPage = () => {
                                     placeholder="Nhập họ tên của bạn" />
                             </div>
                             <div>
+                                <label className="block text-sm font-semibold text-slate-700 mb-2">Tên công ty (Nếu có)</label>
+                                <input name="companyName" value={formData.companyName} onChange={handleChange}
+                                    className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 outline-none transition-all bg-white/50"
+                                    placeholder="Ví dụ: Công ty TNHH ABC" />
+                            </div>
+                            <div>
                                 <label className="block text-sm font-semibold text-slate-700 mb-2">Số điện thoại *</label>
                                 <input required name="phoneNumber" value={formData.phoneNumber} onChange={handleChange}
                                     className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 outline-none transition-all bg-white/50"
@@ -163,7 +208,7 @@ const RepairRequestPage = () => {
                                 <label className="block text-sm font-semibold text-slate-700 mb-2">Email</label>
                                 <input type="email" name="email" value={formData.email} onChange={handleChange}
                                     className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 outline-none transition-all bg-white/50"
-                                    placeholder="example@email.com" />
+                                    placeholder="example@email.com (Để nhận thông báo)" />
                             </div>
                             <div>
                                 <label className="block text-sm font-semibold text-slate-700 mb-2">Địa chỉ *</label>
@@ -191,6 +236,21 @@ const RepairRequestPage = () => {
                                 <input name="serialNumber" value={formData.serialNumber} onChange={handleChange}
                                     className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all bg-white/50"
                                     placeholder="Nhập số serial thiết bị" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-semibold text-slate-700 mb-2">Hình ảnh sản phẩm (Tối đa 5 ảnh)</label>
+                                <div className="flex flex-wrap gap-4 mb-2">
+                                    {previewImages.map((img, index) => (
+                                        <div key={index} className="relative w-20 h-20 rounded-lg overflow-hidden border border-slate-200 shadow-sm">
+                                            <img src={img} alt="Preview" className="w-full h-full object-cover" />
+                                        </div>
+                                    ))}
+                                    <label className="w-20 h-20 flex items-center justify-center border-2 border-dashed border-slate-300 rounded-lg cursor-pointer hover:border-indigo-500 hover:bg-slate-50 transition-colors">
+                                        <input type="file" multiple accept="image/*" onChange={handleImageChange} className="hidden" />
+                                        <span className="text-2xl text-slate-400">+</span>
+                                    </label>
+                                </div>
+                                <p className="text-xs text-slate-500">Hỗ trợ JPG, PNG, WEBP.</p>
                             </div>
                             <div>
                                 <label className="block text-sm font-semibold text-slate-700 mb-2">Mô tả sự cố *</label>

@@ -14,6 +14,7 @@ import SoftwareTableRow from '../components/Admin/SoftwareTableRow';
 import WarrantyForm from '../components/Admin/WarrantyForm';
 import WarrantyTableRow from '../components/Admin/WarrantyTableRow';
 import QRLabelPrint from '../components/QRLabelPrint';
+import RepairReceiptPrint from '../components/RepairReceiptPrint';
 import ConfirmModal from '../components/Shared/ConfirmModal';
 import { createRoundedLogoDataURL } from '../utils/qrLogo';
 
@@ -23,6 +24,7 @@ const AdminDashboard = () => {
   const [softwareList, setSoftwareList] = useState([]);
   const [repairRequests, setRepairRequests] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [printReceipt, setPrintReceipt] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [confirmConfig, setConfirmConfig] = useState({ isOpen: false, title: '', message: '', onConfirm: () => { }, type: 'danger' });
   const [qrModal, setQrModal] = useState(null);
@@ -651,6 +653,7 @@ const AdminDashboard = () => {
                         request={item}
                         onDelete={handleDelete}
                         onUpdateStatus={handleUpdateRepairStatus}
+                        onPrint={(req) => setPrintReceipt(req)}
                       />
                     )
                   ))
@@ -917,6 +920,50 @@ const AdminDashboard = () => {
           {...confirmConfig}
           onClose={() => setConfirmConfig({ ...confirmConfig, isOpen: false })}
         />
+
+        {/* Print Receipt Modal */}
+        <AnimatePresence>
+          {printReceipt && (
+            <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"
+                onClick={() => setPrintReceipt(null)}
+              ></motion.div>
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                className="bg-white rounded-3xl shadow-2xl p-8 max-w-2xl w-full relative z-10 max-h-[90vh] overflow-y-auto"
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-black text-slate-900">Phiếu Nhận Hàng</h3>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => window.print()}
+                      className="bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded-xl flex items-center gap-2 transition-all"
+                    >
+                      <Printer size={16} /> In phiếu
+                    </button>
+                    <button
+                      onClick={() => setPrintReceipt(null)}
+                      className="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all"
+                    >
+                      <X size={20} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Receipt Preview */}
+                <div className="border border-slate-200 rounded-xl overflow-hidden">
+                  <RepairReceiptPrint request={printReceipt} />
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
