@@ -4,14 +4,21 @@ const { sendRepairConfirmation } = require('./emailService');
 
 const createRequest = async (data) => {
   // Generate simple code: SR + random 6 digits
-  // Ideally use a counter, but for simplicity:
   const code = 'SR-' + Math.floor(100000 + Math.random() * 900000);
   const request = new RepairRequest({ ...data, code });
   const savedRequest = await request.save();
 
-  // Send confirmation email asynchronously (fire and forget)
+  console.log('📝 Repair request created:', savedRequest.code);
+  console.log('📧 Customer email:', savedRequest.email);
+
+  // Send confirmation email asynchronously
   if (savedRequest.email) {
-    sendRepairConfirmation(savedRequest).catch(err => console.error('Email sending failed', err));
+    console.log('✅ Email found, attempting to send...');
+    sendRepairConfirmation(savedRequest).catch(err => {
+      console.error('❌ Email sending failed:', err.message);
+    });
+  } else {
+    console.log('⚠️  No email provided, skipping email send');
   }
 
   return savedRequest;

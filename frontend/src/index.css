@@ -299,3 +299,111 @@ body::before {
     font-size: 18px;
   }
 }
+
+/* ============================================
+   PRINT STYLES FOR A5 RECEIPT
+   ============================================ */
+@media print {
+  @page {
+    size: A5 portrait;
+    margin: 8mm;
+  }
+
+  /* Reset body for print */
+  html,
+  body {
+    width: 148mm !important;
+    height: 210mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+    overflow: visible !important;
+  }
+
+  body::before {
+    display: none !important;
+  }
+
+  /* Hide everything by default when printing */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Only show receipt print content */
+  .a5-receipt-print,
+  .a5-receipt-print * {
+    visibility: visible !important;
+  }
+
+  .a5-receipt-print {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+    font-family: 'Arial', sans-serif !important;
+    color: #000 !important;
+  }
+
+  .a5-receipt-print .receipt-page {
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: white !important;
+  }
+
+  /* Hide modal overlays and navigation */
+  nav,
+  .fixed,
+  [class*="modal"],
+  [class*="backdrop"],
+  button,
+  .bg-slate-900 {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* Force show receipt elements */
+  .a5-receipt-print .receipt-header,
+  .a5-receipt-print .section,
+  .a5-receipt-print .signature-section,
+  .a5-receipt-print .footer-note,
+  .a5-receipt-print .company-info,
+  .a5-receipt-print .receipt-title,
+  .a5-receipt-print .info-table,
+  .a5-receipt-print table,
+  .a5-receipt-print tr,
+  .a5-receipt-print td,
+  .a5-receipt-print th,
+  .a5-receipt-print h1,
+  .a5-receipt-print h2,
+  .a5-receipt-print h3,
+  .a5-receipt-print p,
+  .a5-receipt-print strong {
+    display: block !important;
+    visibility: visible !important;
+  }
+
+  .a5-receipt-print table {
+    display: table !important;
+  }
+
+  .a5-receipt-print tr {
+    display: table-row !important;
+  }
+
+  .a5-receipt-print td,
+  .a5-receipt-print th {
+    display: table-cell !important;
+  }
+
+  .a5-receipt-print .signature-section {
+    display: flex !important;
+  }
+}

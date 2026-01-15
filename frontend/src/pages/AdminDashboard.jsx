@@ -942,7 +942,231 @@ const AdminDashboard = () => {
                   <h3 className="text-xl font-black text-slate-900">Phiếu Nhận Hàng</h3>
                   <div className="flex gap-2">
                     <button
-                      onClick={() => window.print()}
+                      onClick={() => {
+                        // Open new window for printing
+                        const printWindow = window.open('', '_blank', 'width=600,height=800');
+                        const receiptHTML = `
+                          <!DOCTYPE html>
+                          <html>
+                          <head>
+                            <meta charset="UTF-8">
+                            <title>Phiếu Nhận Hàng - ${printReceipt.code}</title>
+                            <style>
+                              @page {
+                                size: A5 portrait;
+                                margin: 8mm;
+                              }
+                              * {
+                                margin: 0;
+                                padding: 0;
+                                box-sizing: border-box;
+                              }
+                              body {
+                                font-family: Arial, sans-serif;
+                                color: #000;
+                                background: white;
+                                width: 148mm;
+                                min-height: 210mm;
+                                padding: 8mm;
+                                margin: 0 auto;
+                              }
+                              .receipt-header {
+                                border-bottom: 2px solid #000;
+                                padding-bottom: 6px;
+                                margin-bottom: 10px;
+                              }
+                              .company-info h1 {
+                                font-size: 12px;
+                                font-weight: bold;
+                                text-align: center;
+                                margin: 0 0 3px 0;
+                              }
+                              .company-info p {
+                                font-size: 9px;
+                                text-align: center;
+                                margin: 2px 0;
+                              }
+                              .receipt-title {
+                                text-align: center;
+                                margin-top: 8px;
+                              }
+                              .receipt-title h2 {
+                                font-size: 14px;
+                                font-weight: bold;
+                                margin: 4px 0;
+                              }
+                              .receipt-code, .receipt-date {
+                                font-size: 10px;
+                                margin: 2px 0;
+                              }
+                              .section {
+                                margin: 10px 0;
+                              }
+                              .section h3 {
+                                font-size: 11px;
+                                font-weight: bold;
+                                border-bottom: 1px solid #ddd;
+                                padding-bottom: 3px;
+                                margin-bottom: 5px;
+                              }
+                              .info-table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                font-size: 10px;
+                              }
+                              .info-table td {
+                                padding: 3px 4px;
+                                vertical-align: top;
+                              }
+                              .info-table .label {
+                                width: 35%;
+                                font-weight: bold;
+                              }
+                              .info-table .value {
+                                border-bottom: 1px dotted #ccc;
+                              }
+                              .status-text {
+                                font-size: 10px;
+                                margin: 4px 0;
+                              }
+                              .status-badge {
+                                display: inline-block;
+                                padding: 2px 6px;
+                                background: #f0f0f0;
+                                border-radius: 3px;
+                                font-size: 9px;
+                              }
+                              .signature-section {
+                                display: flex;
+                                justify-content: space-between;
+                                margin-top: 15px;
+                              }
+                              .signature-box {
+                                width: 45%;
+                                text-align: center;
+                              }
+                              .signature-title {
+                                font-size: 10px;
+                                font-weight: bold;
+                                margin-bottom: 3px;
+                              }
+                              .signature-note {
+                                font-size: 8px;
+                                font-style: italic;
+                                margin-bottom: 3px;
+                              }
+                              .signature-space {
+                                height: 40px;
+                                border-bottom: 1px solid #000;
+                                margin-top: 25px;
+                              }
+                              .footer-note {
+                                margin-top: 12px;
+                                padding-top: 8px;
+                                border-top: 1px dashed #ccc;
+                                font-size: 8px;
+                                font-style: italic;
+                              }
+                              .footer-note p {
+                                margin: 2px 0;
+                              }
+                              @media print {
+                                body {
+                                  width: 100%;
+                                  padding: 0;
+                                }
+                              }
+                            </style>
+                          </head>
+                          <body>
+                            <div class="receipt-header">
+                              <div class="company-info">
+                                <h1>CÔNG TY TNHH GIẢI PHÁP CÔNG NGHỆ THÀNH PHÁT</h1>
+                                <p>MST: 0314763940</p>
+                                <p>Địa chỉ: A60 Tô Ký, Phường Đông Hưng Thuận, TP.Hồ Chí Minh</p>
+                                <p>Hotline: 0935.888.489 - 0967.049.018</p>
+                              </div>
+                              <div class="receipt-title">
+                                <h2>PHIẾU NHẬN HÀNG SỬA CHỮA</h2>
+                                <p class="receipt-code">Mã phiếu: <strong>${printReceipt.code}</strong></p>
+                                <p class="receipt-date">Ngày: ${format(new Date(printReceipt.createdAt), 'dd/MM/yyyy HH:mm')}</p>
+                              </div>
+                            </div>
+                            
+                            <div class="section">
+                              <h3>THÔNG TIN KHÁCH HÀNG</h3>
+                              <table class="info-table">
+                                <tr>
+                                  <td class="label">Họ và tên:</td>
+                                  <td class="value">${printReceipt.customerName}</td>
+                                </tr>
+                                ${printReceipt.companyName ? `<tr><td class="label">Công ty:</td><td class="value">${printReceipt.companyName}</td></tr>` : ''}
+                                <tr>
+                                  <td class="label">Số điện thoại:</td>
+                                  <td class="value">${printReceipt.phoneNumber}</td>
+                                </tr>
+                                ${printReceipt.email ? `<tr><td class="label">Email:</td><td class="value">${printReceipt.email}</td></tr>` : ''}
+                                <tr>
+                                  <td class="label">Địa chỉ:</td>
+                                  <td class="value">${printReceipt.address || ''}</td>
+                                </tr>
+                              </table>
+                            </div>
+                            
+                            <div class="section">
+                              <h3>THÔNG TIN THIẾT BỊ</h3>
+                              <table class="info-table">
+                                <tr>
+                                  <td class="label">Tên sản phẩm:</td>
+                                  <td class="value">${printReceipt.productName}</td>
+                                </tr>
+                                <tr>
+                                  <td class="label">Số Serial:</td>
+                                  <td class="value">${printReceipt.serialNumber || 'Không có'}</td>
+                                </tr>
+                                <tr>
+                                  <td class="label">Mô tả sự cố:</td>
+                                  <td class="value">${printReceipt.issueDescription}</td>
+                                </tr>
+                              </table>
+                            </div>
+                            
+                            <div class="section">
+                              <h3>TRẠNG THÁI</h3>
+                              <p class="status-text">
+                                Trạng thái hiện tại: <strong class="status-badge">${{ pending: 'Chờ xử lý', contacted: 'Đã liên hệ', received: 'Đã nhận máy', in_progress: 'Đang sửa chữa', completed: 'Hoàn thành', cancelled: 'Đã hủy' }[printReceipt.status] || printReceipt.status
+                          }</strong>
+                              </p>
+                            </div>
+                            
+                            <div class="signature-section">
+                              <div class="signature-box">
+                                <p class="signature-title">NGƯỜI GIAO</p>
+                                <p class="signature-note">(Ký và ghi rõ họ tên)</p>
+                                <div class="signature-space"></div>
+                              </div>
+                              <div class="signature-box">
+                                <p class="signature-title">NGƯỜI NHẬN</p>
+                                <p class="signature-note">(Ký và ghi rõ họ tên)</p>
+                                <div class="signature-space"></div>
+                              </div>
+                            </div>
+                            
+                            <div class="footer-note">
+                              <p>* Vui lòng giữ phiếu này để nhận lại thiết bị.</p>
+                              <p>* Thời gian sửa chữa dự kiến: _____ ngày làm việc.</p>
+                            </div>
+                          </body>
+                          </html>
+                        `;
+                        printWindow.document.write(receiptHTML);
+                        printWindow.document.close();
+                        printWindow.focus();
+                        // Wait for content to render then print
+                        setTimeout(() => {
+                          printWindow.print();
+                        }, 250);
+                      }}
                       className="bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded-xl flex items-center gap-2 transition-all"
                     >
                       <Printer size={16} /> In phiếu

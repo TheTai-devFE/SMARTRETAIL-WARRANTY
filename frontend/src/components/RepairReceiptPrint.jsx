@@ -105,33 +105,13 @@ const RepairReceiptPrint = ({ request }) => {
             </div>
 
             <style>{`
-                @media print {
-                    @page {
-                        size: A5;
-                        margin: 10mm;
-                    }
-                    
-                    body * {
-                        visibility: hidden;
-                    }
-                    
-                    .a5-receipt-print,
-                    .a5-receipt-print * {
-                        visibility: visible;
-                    }
-                    
-                    .a5-receipt-print {
-                        position: absolute;
-                        left: 0;
-                        top: 0;
-                        width: 100%;
-                    }
-                }
-
                 .a5-receipt-print {
                     font-family: 'Arial', sans-serif;
                     color: #000;
                     background: white;
+                    width: 100%;
+                    max-width: 148mm;
+                    margin: 0 auto;
                 }
 
                 .receipt-page {
@@ -139,27 +119,29 @@ const RepairReceiptPrint = ({ request }) => {
                     min-height: 210mm;
                     margin: 0 auto;
                     background: white;
-                    padding: 10mm;
+                    padding: 8mm;
                     box-sizing: border-box;
                 }
 
                 .receipt-header {
                     border-bottom: 2px solid #000;
-                    padding-bottom: 8px;
-                    margin-bottom: 12px;
+                    padding-bottom: 6px;
+                    margin-bottom: 10px;
                 }
 
                 .company-info h1 {
-                    font-size: 14px;
+                    font-size: 12px;
                     font-weight: bold;
                     text-align: center;
-                    margin: 0 0 4px 0;
+                    margin: 0 0 3px 0;
+                    line-height: 1.3;
                 }
 
                 .company-info p {
-                    font-size: 10px;
+                    font-size: 9px;
                     text-align: center;
                     margin: 2px 0;
+                    line-height: 1.3;
                 }
 
                 .receipt-title {
@@ -168,38 +150,42 @@ const RepairReceiptPrint = ({ request }) => {
                 }
 
                 .receipt-title h2 {
-                    font-size: 16px;
+                    font-size: 14px;
                     font-weight: bold;
                     margin: 4px 0;
+                    line-height: 1.3;
                 }
 
                 .receipt-code, .receipt-date {
-                    font-size: 11px;
+                    font-size: 10px;
                     margin: 2px 0;
+                    line-height: 1.3;
                 }
 
                 .section {
-                    margin: 12px 0;
+                    margin: 10px 0;
                     page-break-inside: avoid;
                 }
 
                 .section h3 {
-                    font-size: 12px;
+                    font-size: 11px;
                     font-weight: bold;
                     border-bottom: 1px solid #ddd;
-                    padding-bottom: 4px;
-                    margin-bottom: 6px;
+                    padding-bottom: 3px;
+                    margin-bottom: 5px;
+                    line-height: 1.3;
                 }
 
                 .info-table {
                     width: 100%;
                     border-collapse: collapse;
-                    font-size: 11px;
+                    font-size: 10px;
                 }
 
                 .info-table td {
-                    padding: 4px 6px;
+                    padding: 3px 4px;
                     vertical-align: top;
+                    line-height: 1.4;
                 }
 
                 .info-table .label {
@@ -212,26 +198,27 @@ const RepairReceiptPrint = ({ request }) => {
                 }
 
                 .info-table .value.description {
-                    min-height: 40px;
+                    min-height: 30px;
                 }
 
                 .status-text {
-                    font-size: 11px;
-                    margin: 6px 0;
+                    font-size: 10px;
+                    margin: 4px 0;
+                    line-height: 1.4;
                 }
 
                 .status-badge {
                     display: inline-block;
-                    padding: 2px 8px;
+                    padding: 2px 6px;
                     background: #f0f0f0;
-                    border-radius: 4px;
-                    font-size: 10px;
+                    border-radius: 3px;
+                    font-size: 9px;
                 }
 
                 .signature-section {
                     display: flex;
                     justify-content: space-between;
-                    margin-top: 20px;
+                    margin-top: 15px;
                     page-break-inside: avoid;
                 }
 
@@ -241,33 +228,36 @@ const RepairReceiptPrint = ({ request }) => {
                 }
 
                 .signature-title {
-                    font-size: 11px;
+                    font-size: 10px;
                     font-weight: bold;
-                    margin-bottom: 2px;
+                    margin-bottom: 3px;
+                    line-height: 1.3;
                 }
 
                 .signature-note {
-                    font-size: 9px;
+                    font-size: 8px;
                     font-style: italic;
-                    margin-bottom: 4px;
+                    margin-bottom: 3px;
+                    line-height: 1.3;
                 }
 
                 .signature-space {
-                    height: 50px;
+                    height: 40px;
                     border-bottom: 1px solid #000;
-                    margin-top: 40px;
+                    margin-top: 25px;
                 }
 
                 .footer-note {
-                    margin-top: 16px;
+                    margin-top: 12px;
                     padding-top: 8px;
                     border-top: 1px dashed #ccc;
-                    font-size: 9px;
+                    font-size: 8px;
                     font-style: italic;
                 }
 
                 .footer-note p {
-                    margin: 3px 0;
+                    margin: 2px 0;
+                    line-height: 1.3;
                 }
             `}</style>
         </div>
