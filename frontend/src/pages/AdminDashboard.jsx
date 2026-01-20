@@ -549,8 +549,8 @@ const AdminDashboard = () => {
         </AnimatePresence>
 
         {/* Filters */}
-        <div className="flex flex-col md:flex-row gap-4 mb-8 items-end">
-          <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-4 w-full">
+        <div className="flex flex-col md:flex-row gap-3 items-stretch">
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-3 w-full">
             {activeTab === 'Hardware' ? (
               // Hardware Filters
               <div className="relative group">
@@ -614,7 +614,7 @@ const AdminDashboard = () => {
           </div>
 
           {activeTab === 'Hardware' && (
-            <div className="flex gap-2 bg-slate-100 p-1.5 rounded-[20px] w-full md:w-auto">
+            <div className="flex gap-1.5 bg-slate-100 p-1 rounded-2xl w-full md:w-auto shrink-0">
               {['', 'Retail', 'Dealer', 'Project'].map((type) => (
                 <button
                   key={type}
@@ -663,17 +663,17 @@ const AdminDashboard = () => {
                     </>
                   ) : (
                     <>
-                      <th className="px-6 py-4">Sản phẩm / {activeTab === 'Hardware' ? 'Model' : 'Mã KH'}</th>
+                      <th className="px-6 py-4 whitespace-nowrap">Sản phẩm / {activeTab === 'Hardware' ? 'Model' : 'Mã KH'}</th>
                       <th
-                        className={`px-6 py-4 ${activeTab === 'Hardware' ? '' : 'hidden'}`}
+                        className={`px-6 py-4 whitespace-nowrap ${activeTab === 'Hardware' ? '' : 'hidden'}`}
                       >
-                        Mã Khách Hàng
+                        Mã KH
                       </th>
-                      <th className="px-6 py-4">{activeTab === 'Hardware' ? 'Serial' : 'Loại License'}</th>
-                      {activeTab === 'Software' && <th className="px-6 py-4">Số lượng</th>}
-                      <th className="px-6 py-4">Khách hàng / Địa chỉ / SĐT</th>
-                      <th className="px-6 py-4">Trạng thái</th>
-                      <th className="px-6 py-4">Thời hạn</th>
+                      <th className="px-6 py-4 whitespace-nowrap">{activeTab === 'Hardware' ? 'Serial' : 'Loại License'}</th>
+                      {activeTab === 'Software' && <th className="px-6 py-4 whitespace-nowrap">Số lượng</th>}
+                      <th className="px-6 py-4 whitespace-nowrap">Khách hàng</th>
+                      <th className="px-6 py-4 whitespace-nowrap">Trạng thái</th>
+                      <th className="px-6 py-4 whitespace-nowrap">Thời hạn</th>
                     </>
                   )}
                   <th className="px-6 py-4 text-center">Thao Tác</th>
