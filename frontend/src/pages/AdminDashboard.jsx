@@ -818,7 +818,7 @@ const AdminDashboard = () => {
                     <button
                       onClick={() => {
                         // Open new window for printing QR label
-                        const printWindow = window.open('', '_blank', 'width=500,height=350');
+                        const printWindow = window.open('', '_blank', 'width=full ,height=full');
                         const labelHTML = `
                           <!DOCTYPE html>
                           <html>
@@ -853,26 +853,41 @@ const AdminDashboard = () => {
                                 align-items: stretch;
                                 background: white;
                               }
-                              .qr-section {
-                                width: 50%;
-                                height: 100%;
+                              .qr{
                                 display: flex;
+                                flex-direction: column;
                                 align-items: center;
                                 justify-content: center;
                                 padding: 0;
                                 border-right: 0.3mm dashed #ccc;
+
+                                }
+                              .qr-section {
+                                width: 50%;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
                               }
                               .qr-section svg {
                                 width: 35mm;
                                 height: 35mm;
                               }
+                              .qr-title{
+                                font-size: 5pt;
+                                font-weight: 700;
+                                color: #000;
+                                line-height: 1.2;
+                                display: flex;
+                                text-transform : uppercase;
+                              }
                               .info-section {
                                 width: 50%;
                                 display: flex;
                                 flex-direction: column;
-                                justify-content: center;
+                                // justify-content: center;
+                                margin-top: 15px;
                                 gap: 1.5mm;
-                                padding: 1mm 1mm 1mm 2mm;
+                                padding: 1mm 1mm 7mm 2mm;
                                 overflow: hidden;
                               }
                               .logo {
@@ -881,7 +896,7 @@ const AdminDashboard = () => {
                                 object-fit: contain;
                               }
                               .product {
-                                font-size: 7pt;
+                                font-size: 5pt;
                                 font-weight: 700;
                                 color: #000;
                                 line-height: 1.2;
@@ -891,31 +906,20 @@ const AdminDashboard = () => {
                                 overflow: hidden;
                               }
                               .instruction {
-                                font-size: 5.5pt;
+                                display: flex;
+                                font-size: 5px;
+                                align-items: center;
+                                justify-content: center;
                                 color: #555;
-                                font-style: italic;
+                                
                               }
                               .hotline {
-                                font-size: 5.5pt;
+                                font-size: 3pt;
                                 color: #000;
-                                font-weight: 600;
+                                font-weight: 400;
                               }
-                              .footer {
-                                display: flex;
-                                align-items: center;
-                                gap: 1mm;
-                                margin-top: 1mm;
-                              }
-                              .footer svg {
-                                width: 2.5mm;
-                                height: 2.5mm;
-                                fill: #4361ee;
-                              }
-                              .website {
-                                font-size: 5pt;
-                                color: #4361ee;
-                                font-weight: 500;
-                              }
+                              
+                             
                               @media print {
                                 html, body {
                                   width: 61mm;
@@ -934,19 +938,17 @@ const AdminDashboard = () => {
                           </head>
                           <body>
                             <div class="label">
+                              <div class= "qr">
                               <div class="qr-section" id="qrcode"></div>
+                              <div class="qr-title" id="qrcode">Bảo hành điện tử</div>
+                              </div>
+                              
                               <div class="info-section">
                                 <img class="logo" src="${printLogoBase64}" alt="SmartRetail" />
-                                <div class="product">${qrModal.productName}</div>
                                 <div class="instruction">Quét mã kích hoạt BH</div>
+                                <div class="product">${qrModal.productName}</div>
                                 <div class="hotline">Hotline: 0935 888 489</div>
-                                <div class="hotline">KT: 0909 045 663</div>
-                                <div class="footer">
-                                  <svg viewBox="0 0 24 24">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-                                  </svg>
-                                  <span class="website">smartretail.com.vn</span>
-                                </div>
+                                <div class="hotline">Technical: 0909 045 663</div>
                               </div>
                             </div>
                             <script>
