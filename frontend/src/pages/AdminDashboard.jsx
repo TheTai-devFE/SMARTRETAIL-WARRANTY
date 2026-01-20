@@ -854,49 +854,48 @@ const AdminDashboard = () => {
                                 background: white;
                               }
                               .qr{
+                                width: 50%;
                                 display: flex;
                                 flex-direction: column;
                                 align-items: center;
                                 justify-content: center;
-                                padding: 0;
+                                padding: 1mm;
                                 border-right: 0.3mm dashed #ccc;
-
-                                }
+                              }
                               .qr-section {
-                                width: 50%;
+                                width: 100%;
                                 display: flex;
                                 align-items: center;
                                 justify-content: center;
                               }
                               .qr-section svg {
-                                width: 35mm;
-                                height: 35mm;
+                                width: 32mm;
+                                height: 32mm;
                               }
                               .qr-title{
-                                font-size: 5pt;
+                                font-size: 6pt;
                                 font-weight: 700;
                                 color: #000;
                                 line-height: 1.2;
-                                display: flex;
-                                text-transform : uppercase;
+                                margin-top: 1mm;
+                                text-transform: uppercase;
                               }
                               .info-section {
                                 width: 50%;
                                 display: flex;
                                 flex-direction: column;
-                                // justify-content: center;
-                                margin-top: 15px;
+                                justify-content: center;
                                 gap: 1.5mm;
-                                padding: 1mm 1mm 7mm 2mm;
+                                padding: 1mm 1mm 1mm 2mm;
                                 overflow: hidden;
                               }
                               .logo {
-                                height: 5mm;
+                                height: 6mm;
                                 width: auto;
                                 object-fit: contain;
                               }
                               .product {
-                                font-size: 5pt;
+                                font-size: 7pt;
                                 font-weight: 700;
                                 color: #000;
                                 line-height: 1.2;
@@ -906,17 +905,13 @@ const AdminDashboard = () => {
                                 overflow: hidden;
                               }
                               .instruction {
-                                display: flex;
-                                font-size: 5px;
-                                align-items: center;
-                                justify-content: center;
+                                font-size: 6pt;
                                 color: #555;
-                                
                               }
                               .hotline {
-                                font-size: 3pt;
+                                font-size: 5.5pt;
                                 color: #000;
-                                font-weight: 400;
+                                font-weight: 500;
                               }
                               
                              

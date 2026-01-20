@@ -2,8 +2,8 @@ import axios from 'axios';
 
 const api = axios.create({
   // baseURL: 'https://smartretail-warranty-efvg.vercel.app/api',
-  baseURL: 'https://smartretail-warranty.onrender.com/api'
-  // baseURL: 'http://localhost:5001/api',
+  // baseURL: 'https://smartretail-warranty.onrender.com/api'
+  baseURL: 'http://localhost:5001/api',
 });
 
 export const hardwareApi = {
