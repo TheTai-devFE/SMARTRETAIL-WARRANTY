@@ -10,8 +10,27 @@ const upload = multer({ storage: multer.memoryStorage() });
 // --- ADMIN APIs ---
 
 // Create Warranty
+// Create Warranty (Support Batch for Retail)
 router.post('/warranties', async (req, res) => {
   try {
+    const { batch, customerData, products, ...singleData } = req.body;
+
+    if (batch && Array.isArray(products) && products.length > 0) {
+      const results = [];
+      // Sequential execution to ensure customer duplication logic works perfectly
+      // The first one will create/find the customer, subsequent ones will reuse it.
+      for (const prod of products) {
+        const payload = { ...customerData, ...prod };
+        // Ensure defaults
+        if (!payload.customerType) payload.customerType = customerData.customerType || 'Retail';
+
+        // Call service
+        const result = await hardwareService.createWarranty(payload);
+        results.push(result);
+      }
+      return res.status(201).json({ message: 'Đã tạo xong danh sách bảo hành', count: results.length, data: results });
+    }
+
     const newWarranty = await hardwareService.createWarranty(req.body);
     res.status(201).json(newWarranty);
   } catch (error) {

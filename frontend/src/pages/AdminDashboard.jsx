@@ -6,8 +6,9 @@ import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 import { repairApi, softwareApi, warrantyApi } from '../api';
-import logoSR from '../assets/LOGO SR.png';
-import logo from '../assets/logo-white.png';
+import logoPrint from '../assets/LOGO SR.png';
+import logoSR from '../assets/logo-white.png';
+import logoQR from '../assets/logo.jpg';
 import RepairTableRow from '../components/Admin/RepairTableRow';
 import SoftwareForm from '../components/Admin/SoftwareForm';
 import SoftwareTableRow from '../components/Admin/SoftwareTableRow';
@@ -16,7 +17,7 @@ import WarrantyTableRow from '../components/Admin/WarrantyTableRow';
 import QRLabelPrint from '../components/QRLabelPrint';
 import RepairReceiptPrint from '../components/RepairReceiptPrint';
 import ConfirmModal from '../components/Shared/ConfirmModal';
-import { createRoundedLogoDataURL } from '../utils/qrLogo';
+import { convertImageToBase64, createRoundedLogoDataURL } from '../utils/qrLogo';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('Hardware'); // 'Hardware' | 'Software'
@@ -29,6 +30,7 @@ const AdminDashboard = () => {
   const [confirmConfig, setConfirmConfig] = useState({ isOpen: false, title: '', message: '', onConfirm: () => { }, type: 'danger' });
   const [qrModal, setQrModal] = useState(null);
   const [roundedLogo, setRoundedLogo] = useState(null);
+  const [printLogoBase64, setPrintLogoBase64] = useState(null);
   const [pagination, setPagination] = useState({
     page: 1,
     totalPages: 1,
@@ -81,6 +83,8 @@ const AdminDashboard = () => {
   const [editingId, setEditingId] = useState(null);
   const fileInputRef = useRef(null);
 
+  const [productItems, setProductItems] = useState([]); // List for Retail Batch
+
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -112,7 +116,8 @@ const AdminDashboard = () => {
 
   // Create rounded logo on mount
   useEffect(() => {
-    createRoundedLogoDataURL(logoSR).then(setRoundedLogo);
+    createRoundedLogoDataURL(logoQR).then(setRoundedLogo);
+    convertImageToBase64(logoPrint).then(setPrintLogoBase64);
   }, []);
 
   useEffect(() => {
@@ -133,22 +138,74 @@ const AdminDashboard = () => {
     const loadingToast = toast.loading(editingId ? 'Đang cập nhật...' : 'Đang tạo mới...');
     try {
       if (activeTab === 'Hardware') {
-        const { serialNumber, softwareAccount, softwarePassword, playerId, licenseType, ...rest } = formData;
-        const payload = {
-          ...rest,
-          serialNumbers: formData.customerType === 'Project'
-            ? serialNumber.split('\n').map(s => s.trim()).filter(Boolean)
-            : [serialNumber.trim()],
-          hasSoftware: formData.hasSoftware,
-          softwareInfo: formData.hasSoftware ? {
-            softwareAccount, softwarePassword, playerId, licenseType
-          } : null
-        };
+        // DETECT BATCH MODE (Retail + Items in List OR Retail + current form has product data)
+        let finalProductItems = [...productItems];
 
-        if (editingId) {
-          await warrantyApi.update(editingId, payload);
-        } else {
+        // Auto-add current form product if it has data (user might not have clicked "Add to list")
+        if (!editingId && formData.customerType === 'Retail' && formData.productName && formData.serialNumber) {
+          const currentFormProduct = {
+            id: Date.now(),
+            productName: formData.productName,
+            productCode: formData.productCode,
+            serialNumber: formData.serialNumber,
+            startDate: formData.startDate,
+            warrantyPeriod: formData.warrantyPeriod,
+            hasSoftware: formData.hasSoftware,
+            softwareInfo: formData.hasSoftware ? {
+              softwareAccount: formData.softwareAccount,
+              softwarePassword: formData.softwarePassword,
+              playerId: formData.playerId,
+              licenseType: formData.licenseType
+            } : null
+          };
+          finalProductItems.push(currentFormProduct);
+        }
+
+        const isBatchMode = !editingId && formData.customerType === 'Retail' && finalProductItems.length > 0;
+
+        if (isBatchMode) {
+          // Batch Creation Payload
+          const customerData = {
+            companyName: formData.companyName,
+            taxCode: formData.taxCode,
+            customerPhone: formData.customerPhone,
+            customerType: 'Retail',
+            deliveryAddress: formData.deliveryAddress,
+            customerCode: formData.customerCode
+          };
+
+          // Transform finalProductItems to include serialNumbers array for backend
+          const transformedProducts = finalProductItems.map(item => ({
+            ...item,
+            serialNumbers: [item.serialNumber] // Backend expects serialNumbers array
+          }));
+
+          const payload = {
+            batch: true,
+            customerData,
+            products: transformedProducts
+          };
+
           await warrantyApi.create(payload);
+        } else {
+          // Normal Single/Project Creation
+          const { serialNumber, softwareAccount, softwarePassword, playerId, licenseType, ...rest } = formData;
+          const payload = {
+            ...rest,
+            serialNumbers: formData.customerType === 'Project'
+              ? serialNumber.split('\n').map(s => s.trim()).filter(Boolean)
+              : [serialNumber.trim()],
+            hasSoftware: formData.hasSoftware,
+            softwareInfo: formData.hasSoftware ? {
+              softwareAccount, softwarePassword, playerId, licenseType
+            } : null
+          };
+
+          if (editingId) {
+            await warrantyApi.update(editingId, payload);
+          } else {
+            await warrantyApi.create(payload);
+          }
         }
       } else {
         // Software Submit
@@ -327,6 +384,7 @@ const AdminDashboard = () => {
       deviceLimit: 1
     });
     setEditingId(null);
+    setProductItems([]);
   };
 
   const handleSelectAll = (e) => {
@@ -392,7 +450,7 @@ const AdminDashboard = () => {
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-4">
             <Link to="/" className="flex items-center gap-2 font-black text-2xl tracking-tighter group transition-transform active:scale-95">
-              <img src={logo} alt="Smart Retail Logo" className="h-8 md:h-10 w-auto" />
+              <img src={logoSR} alt="Smart Retail Logo" className="h-8 md:h-10 w-auto" />
             </Link>
             <span className="h-6 w-px bg-slate-700"></span>
             <span className="text-xs font-black uppercase tracking-[0.2em] text-primary-400">Technician Portal</span>
@@ -759,7 +817,150 @@ const AdminDashboard = () => {
                     </button>
                     <button
                       onClick={() => {
-                        window.print();
+                        // Open new window for printing QR label
+                        const printWindow = window.open('', '_blank', 'width=300,height=200');
+                        const labelHTML = `
+                          <!DOCTYPE html>
+                          <html>
+                          <head>
+                            <meta charset="UTF-8">
+                            <title>QR Label - ${qrModal.productName}</title>
+                            <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+                            <style>
+                              @page {
+                                size: 58mm 40mm;
+                                margin: 0;
+                              }
+                              * {
+                                margin: 0;
+                                padding: 0;
+                                box-sizing: border-box;
+                              }
+                              body {
+                                font-family: 'Inter', Arial, sans-serif;
+                                background: white;
+                                width: 58mm;
+                                height: 40mm;
+                                margin: 0 auto;
+                              }
+                              .label {
+                                width: 58mm;
+                                height: 40mm;
+                                padding: 2mm;
+                                display: flex;
+                                flex-direction: row;
+                                align-items: stretch;
+                                background: white;
+                              }
+                              .qr-section {
+                                width: 50%;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                padding: 1mm;
+                                border-right: 0.2mm dashed #ddd;
+                              }
+                              .qr-section svg {
+                                max-width: 28mm;
+                                max-height: 28mm;
+                              }
+                              .info-section {
+                                width: 50%;
+                                display: flex;
+                                flex-direction: column;
+                                justify-content: center;
+                                gap: 2px;
+                                padding: 1mm 1mm 1mm 2mm;
+                                overflow: hidden;
+                              }
+                              .logo {
+                                height: 6mm;
+                                width: auto;
+                                object-fit: contain;
+                              }
+                             
+                              .product {
+                                font-size: 6pt;
+                                font-weight: 700;
+                                color: #1a1a2e;
+                                line-height: 1.2;
+                                display: -webkit-box;
+                                -webkit-line-clamp: 2;
+                                -webkit-box-orient: vertical;
+                                overflow: hidden;
+                              }
+                              .instruction {
+                                font-size: 5pt;
+                                color: #666;
+                                font-style: italic;
+                                margin-top: 5px;
+                              }
+                              .footer {
+                                display: flex;
+                                align-items: center;
+                                gap: 1mm;
+                                margin-top: 0;
+                              }
+                              .footer svg {
+                                width: 2.5mm;
+                                height: 2.5mm;
+                              }
+                              .website {
+                                font-size: 5pt;
+                                color: #4361ee;
+                                font-weight: 500;
+                              }
+                              @media print {
+                                body {
+                                  width: 58mm;
+                                  height: 40mm;
+                                }
+                              }
+                            </style>
+                          </head>
+                          <body>
+                            <div class="label">
+                              <div class="qr-section" id="qrcode"></div>
+                              <div class="info-section">
+                                <img class="logo" src="${printLogoBase64}" alt="Smart Retail" />
+                                <div class="product">${qrModal.productName}</div>
+                                <div class="instruction">Quét mã để kích hoạt bảo hành</div>
+                                <div class="instruction">Hotline: 0935 888 489</div>
+                                <div class="instruction">Hỗ trợ kỹ thuật: 0909 045 663</div>
+                                <div class="footer">
+                                  <svg viewBox="0 0 24 24" fill="#4361ee">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                                  </svg>
+                                  <span class="website">smartretail.com.vn</span>
+                                </div>
+                              </div>
+                            </div>
+                            <script>
+                              var qr = qrcode(0, 'H');
+                              qr.addData('${getActivationUrl(qrModal._id)}');
+                              qr.make();
+                              
+                              // Create QR SVG
+                              var qrContainer = document.getElementById('qrcode');
+                              qrContainer.innerHTML = qr.createSvgTag(2.5, 0);
+                              
+                              // Add logo overlay in center
+                              var logoImg = document.createElement('img');
+                              logoImg.src = '${roundedLogo}';
+                              logoImg.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 22%; height: 22%; border-radius: 50%; background: white; padding: 1px;';
+                              qrContainer.style.position = 'relative';
+                              qrContainer.appendChild(logoImg);
+                              
+                              // Auto print after rendering
+                              setTimeout(function() {
+                                window.print();
+                              }, 400);
+                            </script>
+                          </body>
+                          </html>
+                        `;
+                        printWindow.document.write(labelHTML);
+                        printWindow.document.close();
                       }}
                       className="bg-primary-600 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-primary-700 transition-all"
                     >
@@ -774,8 +975,8 @@ const AdminDashboard = () => {
                   </button>
                 </div>
 
-                {/* Hidden Print Component */}
-                <div className="hidden print:block">
+                {/* Hidden Print Component - Only visible when printing */}
+                <div style={{ display: 'none' }} className="print-only-label">
                   <QRLabelPrint
                     activationUrl={getActivationUrl(qrModal._id)}
                     productName={qrModal.productName}
@@ -827,6 +1028,8 @@ const AdminDashboard = () => {
                         formData={formData}
                         setFormData={setFormData}
                         editingId={editingId}
+                        productItems={productItems}
+                        setProductItems={setProductItems}
                       />
                     ) : (
                       <SoftwareForm

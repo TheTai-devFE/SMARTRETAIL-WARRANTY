@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   Briefcase,
   Building,
@@ -12,12 +12,15 @@ import {
   MapPin,
   Package,
   Phone,
+  Plus,
   ShieldCheck,
   Smartphone,
   Tags,
+  Trash2,
   User as UserIcon,
   Users
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const FormSectionHeader = ({ icon: Icon, title, subtitle, colorClass = "text-primary-600" }) => (
   <div className="md:col-span-2 mb-2">
@@ -47,7 +50,51 @@ const InputWrapper = ({ label, icon: Icon, children, required, fullWidth }) => (
   </div>
 );
 
-const WarrantyForm = ({ formData, setFormData, editingId }) => {
+const WarrantyForm = ({ formData, setFormData, editingId, productItems = [], setProductItems }) => {
+
+  const handleAddItem = () => {
+    if (!formData.productName || !formData.serialNumber) {
+      toast.error('Vui lòng nhập Tên sản phẩm và Serial Number');
+      return;
+    }
+
+    const newItem = {
+      id: Date.now(),
+      productName: formData.productName,
+      productCode: formData.productCode,
+      serialNumber: formData.serialNumber,
+      startDate: formData.startDate,
+      warrantyPeriod: formData.warrantyPeriod,
+      hasSoftware: formData.hasSoftware,
+      softwareInfo: formData.hasSoftware ? {
+        softwareAccount: formData.softwareAccount,
+        softwarePassword: formData.softwarePassword,
+        playerId: formData.playerId,
+        licenseType: formData.licenseType
+      } : null
+    };
+
+    if (setProductItems) {
+      setProductItems([...productItems, newItem]);
+
+      // Clear product specific fields
+      setFormData({
+        ...formData,
+        productName: '',
+        productCode: '',
+        serialNumber: '',
+        playerId: '', // Clear specific unique ID if any
+        // Keep Dates and Customer Info
+      });
+      toast.success('Đã thêm sản phẩm vào danh sách');
+    }
+  };
+
+  const handleRemoveItem = (id) => {
+    if (setProductItems) {
+      setProductItems(productItems.filter(item => item.id !== id));
+    }
+  };
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
       {/* Customer Info Section */}
@@ -69,8 +116,8 @@ const WarrantyForm = ({ formData, setFormData, editingId }) => {
               type="button"
               onClick={() => setFormData({ ...formData, customerType: type.id })}
               className={`p-4 rounded-3xl border-2 transition-all duration-300 text-left relative overflow-hidden group ${formData.customerType === type.id
-                  ? 'border-primary-500 bg-primary-50/50 shadow-lg shadow-primary-500/10'
-                  : 'border-slate-100 bg-white hover:border-primary-200'
+                ? 'border-primary-500 bg-primary-50/50 shadow-lg shadow-primary-500/10'
+                : 'border-slate-100 bg-white hover:border-primary-200'
                 }`}
             >
               <div className={`p-2 rounded-xl mb-3 inline-block transition-colors ${formData.customerType === type.id ? 'bg-primary-500 text-white' : 'bg-slate-100 text-slate-400 group-hover:bg-primary-100 group-hover:text-primary-500'
@@ -146,18 +193,59 @@ const WarrantyForm = ({ formData, setFormData, editingId }) => {
         />
       </InputWrapper>
 
-      {/* Product Info Section */}
       <div className="md:col-span-2 mt-4">
         <FormSectionHeader
           icon={Package}
           title="Thông tin sản phẩm & Bảo hành"
           subtitle="Hardware & Warranty Specifications"
         />
+
+        {/* RETAIL BATCH LIST */}
+        {!editingId && formData.customerType === 'Retail' && productItems && productItems.length > 0 && (
+          <div className="mt-4 mb-6 bg-slate-50 rounded-2xl p-4 border border-slate-200">
+            <div className="flex justify-between items-center mb-3">
+              <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Danh sách sản phẩm chờ tạo ({productItems.length})</h4>
+              <span className="text-[10px] text-primary-600 bg-primary-50 px-2 py-1 rounded-lg font-bold">Batch Mode Active</span>
+            </div>
+            <div className="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-1">
+              <AnimatePresence>
+                {productItems.map((item, idx) => (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    key={item.id}
+                    className="flex items-center justify-between p-3 bg-white border border-slate-100 rounded-xl shadow-sm hover:border-primary-200 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-xs font-bold">{idx + 1}</span>
+                      <div>
+                        <p className="text-sm font-bold text-slate-800 leading-tight">{item.productName}</p>
+                        <div className="flex items-center gap-2 text-[10px] text-slate-400 font-mono mt-0.5">
+                          <span className="bg-slate-100 px-1.5 rounded">{item.productCode}</span>
+                          <span>{item.serialNumber}</span>
+                          {item.hasSoftware && <span className="text-emerald-500 font-bold">• Software</span>}
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveItem(item.id)}
+                      className="text-slate-400 hover:text-rose-500 hover:bg-rose-50 p-2 rounded-lg transition-all"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          </div>
+        )}
       </div>
 
-      <InputWrapper label="Tên sản phẩm" icon={Smartphone} required>
+      <InputWrapper label="Tên sản phẩm" icon={Smartphone} required={!(productItems.length > 0 && formData.customerType === 'Retail' && !editingId)}>
         <input
-          required
+          required={!(productItems.length > 0 && formData.customerType === 'Retail' && !editingId)}
           type="text"
           placeholder="Màn hình cảm ứng, Kiosk..."
           className="w-full px-4 py-3 rounded-2xl border border-slate-200 outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500 transition-all bg-white font-medium text-slate-800 placeholder:text-slate-300"
@@ -166,9 +254,9 @@ const WarrantyForm = ({ formData, setFormData, editingId }) => {
         />
       </InputWrapper>
 
-      <InputWrapper label="Mã Model" icon={Hash} required>
+      <InputWrapper label="Mã Model" icon={Hash} required={!(productItems.length > 0 && formData.customerType === 'Retail' && !editingId)}>
         <input
-          required
+          required={!(productItems.length > 0 && formData.customerType === 'Retail' && !editingId)}
           type="text"
           placeholder="SR-K215, LCD-43..."
           className="w-full px-4 py-3 rounded-2xl border border-slate-200 outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500 transition-all bg-white font-bold text-slate-800 placeholder:text-slate-300 font-mono text-sm uppercase"
@@ -180,7 +268,7 @@ const WarrantyForm = ({ formData, setFormData, editingId }) => {
       <InputWrapper
         label={`Danh sách Serial Number ${formData.customerType === 'Project' ? '(Mỗi dòng 1 mã)' : '(Một mã duy nhất)'}`}
         icon={Hash}
-        required
+        required={!(productItems.length > 0 && formData.customerType === 'Retail' && !editingId)}
         fullWidth
       >
         <div className="relative">
@@ -195,7 +283,7 @@ const WarrantyForm = ({ formData, setFormData, editingId }) => {
             />
           ) : (
             <input
-              required
+              required={!(productItems.length > 0 && formData.customerType === 'Retail' && !editingId)}
               type="text"
               className="w-full px-4 py-3 rounded-2xl border border-slate-200 outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500 transition-all font-mono bg-slate-50/30 font-bold"
               placeholder="Nhập S/N sản phẩm..."
@@ -252,7 +340,7 @@ const WarrantyForm = ({ formData, setFormData, editingId }) => {
       <InputWrapper label="Thời hạn bảo hành (Tháng)" icon={ShieldCheck}>
         <div className="relative">
           <input
-            required
+            required={!editingId && formData.customerType === 'Retail' && productItems.length > 0 ? false : true} // Not required if list has items
             type="number"
             className="w-full px-4 py-3 rounded-2xl border border-slate-200 outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500 transition-all font-bold text-slate-700 bg-white"
             value={formData.warrantyPeriod}
@@ -261,6 +349,19 @@ const WarrantyForm = ({ formData, setFormData, editingId }) => {
           <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-400 uppercase tracking-widest">Tháng</span>
         </div>
       </InputWrapper>
+
+      {/* ADD BUTTON FOR RETAIL */}
+      {!editingId && formData.customerType === 'Retail' && (
+        <div className="md:col-span-2 flex justify-end">
+          <button
+            type="button"
+            onClick={handleAddItem}
+            className="bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-slate-200 transition-all flex items-center gap-2 text-xs uppercase tracking-wider"
+          >
+            <Plus size={16} /> Thêm vào danh sách
+          </button>
+        </div>
+      )}
 
       {/* Software Info Section (v2.1) */}
       <div className="md:col-span-2 mt-8">
@@ -301,7 +402,7 @@ const WarrantyForm = ({ formData, setFormData, editingId }) => {
               className="grid grid-cols-1 md:grid-cols-2 gap-6"
             >
               <div className="md:col-span-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 block flex items-center gap-1.5">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2 flex items-center gap-1.5">
                   <Key size={12} className="text-emerald-500" /> Loại bản quyền
                 </label>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -311,8 +412,8 @@ const WarrantyForm = ({ formData, setFormData, editingId }) => {
                       type="button"
                       onClick={() => setFormData({ ...formData, licenseType: type })}
                       className={`py-3 px-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border-2 ${formData.licenseType === type
-                          ? 'bg-emerald-500 text-white border-emerald-500 shadow-xl shadow-emerald-500/20 scale-105'
-                          : 'bg-white text-slate-500 border-slate-100 hover:border-emerald-200 hover:bg-emerald-50/50'
+                        ? 'bg-emerald-500 text-white border-emerald-500 shadow-xl shadow-emerald-500/20 scale-105'
+                        : 'bg-white text-slate-500 border-slate-100 hover:border-emerald-200 hover:bg-emerald-50/50'
                         }`}
                     >
                       {type.replace('_', ' ')}
