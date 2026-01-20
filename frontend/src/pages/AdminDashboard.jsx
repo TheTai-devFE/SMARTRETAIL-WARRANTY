@@ -818,7 +818,7 @@ const AdminDashboard = () => {
                     <button
                       onClick={() => {
                         // Open new window for printing QR label
-                        const printWindow = window.open('', '_blank', 'width=300,height=200');
+                        const printWindow = window.open('', '_blank', 'width=200,height=300');
                         const labelHTML = `
                           <!DOCTYPE html>
                           <html>
@@ -828,7 +828,7 @@ const AdminDashboard = () => {
                             <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
                             <style>
                               @page {
-                                size: 58mm 40mm;
+                                size: 40mm 58mm;
                                 margin: 0;
                               }
                               * {
@@ -837,83 +837,85 @@ const AdminDashboard = () => {
                                 box-sizing: border-box;
                               }
                               body {
-                                font-family: 'Inter', Arial, sans-serif;
+                                font-family: Arial, sans-serif;
                                 background: white;
-                                width: 58mm;
-                                height: 40mm;
-                                margin: 0 auto;
+                                width: 40mm;
+                                height: 58mm;
+                                margin: 0;
+                                padding: 0;
                               }
                               .label {
-                                width: 58mm;
-                                height: 40mm;
-                                padding: 2mm;
+                                width: 40mm;
+                                height: 58mm;
+                                padding: 1.5mm;
                                 display: flex;
-                                flex-direction: row;
-                                align-items: stretch;
+                                flex-direction: column;
+                                align-items: center;
                                 background: white;
                               }
                               .qr-section {
-                                width: 50%;
+                                width: 100%;
                                 display: flex;
                                 align-items: center;
                                 justify-content: center;
-                                padding: 1mm;
-                                border-right: 0.2mm dashed #ddd;
+                                padding: 0.5mm;
                               }
                               .qr-section svg {
-                                max-width: 28mm;
-                                max-height: 28mm;
+                                width: 28mm;
+                                height: 28mm;
                               }
                               .info-section {
-                                width: 50%;
+                                width: 100%;
                                 display: flex;
                                 flex-direction: column;
-                                justify-content: center;
-                                gap: 2px;
-                                padding: 1mm 1mm 1mm 2mm;
-                                overflow: hidden;
+                                align-items: center;
+                                text-align: center;
+                                gap: 0.5mm;
+                                padding: 0 1mm;
                               }
                               .logo {
-                                height: 6mm;
+                                height: 4mm;
                                 width: auto;
                                 object-fit: contain;
+                                margin-bottom: 0.5mm;
                               }
-                             
                               .product {
-                                font-size: 6pt;
+                                font-size: 5pt;
                                 font-weight: 700;
-                                color: #1a1a2e;
-                                line-height: 1.2;
+                                color: #000;
+                                line-height: 1.1;
+                                max-height: 2.5em;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
                                 display: -webkit-box;
                                 -webkit-line-clamp: 2;
                                 -webkit-box-orient: vertical;
-                                overflow: hidden;
                               }
                               .instruction {
-                                font-size: 5pt;
-                                color: #666;
-                                font-style: italic;
-                                margin-top: 5px;
+                                font-size: 4pt;
+                                color: #333;
+                                line-height: 1.2;
                               }
-                              .footer {
-                                display: flex;
-                                align-items: center;
-                                gap: 1mm;
-                                margin-top: 0;
-                              }
-                              .footer svg {
-                                width: 2.5mm;
-                                height: 2.5mm;
+                              .hotline {
+                                font-size: 4pt;
+                                color: #333;
+                                font-weight: 600;
                               }
                               .website {
-                                font-size: 5pt;
-                                color: #4361ee;
+                                font-size: 4pt;
+                                color: #0066cc;
                                 font-weight: 500;
                               }
                               @media print {
-                                body {
-                                  width: 58mm;
-                                  height: 40mm;
+                                html, body {
+                                  width: 40mm;
+                                  height: 58mm;
+                                  margin: 0;
+                                  padding: 0;
+                                }
+                                .label {
+                                  page-break-after: avoid;
+                                  page-break-inside: avoid;
                                 }
                               }
                             </style>
@@ -922,17 +924,12 @@ const AdminDashboard = () => {
                             <div class="label">
                               <div class="qr-section" id="qrcode"></div>
                               <div class="info-section">
-                                <img class="logo" src="${printLogoBase64}" alt="Smart Retail" />
+                                <img class="logo" src="${printLogoBase64}" alt="SR" />
                                 <div class="product">${qrModal.productName}</div>
                                 <div class="instruction">Quét mã để kích hoạt bảo hành</div>
-                                <div class="instruction">Hotline: 0935 888 489</div>
-                                <div class="instruction">Hỗ trợ kỹ thuật: 0909 045 663</div>
-                                <div class="footer">
-                                  <svg viewBox="0 0 24 24" fill="#4361ee">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
-                                  </svg>
-                                  <span class="website">smartretail.com.vn</span>
-                                </div>
+                                <div class="hotline">Hotline: 0935 888 489</div>
+                                <div class="hotline">HTKT: 0909 045 663</div>
+                                <div class="website">smartretail.com.vn</div>
                               </div>
                             </div>
                             <script>
@@ -942,12 +939,12 @@ const AdminDashboard = () => {
                               
                               // Create QR SVG
                               var qrContainer = document.getElementById('qrcode');
-                              qrContainer.innerHTML = qr.createSvgTag(2.5, 0);
+                              qrContainer.innerHTML = qr.createSvgTag(2, 0);
                               
                               // Add logo overlay in center
                               var logoImg = document.createElement('img');
                               logoImg.src = '${roundedLogo}';
-                              logoImg.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 22%; height: 22%; border-radius: 50%; background: white; padding: 1px;';
+                              logoImg.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 20%; height: 20%; border-radius: 50%; background: white;';
                               qrContainer.style.position = 'relative';
                               qrContainer.appendChild(logoImg);
                               
