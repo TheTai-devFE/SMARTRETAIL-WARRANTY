@@ -818,143 +818,162 @@ const AdminDashboard = () => {
                     <button
                       onClick={() => {
                         // Open new window for printing QR label
-                        const printWindow = window.open('', '_blank', 'width=200,height=300');
+                        const printWindow = window.open('', '_blank', 'width=700,height=400');
                         const labelHTML = `
                           <!DOCTYPE html>
-                          <html>
-                          <head>
-                            <meta charset="UTF-8">
-                            <title>QR Label - ${qrModal.productName}</title>
-                            <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
-                            <style>
+                         <html>
+                        <head>
+                          <meta charset="UTF-8">
+                          <title>QR Label</title>
+                          <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+                          <style>
+                            @media print {
                               @page {
-                                size: 40mm 58mm;
+                                /* BƯỚC 1: Đổi kích thước thành DỌC (ngược với kích thước thật của tem) */
+                                /* Máy in sẽ hiểu: Rộng 40mm, Dài 58mm */
+                                size: 40mm 58mm; 
                                 margin: 0;
-                              }
-                              * {
-                                margin: 0;
-                                padding: 0;
-                                box-sizing: border-box;
                               }
                               body {
-                                font-family: Arial, sans-serif;
-                                background: white;
-                                width: 40mm;
-                                height: 58mm;
-                                margin: 0;
-                                padding: 0;
+                                /* Force in màu */
+                                -webkit-print-color-adjust: exact;
+                                print-color-adjust: exact;
                               }
-                              .label {
-                                width: 40mm;
-                                height: 58mm;
-                                padding: 1.5mm;
-                                display: flex;
-                                flex-direction: column;
-                                align-items: center;
-                                background: white;
-                              }
-                              .qr-section {
-                                width: 100%;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                padding: 0.5mm;
-                              }
-                              .qr-section svg {
-                                width: 28mm;
-                                height: 28mm;
-                              }
-                              .info-section {
-                                width: 100%;
-                                display: flex;
-                                flex-direction: column;
-                                align-items: center;
-                                text-align: center;
-                                gap: 0.5mm;
-                                padding: 0 1mm;
-                              }
-                              .logo {
-                                height: 4mm;
-                                width: auto;
-                                object-fit: contain;
-                                margin-bottom: 0.5mm;
-                              }
-                              .product {
-                                font-size: 5pt;
-                                font-weight: 700;
-                                color: #000;
-                                line-height: 1.1;
-                                max-height: 2.5em;
-                                overflow: hidden;
-                                text-overflow: ellipsis;
-                                display: -webkit-box;
-                                -webkit-line-clamp: 2;
-                                -webkit-box-orient: vertical;
-                              }
-                              .instruction {
-                                font-size: 4pt;
-                                color: #333;
-                                line-height: 1.2;
-                              }
-                              .hotline {
-                                font-size: 4pt;
-                                color: #333;
-                                font-weight: 600;
-                              }
-                              .website {
-                                font-size: 4pt;
-                                color: #0066cc;
-                                font-weight: 500;
-                              }
-                              @media print {
-                                html, body {
-                                  width: 40mm;
-                                  height: 58mm;
-                                  margin: 0;
-                                  padding: 0;
-                                }
-                                .label {
-                                  page-break-after: avoid;
-                                  page-break-inside: avoid;
-                                }
-                              }
-                            </style>
-                          </head>
-                          <body>
+                            }
+
+                            * { margin: 0; padding: 0; box-sizing: border-box; }
+
+                            body {
+                              /* Body set theo khổ dọc của máy in */
+                              width: 40mm;
+                              height: 58mm;
+                              margin: 0;
+                              background: white;
+                            }
+
+                            /* BƯỚC 2: Tạo một container để xoay nội dung */
+                            .rotate-wrapper {
+                              /* Kích thước thật của tem */
+                              width: 58mm;
+                              height: 40mm;
+                              
+                              /* Kỹ thuật xoay: */
+                              position: absolute;
+                              top: 0;
+                              left: 0;
+                              transform-origin: top left;
+                              
+                              /* Dời sang phải 40mm rồi xoay 90 độ */
+                              transform: translate(40mm, 0) rotate(90deg); 
+                              
+                              /* Background trắng đè lên mọi thứ */
+                              background: white; 
+                            }
+
+                            /* Các class bên trong giữ nguyên layout cũ */
+                            .label {
+                              width: 100%;
+                              height: 100%;
+                              padding: 1.5mm;
+                              display: flex;
+                              flex-direction: row;
+                              align-items: stretch;
+                            }
+
+                            .qr-section {
+                              width: 50%;
+                              height: 100%;
+                              display: flex;
+                              align-items: center;
+                              justify-content: center;
+                              
+                              padding: 0;
+                              border-right: 0.3mm dashed #ccc;
+                            }
+                            .qr-section svg { 
+                              width: 34mm; 
+                              height: 34mm; 
+                            }
+                            
+                            .info-section {
+                              width: 50%;
+                              display: flex;
+                              flex-direction: column;
+                              justify-content: center;
+                              gap: 1.2mm;
+                              padding: 1mm 1mm 1mm 2mm;
+                              overflow: hidden;
+                            }
+                            
+                            .logo { height: 5mm; width: auto; object-fit: contain; }
+                            
+                            .product {
+                              font-size: 7pt;
+                              font-weight: 700;
+                              color: #000;
+                              line-height: 1.2;
+                              display: -webkit-box;
+                              -webkit-line-clamp: 2;
+                              -webkit-box-orient: vertical;
+                              overflow: hidden;
+                            }
+                            
+                            .instruction { font-size: 5.5pt; color: #555; font-style: italic; }
+                            
+                            .footer {
+                              display: flex;
+                              align-items: center;
+                              gap: 1mm;
+                              margin-top: 1mm;
+                            }
+                            .footer svg { width: 2.5mm; height: 2.5mm; fill: #4361ee; }
+                            .website { font-size: 5pt; color: #4361ee; font-weight: 500; }
+
+                          </style>
+                        </head>
+                        <body>
+                          <div class="rotate-wrapper">
                             <div class="label">
                               <div class="qr-section" id="qrcode"></div>
                               <div class="info-section">
-                                <img class="logo" src="${printLogoBase64}" alt="SR" />
+                                <img class="logo" src="${printLogoBase64}" alt="Smart Retail" />
                                 <div class="product">${qrModal.productName}</div>
-                                <div class="instruction">Quét mã để kích hoạt bảo hành</div>
-                                <div class="hotline">Hotline: 0935 888 489</div>
-                                <div class="hotline">HTKT: 0909 045 663</div>
-                                <div class="website">smartretail.com.vn</div>
+                                <div class="instruction">Quét mã kích hoạt BH</div>
+                                <div class="instruction">Hotline: 0935 888 489</div>
+                                <div class="instruction">KT: 0909 045 663</div>
+                                <div class="footer">
+                                  <svg viewBox="0 0 24 24" fill="#4361ee">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                                  </svg>
+                                  <span class="website">smartretail.com.vn</span>
+                                </div>
                               </div>
                             </div>
-                            <script>
-                              var qr = qrcode(0, 'H');
-                              qr.addData('${getActivationUrl(qrModal._id)}');
-                              qr.make();
-                              
-                              // Create QR SVG
-                              var qrContainer = document.getElementById('qrcode');
-                              qrContainer.innerHTML = qr.createSvgTag(2, 0);
-                              
-                              // Add logo overlay in center
-                              var logoImg = document.createElement('img');
-                              logoImg.src = '${roundedLogo}';
-                              logoImg.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 20%; height: 20%; border-radius: 50%; background: white;';
-                              qrContainer.style.position = 'relative';
-                              qrContainer.appendChild(logoImg);
-                              
-                              // Auto print after rendering
-                              setTimeout(function() {
-                                window.print();
-                              }, 400);
-                            </script>
-                          </body>
-                          </html>
+                          </div>
+
+                          <script>
+                            var qr = qrcode(0, 'H');
+                            qr.addData('${getActivationUrl(qrModal._id)}');
+                            qr.make();
+                            
+                            var qrContainer = document.getElementById('qrcode');
+                            qrContainer.innerHTML = qr.createSvgTag({ scalable: true });
+                            var svgElement = qrContainer.querySelector('svg');
+                            svgElement.style.width = '100%';
+                            svgElement.style.height = '100%';
+
+                            // var logoImg = document.createElement('img');
+                            // logoImg.src = '${roundedLogo}';
+                            // logoImg.style.cssText = 'position: absolute; right: 50%; left: 50%; transform: translate(-50%, -50%); width: 20%; height: 20%; border-radius: 50%; background: white; padding: 1px; z-index: 10;';
+                            // qrContainer.style.position = 'relative';
+                            // qrContainer.appendChild(logoImg);
+                            
+                            setTimeout(function() {
+                              window.print();
+                            }, 500);
+                          </script>
+                        </body>
+                        </html>
                         `;
                         printWindow.document.write(labelHTML);
                         printWindow.document.close();
