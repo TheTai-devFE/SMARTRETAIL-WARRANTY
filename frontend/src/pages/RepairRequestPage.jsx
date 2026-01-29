@@ -92,14 +92,14 @@ const RepairRequestPage = () => {
                     <motion.div
                         initial={{ scale: 0.5, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        className="w-24 h-24 bg-gradient-to-br from-green-100 to-emerald-100 text-green-600 rounded-full flex items-center justify-center mb-6 shadow-lg shadow-green-500/20"
+                        className="w-24 h-24 bg-linear-to-br from-green-100 to-emerald-100 text-green-600 rounded-full flex items-center justify-center mb-6 shadow-lg shadow-green-500/20"
                     >
                         <CheckCircle size={48} />
                     </motion.div>
                     <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-2">Đã Gửi Yêu Cầu!</h2>
                     <div className="bg-white p-6 rounded-2xl border-2 border-primary-200 shadow-xl shadow-primary-500/10 mb-6 w-full max-w-sm mx-auto">
                         <p className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-2">Mã Tra Cứu Của Bạn</p>
-                        <div className="text-3xl font-black text-primary-600 tracking-wider font-mono bg-gradient-to-br from-primary-50 to-accent-50 py-3 rounded-xl border-2 border-dashed border-primary-300">
+                        <div className="text-3xl font-black text-primary-600 tracking-wider font-mono bg-linear-to-br from-primary-50 to-accent-50 py-3 rounded-xl border-2 border-dashed border-primary-300">
                             {submittedData.code}
                         </div>
                         <p className="text-xs text-rose-500 font-bold mt-3">* Vui lòng lưu lại mã này để tra cứu trạng thái sửa chữa.</p>
@@ -118,7 +118,7 @@ const RepairRequestPage = () => {
                                 setFormData({ customerName: '', companyName: '', phoneNumber: '', email: '', address: '', productName: '', serialNumber: '', issueDescription: '', images: [] });
                                 setPreviewImages([]);
                             }}
-                            className="px-6 py-3 bg-gradient-to-r from-primary-600 to-accent-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all hover:scale-105"
+                            className="px-6 py-3 bg-linear-to-r from-primary-600 to-accent-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all hover:scale-105"
                         >
                             Gửi yêu cầu khác
                         </button>
@@ -131,8 +131,8 @@ const RepairRequestPage = () => {
     return (
         <div className="bg-slate-50 min-h-screen font-sans selection:bg-primary-100 selection:text-primary-900 relative overflow-hidden">
             {/* Animated background elements */}
-            <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-l from-indigo-100/40 to-transparent -z-10 blur-3xl rounded-full float-animation"></div>
-            <div className="absolute bottom-40 left-0 w-96 h-96 bg-gradient-to-r from-purple-100/40 to-transparent -z-10 blur-3xl rounded-full float-animation" style={{ animationDelay: '1s' }}></div>
+            <div className="absolute top-0 right-0 w-96 h-96 bg-linear-to-l from-indigo-100/40 to-transparent -z-10 blur-3xl rounded-full float-animation"></div>
+            <div className="absolute bottom-40 left-0 w-96 h-96 bg-linear-to-r from-purple-100/40 to-transparent -z-10 blur-3xl rounded-full float-animation" style={{ animationDelay: '1s' }}></div>
 
             <Navbar isDark={false} />
 
@@ -182,7 +182,7 @@ const RepairRequestPage = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                         <section className="space-y-6">
                             <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                                <span className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 text-white flex items-center justify-center text-sm font-black shadow-lg">1</span>
+                                <span className="w-8 h-8 rounded-full bg-linear-to-br from-primary-500 to-accent-500 text-white flex items-center justify-center text-sm font-black shadow-lg">1</span>
                                 Thông tin liên hệ
                             </h2>
 

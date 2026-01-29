@@ -40,7 +40,7 @@ const RepairInfoBlock = ({ repair }) => {
         <div className="space-y-6">
             {/* Info Grid with Modern Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="group bg-gradient-to-br from-white to-slate-50/50 p-5 rounded-2xl border border-slate-200/60 hover:border-primary-300 transition-all hover:shadow-md">
+                <div className="group bg-linear-to-br from-white to-slate-50/50 p-5 rounded-2xl border border-slate-200/60 hover:border-primary-300 transition-all hover:shadow-md">
                     <div className="flex items-center gap-3 mb-2">
                         <div className="p-2 bg-primary-100 rounded-lg group-hover:scale-110 transition-transform">
                             <FileText size={18} className="text-primary-600" />
@@ -50,7 +50,7 @@ const RepairInfoBlock = ({ repair }) => {
                     <p className="text-xl font-black text-slate-900 font-mono tracking-wide">{repair.code}</p>
                 </div>
 
-                <div className="group bg-gradient-to-br from-white to-slate-50/50 p-5 rounded-2xl border border-slate-200/60 hover:border-primary-300 transition-all hover:shadow-md">
+                <div className="group bg-linear-to-br from-white to-slate-50/50 p-5 rounded-2xl border border-slate-200/60 hover:border-primary-300 transition-all hover:shadow-md">
                     <div className="flex items-center gap-3 mb-2">
                         <div className="p-2 bg-accent-100 rounded-lg group-hover:scale-110 transition-transform">
                             <Calendar size={18} className="text-accent-600" />
@@ -62,7 +62,7 @@ const RepairInfoBlock = ({ repair }) => {
             </div>
 
             {/* Issue Description */}
-            <div className="bg-gradient-to-br from-slate-50 to-white p-6 rounded-2xl border border-slate-200/60">
+            <div className="bg-linear-to-br from-slate-50 to-white p-6 rounded-2xl border border-slate-200/60">
                 <div className="flex items-center gap-2 mb-3">
                     <div className="p-2 bg-slate-200 rounded-lg">
                         <Wrench size={16} className="text-slate-600" />
@@ -77,7 +77,7 @@ const RepairInfoBlock = ({ repair }) => {
             {/* Status Card - Enhanced */}
             <div className={`relative overflow-hidden p-6 rounded-2xl border-2 ${displayStatus.color} backdrop-blur-sm transition-all hover:shadow-lg`}>
                 {/* Animated background gradient */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity"></div>
+                <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity"></div>
 
                 <div className="relative z-10 flex flex-col md:flex-row md:items-center gap-4">
                     <div className="flex items-center gap-4">

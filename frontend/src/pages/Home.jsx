@@ -115,9 +115,9 @@ const Home = () => {
   return (
     <div className="min-h-screen pb-20 pt-24 font-sans relative overflow-hidden">
       {/* Animated background elements */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-gradient-to-b from-primary-50/50 via-accent-50/30 to-transparent -z-10 blur-3xl opacity-60 animate-pulse"></div>
-      <div className="absolute top-40 right-0 w-96 h-96 bg-gradient-to-l from-accent-100/40 to-transparent -z-10 blur-3xl rounded-full float-animation"></div>
-      <div className="absolute bottom-40 left-0 w-96 h-96 bg-gradient-to-r from-primary-100/40 to-transparent -z-10 blur-3xl rounded-full float-animation" style={{ animationDelay: '1s' }}></div>
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-linear-to-b from-primary-50/50 via-accent-50/30 to-transparent -z-10 blur-3xl opacity-60 animate-pulse"></div>
+      <div className="absolute top-40 right-0 w-96 h-96 bg-linear-to-l from-accent-100/40 to-transparent -z-10 blur-3xl rounded-full float-animation"></div>
+      <div className="absolute bottom-40 left-0 w-96 h-96 bg-linear-to-r from-primary-100/40 to-transparent -z-10 blur-3xl rounded-full float-animation" style={{ animationDelay: '1s' }}></div>
 
       <Navbar />
 
@@ -171,8 +171,7 @@ const Home = () => {
           aria-label="Biểu mẫu tra cứu"
         >
           <div className="flex items-center gap-2 mb-8 text-primary-600 font-bold border-b border-slate-100 pb-4">
-            <Search size={18} className="animate-pulse" />
-            <h2 className="text-lg">Nhập thông tin khách hàng</h2>
+            <h2 className="text-lg uppercase">Nhập thông tin khách hàng</h2>
           </div>
 
           <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -216,7 +215,7 @@ const Home = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700 ml-1">{formData.searchType === 'repair' ? 'Mã Phiếu (SR-...) *' : 'Mã Khách Hàng *'}</label>
+              <label className="text-sm font-bold text-slate-700 ml-1">{formData.searchType === 'repair' ? 'Mã phiếu (SR-...) *' : 'Mã khách hàng *'}</label>
               <div className="relative group">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors" size={20} />
                 <input type="text" required placeholder={formData.searchType === 'repair' ? "Nhập mã phiếu..." : "Nhập mã khách hàng..."} className="w-full pl-12 pr-4 py-4 rounded-2xl border border-slate-200 focus:ring-4 focus:ring-primary-100 focus:border-primary-500 outline-none transition-all bg-slate-50/30 text-slate-800 font-bold"
@@ -267,7 +266,7 @@ const Home = () => {
                     </>
                   ) : (
                     <>
-                      <Search size={22} className="stroke-[3]" />
+                      <Search size={22} className="stroke-3" />
                       <span className="tracking-tight uppercase">KIỂM TRA NGAY</span>
                     </>
                   )}
@@ -315,7 +314,7 @@ const Home = () => {
                           aria-label={`Xem chi tiết ${item.productName}`}
                         >
                           {/* Gradient overlay on hover */}
-                          <div className="absolute inset-0 bg-gradient-to-r from-primary-50/0 via-primary-50/50 to-accent-50/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                          <div className="absolute inset-0 bg-linear-to-r from-primary-50/0 via-primary-50/50 to-accent-50/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
                           <div className="flex items-center justify-between relative z-10">
                             <div className="flex-1">
@@ -323,7 +322,7 @@ const Home = () => {
                                 {item.productName}
                               </h3>
                               <div className="flex items-center gap-3 mt-2 text-sm text-slate-500 flex-wrap">
-                                <span className="bg-gradient-to-r from-slate-100 to-slate-50 px-3 py-1 rounded-lg text-xs font-mono font-bold border border-slate-200">
+                                <span className="bg-linear-to-r from-slate-100 to-slate-50 px-3 py-1 rounded-lg text-xs font-mono font-bold border border-slate-200">
                                   {item.type === 'Software' ? item.licenseType : (Array.isArray(item.serialNumber) ? item.serialNumber[0] : item.serialNumber)}
                                 </span>
                                 <span className="text-slate-300">•</span>

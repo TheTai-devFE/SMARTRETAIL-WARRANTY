@@ -53,7 +53,7 @@ const WarrantyCenter = () => {
                         className={`card-hover glass-card p-6 text-center group ${center.available ? 'cursor-pointer' : 'cursor-default opacity-60'
                             }`}
                     >
-                        <div className="mb-4 inline-flex p-4 rounded-2xl bg-gradient-to-br from-primary-100 to-accent-100 group-hover:scale-110 transition-transform">
+                        <div className="mb-4 inline-flex p-4 rounded-2xl bg-linear-to-br from-primary-100 to-accent-100 group-hover:scale-110 transition-transform">
                             <MapPin size={32} className="text-primary-600" />
                         </div>
                         <h3 className="text-lg font-black text-slate-900 mb-2">{center.name}</h3>

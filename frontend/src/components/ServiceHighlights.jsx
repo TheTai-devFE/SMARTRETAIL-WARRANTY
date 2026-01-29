@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
+import { useMemo } from 'react';
 
 const ServiceHighlights = ({ delay = 0.3 }) => {
-    const highlights = [
+    const baseHighlights = [
         { icon: '🔍', text: 'Tra cứu bảo hành' },
         { icon: '🔧', text: 'Sửa chữa thiết bị' },
         { icon: '⚡', text: 'Tiện lợi - Nhanh chóng' },
@@ -10,6 +11,16 @@ const ServiceHighlights = ({ delay = 0.3 }) => {
         { icon: '🌏', text: 'Hỗ trợ toàn quốc' },
         { icon: '🛡️', text: 'An toàn, minh bạch' },
     ];
+
+    // Fisher-Yates shuffle - random thứ tự mỗi lần reload trang
+    const highlights = useMemo(() => {
+        const shuffled = [...baseHighlights];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+    }, []);
 
     return (
         <motion.div

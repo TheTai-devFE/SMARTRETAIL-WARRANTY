@@ -38,8 +38,8 @@ const Navbar = ({ isDark = false }) => {
           <Link
             to="/yeu-cau-sua-chua"
             className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all ${isActive('/yeu-cau-sua-chua')
-              ? 'bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 shadow-sm'
-              : 'hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50'
+              ? 'bg-linear-to-r from-indigo-100 to-purple-100 text-indigo-700 shadow-sm'
+              : 'hover:bg-linear-to-r hover:from-indigo-50 hover:to-purple-50'
               }`}
             aria-label="Yêu cầu dịch vụ sửa chữa"
           >

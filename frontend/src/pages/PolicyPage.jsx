@@ -12,9 +12,9 @@ const PolicyPage = () => {
   return (
     <div className="bg-slate-50 min-h-screen selection:bg-primary-100 selection:text-primary-900 relative overflow-hidden">
       {/* Animated background elements */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-gradient-to-b from-primary-50/50 via-accent-50/30 to-transparent -z-10 blur-3xl opacity-60 animate-pulse"></div>
-      <div className="absolute top-40 right-0 w-96 h-96 bg-gradient-to-l from-accent-100/40 to-transparent -z-10 blur-3xl rounded-full float-animation"></div>
-      <div className="absolute bottom-40 left-0 w-96 h-96 bg-gradient-to-r from-primary-100/40 to-transparent -z-10 blur-3xl rounded-full float-animation" style={{ animationDelay: '1s' }}></div>
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-linear-to-b from-primary-50/50 via-accent-50/30 to-transparent -z-10 blur-3xl opacity-60 animate-pulse"></div>
+      <div className="absolute top-40 right-0 w-96 h-96 bg-linear-to-l from-accent-100/40 to-transparent -z-10 blur-3xl rounded-full float-animation"></div>
+      <div className="absolute bottom-40 left-0 w-96 h-96 bg-linear-to-r from-primary-100/40 to-transparent -z-10 blur-3xl rounded-full float-animation" style={{ animationDelay: '1s' }}></div>
 
       <Navbar isDark={false} />
 
@@ -100,7 +100,7 @@ const PolicyPage = () => {
                     transition={{ delay: idx * 0.1 }}
                     className="card-hover glass-card p-6 text-center group"
                   >
-                    <div className="mb-4 inline-flex p-4 rounded-2xl bg-gradient-to-br from-primary-100 to-accent-100 group-hover:scale-110 transition-transform">
+                    <div className="mb-4 inline-flex p-4 rounded-2xl bg-linear-to-br from-primary-100 to-accent-100 group-hover:scale-110 transition-transform">
                       <Icon size={32} className="text-primary-600" />
                     </div>
                     <h3 className="text-lg font-black text-slate-900 mb-4">{item.title}</h3>
@@ -134,7 +134,7 @@ const PolicyPage = () => {
                   transition={{ delay: idx * 0.1 }}
                   className="card-hover glass-card p-6 text-center group cursor-pointer"
                 >
-                  <div className="mb-4 inline-flex p-4 rounded-2xl bg-gradient-to-br from-primary-100 to-accent-100 group-hover:scale-110 transition-transform">
+                  <div className="mb-4 inline-flex p-4 rounded-2xl bg-linear-to-br from-primary-100 to-accent-100 group-hover:scale-110 transition-transform">
                     <Icon size={32} className="text-primary-600" />
                   </div>
                   <h3 className="text-lg font-black text-slate-900 mb-2">{item.title}</h3>

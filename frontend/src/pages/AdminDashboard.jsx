@@ -442,9 +442,9 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-slate-50 pb-20 font-sans relative overflow-hidden">
       {/* Animated background elements */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-gradient-to-b from-primary-50/50 via-accent-50/30 to-transparent -z-10 blur-3xl opacity-60 animate-pulse"></div>
-      <div className="absolute top-40 right-0 w-96 h-96 bg-gradient-to-l from-accent-100/40 to-transparent -z-10 blur-3xl rounded-full float-animation"></div>
-      <div className="absolute bottom-40 left-0 w-96 h-96 bg-gradient-to-r from-primary-100/40 to-transparent -z-10 blur-3xl rounded-full float-animation" style={{ animationDelay: '1s' }}></div>
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-linear-to-b from-primary-50/50 via-accent-50/30 to-transparent -z-10 blur-3xl opacity-60 animate-pulse"></div>
+      <div className="absolute top-40 right-0 w-96 h-96 bg-linear-to-l from-accent-100/40 to-transparent -z-10 blur-3xl rounded-full float-animation"></div>
+      <div className="absolute bottom-40 left-0 w-96 h-96 bg-linear-to-r from-primary-100/40 to-transparent -z-10 blur-3xl rounded-full float-animation" style={{ animationDelay: '1s' }}></div>
 
       <nav className="bg-slate-900 text-white sticky top-0 z-50 mb-8">
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
@@ -1013,7 +1013,7 @@ const AdminDashboard = () => {
                 className="bg-white rounded-3xl md:rounded-[32px] shadow-2xl w-full max-w-4xl relative z-10 flex flex-col max-h-[90vh] overflow-hidden border border-slate-100"
               >
                 {/* Modal Header */}
-                <div className="px-8 py-6 border-b bg-gradient-to-r from-slate-50 to-white flex justify-between items-center shrink-0">
+                <div className="px-8 py-6 border-b bg-linear-to-r from-slate-50 to-white flex justify-between items-center shrink-0">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <span className="w-2 h-2 rounded-full bg-primary-500 animate-pulse"></span>
