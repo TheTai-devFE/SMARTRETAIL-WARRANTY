@@ -278,6 +278,25 @@ const updateWarranty = async (id, data) => {
     ...rest
   } = data;
 
+  // Process serialNumber update - convert to array format as expected by Hardware model
+  const finalSerialNumbers = Array.isArray(serialNumbers)
+    ? serialNumbers
+    : (serialNumber ? [serialNumber].filter(Boolean) : null);
+
+  // If serialNumber is provided, add it to the update object
+  if (finalSerialNumbers && finalSerialNumbers.length > 0) {
+    // Check for duplicates (exclude current record)
+    const existing = await Hardware.findOne({
+      _id: { $ne: id },
+      serialNumber: { $in: finalSerialNumbers }
+    });
+    if (existing) {
+      const foundSN = existing.serialNumber.find(sn => finalSerialNumbers.includes(sn));
+      throw new Error(`Serial Number đã tồn tại trong hệ thống: ${foundSN}`);
+    }
+    rest.serialNumber = finalSerialNumbers;
+  }
+
   // Auto-calculate EndDate if Updating Activation
   if (rest.activationDate && !rest.endDate) {
     // We try to use provided period, or default to 24 if missing. 
