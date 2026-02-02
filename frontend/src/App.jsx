@@ -10,6 +10,7 @@ function App() {
   return (
     <Router>
       <Toaster position="top-right" reverseOrder={false} />
+      <Analytics />
       <div className="min-h-screen bg-slate-50">
         <Routes>
           <Route path="/" element={<Home />} />
