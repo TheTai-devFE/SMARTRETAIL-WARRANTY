@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/react";
 import { Toaster } from 'react-hot-toast';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import Activation from './pages/Activation';
@@ -5,7 +6,6 @@ import AdminDashboard from './pages/AdminDashboard';
 import Home from './pages/Home';
 import PolicyPage from './pages/PolicyPage';
 import RepairRequestPage from './pages/RepairRequestPage';
-
 function App() {
   return (
     <Router>
