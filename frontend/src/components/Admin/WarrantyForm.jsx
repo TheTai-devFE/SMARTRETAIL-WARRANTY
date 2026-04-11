@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   Briefcase,
@@ -51,6 +52,11 @@ const InputWrapper = ({ label, icon: Icon, children, required, fullWidth }) => (
 );
 
 const WarrantyForm = ({ formData, setFormData, editingId, productItems = [], setProductItems }) => {
+  const [genConfig, setGenConfig] = useState({
+    companyCode: '',
+    projectName: '',
+    quantity: 10
+  });
 
   const handleAddItem = () => {
     if (!formData.productName || !formData.serialNumber) {
@@ -95,6 +101,34 @@ const WarrantyForm = ({ formData, setFormData, editingId, productItems = [], set
       setProductItems(productItems.filter(item => item.id !== id));
     }
   };
+
+  const handleGenerateSerials = () => {
+    const { companyCode, projectName, quantity } = genConfig;
+    
+    if (!companyCode || !projectName) {
+      toast.error('Vui lòng nhập Mã Cty và Tên Dự án');
+      return;
+    }
+
+    if (!quantity || quantity <= 0) {
+      toast.error('Vui lòng nhập số lượng hợp lệ');
+      return;
+    }
+
+    const prefix = `${companyCode.toUpperCase()}-${projectName.toUpperCase().replace(/\s/g, '')}-`;
+    const generated = [];
+    for (let i = 1; i <= quantity; i++) {
+      generated.push(`${prefix}${i.toString().padStart(4, '0')}`);
+    }
+
+    if (formData.customerType === 'Project') {
+      const current = formData.serialNumber.trim();
+      const newValue = current ? current + '\n' + generated.join('\n') : generated.join('\n');
+      setFormData({ ...formData, serialNumber: newValue });
+      toast.success(`Đã sinh ${quantity} mã thành công!`);
+    }
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8">
       {/* Customer Info Section */}
@@ -271,33 +305,80 @@ const WarrantyForm = ({ formData, setFormData, editingId, productItems = [], set
         required={!(productItems.length > 0 && formData.customerType === 'Retail' && !editingId)}
         fullWidth
       >
-        <div className="relative">
-          {formData.customerType === 'Project' ? (
-            <textarea
-              required
-              rows={4}
-              className="w-full px-4 py-3 rounded-2xl border border-slate-200 outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500 transition-all font-mono text-xs bg-slate-50/30"
-              placeholder="Paste hàng loạt serial vào đây..."
-              value={formData.serialNumber}
-              onChange={e => setFormData({ ...formData, serialNumber: e.target.value })}
-            />
-          ) : (
-            <input
-              required={!(productItems.length > 0 && formData.customerType === 'Retail' && !editingId)}
-              type="text"
-              className="w-full px-4 py-3 rounded-2xl border border-slate-200 outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500 transition-all font-mono bg-slate-50/30 font-bold"
-              placeholder="Nhập S/N sản phẩm..."
-              value={formData.serialNumber}
-              onChange={e => setFormData({ ...formData, serialNumber: e.target.value })}
-            />
-          )}
-          {formData.customerType === 'Project' && (
-            <div className="absolute right-3 bottom-3 hidden md:block">
-              <span className="text-[9px] font-black bg-primary-600 text-white px-2 py-0.5 rounded-full shadow-lg shadow-primary-500/30">
-                COUNT: {formData.serialNumber.split('\n').filter(s => s.trim()).length}
-              </span>
+        <div className="space-y-4">
+          {/* GENERATOR UI FOR PROJECT */}
+          {!editingId && formData.customerType === 'Project' && (
+            <div className="bg-slate-100/50 p-4 rounded-2xl border border-slate-200 grid grid-cols-1 md:grid-cols-4 gap-3">
+              <div>
+                <label className="text-[9px] font-black text-slate-400 uppercase mb-1 block">Mã Công ty</label>
+                <input 
+                  type="text" 
+                  placeholder="Ví dụ: CTTG"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold uppercase"
+                  value={genConfig.companyCode}
+                  onChange={e => setGenConfig({...genConfig, companyCode: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="text-[9px] font-black text-slate-400 uppercase mb-1 block">Tên Dự án (Viết liền)</label>
+                <input 
+                  type="text" 
+                  placeholder="Ví dụ: MANHINH"
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold uppercase"
+                  value={genConfig.projectName}
+                  onChange={e => setGenConfig({...genConfig, projectName: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="text-[9px] font-black text-slate-400 uppercase mb-1 block">Số lượng</label>
+                <input 
+                  type="number" 
+                  className="w-full px-3 py-2 rounded-xl border border-slate-200 text-xs font-bold"
+                  value={genConfig.quantity}
+                  onChange={e => setGenConfig({...genConfig, quantity: parseInt(e.target.value)})}
+                />
+              </div>
+              <div className="flex items-end">
+                <button
+                  type="button"
+                  onClick={handleGenerateSerials}
+                  className="w-full bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-black uppercase tracking-widest py-2.5 rounded-xl shadow-lg transition-all active:scale-95"
+                >
+                  Sinh mã
+                </button>
+              </div>
             </div>
           )}
+
+          <div className="relative group/sn">
+            {formData.customerType === 'Project' ? (
+              <textarea
+                required
+                rows={4}
+                className="w-full px-4 py-3 rounded-2xl border border-slate-200 outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500 transition-all font-mono text-xs bg-white"
+                placeholder={formData.customerType === 'Project' ? "Sử dụng công cụ sinh mã ở trên hoặc dán danh sách vào đây..." : "Nhập số Serial..."}
+                value={formData.serialNumber}
+                onChange={e => setFormData({ ...formData, serialNumber: e.target.value })}
+              />
+            ) : (
+              <input
+                required={!(productItems.length > 0 && formData.customerType === 'Retail' && !editingId)}
+                type="text"
+                className="w-full px-4 py-3 rounded-2xl border border-slate-200 outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500 transition-all font-mono bg-white font-bold"
+                placeholder="Nhập S/N sản phẩm..."
+                value={formData.serialNumber}
+                onChange={e => setFormData({ ...formData, serialNumber: e.target.value })}
+              />
+            )}
+
+            {formData.customerType === 'Project' && formData.serialNumber && (
+              <div className="absolute right-3 bottom-3">
+                <span className="text-[9px] font-black bg-slate-800 text-white px-2 py-0.5 rounded-full shadow-lg">
+                  COUNT: {formData.serialNumber.split('\n').filter(s => s.trim()).length}
+                </span>
+              </div>
+            )}
+          </div>
         </div>
       </InputWrapper>
 

@@ -1,11 +1,11 @@
 import { format } from 'date-fns';
 import { AnimatePresence, motion } from 'framer-motion';
-import { AppWindow, Building, ChevronRight, Copy, Fingerprint, HardDrive, Phone, Plus, Printer, QrCode, Search, Trash2, Upload, Wrench, X } from 'lucide-react';
+import { AppWindow, Building, ChevronRight, Copy, Edit2, Fingerprint, HardDrive, Package, Phone, Plus, Printer, QrCode, Search, Trash2, Upload, Wrench, X } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
-import { repairApi, softwareApi, warrantyApi } from '../api';
+import { repairApi, softwareApi, warrantyApi, projectApi } from '../api';
 import logoPrint from '../assets/LOGO SR.png';
 import logoSR from '../assets/logo-white.png';
 import logoQR from '../assets/logo.jpg';
@@ -14,12 +14,15 @@ import SoftwareForm from '../components/Admin/SoftwareForm';
 import SoftwareTableRow from '../components/Admin/SoftwareTableRow';
 import WarrantyForm from '../components/Admin/WarrantyForm';
 import WarrantyTableRow from '../components/Admin/WarrantyTableRow';
+import BulkQRLabelPrint from '../components/BulkQRLabelPrint';
 import QRLabelPrint from '../components/QRLabelPrint';
 import RepairReceiptPrint from '../components/RepairReceiptPrint';
 import ConfirmModal from '../components/Shared/ConfirmModal';
 import { convertImageToBase64, createRoundedLogoDataURL } from '../utils/qrLogo';
+import { printLabels } from '../utils/printLabels';
 
 const AdminDashboard = () => {
+  const [projectDetailModal, setProjectDetailModal] = useState(null);
   const [activeTab, setActiveTab] = useState('Hardware'); // 'Hardware' | 'Software'
   const [warranties, setWarranties] = useState([]);
   const [softwareList, setSoftwareList] = useState([]);
@@ -85,6 +88,8 @@ const AdminDashboard = () => {
 
   const [productItems, setProductItems] = useState([]); // List for Retail Batch
 
+  const [bulkPrintItems, setBulkPrintItems] = useState(null);
+
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -94,9 +99,52 @@ const AdminDashboard = () => {
       }, {});
 
       if (activeTab === 'Hardware') {
-        const res = await warrantyApi.getAll(cleanFilters);
-        setWarranties(res.data.data);
-        setPagination(res.data.pagination);
+        if (cleanFilters.customerType === 'Project') {
+          // OPTIMIZED: Fetch projects directly if filtering by project
+          const res = await projectApi.getAll(cleanFilters);
+          const projectListData = res.data.projects.map(p => ({
+            ...p,
+            isProjectHeader: true,
+            projectId: p._id,
+            children: null // Loaded on-demand
+          }));
+          setWarranties(projectListData);
+          setPagination({
+            total: res.data.total,
+            page: res.data.page,
+            totalPages: res.data.pages,
+            limit: cleanFilters.limit || 10
+          });
+        } else {
+          // Standard fetch for Retail/Dealer or combined
+          const res = await warrantyApi.getAll(cleanFilters);
+          let data = res.data.data;
+
+          if (!cleanFilters.customerType) {
+            // Mixed view: Group in-memory for the current page only
+            const grouped = [];
+            const projectMap = new Map();
+            data.forEach(item => {
+              if (item.customerType === 'Project' && item.projectId) {
+                if (!projectMap.has(item.projectId)) {
+                  projectMap.set(item.projectId, {
+                    ...item,
+                    isProjectHeader: true,
+                    children: []
+                  });
+                  grouped.push(projectMap.get(item.projectId));
+                }
+                projectMap.get(item.projectId).children.push(item);
+              } else {
+                grouped.push(item);
+              }
+            });
+            setWarranties(grouped);
+          } else {
+            setWarranties(data);
+          }
+          setPagination(res.data.pagination);
+        }
       } else if (activeTab === 'Software') {
         const res = await softwareApi.getAll(cleanFilters);
         setSoftwareList(res.data.data);
@@ -406,6 +454,28 @@ const AdminDashboard = () => {
     );
   };
 
+  const handleBulkPrint = async () => {
+    const itemsToPrint = warranties.flatMap(w => {
+      if (w.isProjectHeader) {
+        return (w.children || []).filter(c => selectedIds.includes(c._id));
+      }
+      return selectedIds.includes(w._id) ? [w] : [];
+    });
+
+    if (itemsToPrint.length === 0) {
+      toast.error('Vui lòng chọn ít nhất 1 thiết bị. Lưu ý: Cần "Xem chi tiết" dự án để tải danh sách máy trước khi in hàng loạt.');
+      return;
+    }
+
+    try {
+      toast.loading('Đang tạo mã QR...', { id: 'bulk-print' });
+      await printLabels(itemsToPrint);
+      toast.dismiss('bulk-print');
+    } catch (err) {
+      toast.error('Lỗi khi tạo tem in: ' + err.message, { id: 'bulk-print' });
+    }
+  };
+
   const handleBulkDelete = () => {
     setConfirmConfig({
       isOpen: true,
@@ -420,8 +490,6 @@ const AdminDashboard = () => {
           } else if (activeTab === 'Software') {
             await softwareApi.bulkDelete(selectedIds);
           } else {
-            // Maybe implement bulk delete for repair later
-            // For now just loop delete or warn
             await Promise.all(selectedIds.map(id => repairApi.delete(id)));
           }
           setSelectedIds([]);
@@ -432,6 +500,29 @@ const AdminDashboard = () => {
         }
       }
     });
+  };
+
+  const handleViewProjectDetails = async (project) => {
+    setProjectDetailModal(project);
+    if (!project.children) {
+      try {
+        const res = await projectApi.getDevices(project._id || project.projectId);
+        setProjectDetailModal(prev => ({ ...prev, children: res.data }));
+      } catch (err) {
+        toast.error('Không thể tải danh sách thiết bị');
+      }
+    }
+  };
+  const handleDeleteProject = async (id) => {
+    if (window.confirm('CẢNH BÁO: Xóa dự án này sẽ xóa TOÀNBỘ các máy con liên quan. Hành động này không thể hoàn tác. Bạn có chắc chắn muốn xóa?')) {
+      try {
+        await projectApi.delete(id);
+        toast.success('Đã xóa dự án và toàn bộ thiết bị liên quan');
+        fetchData();
+      } catch (err) {
+        toast.error('Lỗi khi xóa dự án');
+      }
+    }
   };
 
   const getActivationUrl = (id) => {
@@ -523,6 +614,103 @@ const AdminDashboard = () => {
           </button>
         </div>
 
+        {/* Project Detail Modal */}
+      {projectDetailModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-white rounded-3xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col"
+          >
+            <div className="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+              <div>
+                <h3 className="text-xl font-black text-slate-800 flex items-center gap-3">
+                  <div className="p-2 bg-primary-100 text-primary-600 rounded-xl"><Package size={20} /></div>
+                  Chi tiết Dự án: {projectDetailModal.companyName}
+                </h3>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">
+                  {projectDetailModal.productName} • {projectDetailModal.children?.length || 0} Thiết bị
+                </p>
+              </div>
+              <button
+                onClick={() => setProjectDetailModal(null)}
+                className="p-2 hover:bg-white text-slate-400 hover:text-slate-600 rounded-xl transition-all shadow-sm"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+              <table className="w-full text-left">
+                <thead className="bg-slate-50 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                  <tr>
+                    <th className="px-4 py-3 border-b border-slate-100">STT</th>
+                    <th className="px-4 py-3 border-b border-slate-100">Sản phẩm</th>
+                    <th className="px-4 py-3 border-b border-slate-100">Mã KH</th>
+                    <th className="px-4 py-3 border-b border-slate-100">Serial Number</th>
+                    <th className="px-4 py-3 border-b border-slate-100">Địa chỉ giao</th>
+                    <th className="px-4 py-3 border-b border-slate-100">Trạng thái</th>
+                    <th className="px-4 py-3 border-b border-slate-100 text-right">In / Sửa</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {!projectDetailModal.children ? (
+                    <tr>
+                      <td colSpan="7" className="px-4 py-20 text-center">
+                        <div className="flex flex-col items-center gap-3">
+                          <div className="w-8 h-8 border-4 border-primary-100 border-t-primary-600 rounded-full animate-spin"></div>
+                          <p className="text-xs font-bold text-slate-400">Đang tải danh sách thiết bị...</p>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : projectDetailModal.children.length === 0 ? (
+                    <tr><td colSpan="7" className="px-4 py-20 text-center text-slate-400">Không có thiết bị nào trong dự án này.</td></tr>
+                  ) : (
+                    projectDetailModal.children.map((child, idx) => (
+                      <tr key={child._id} className="hover:bg-slate-50/50 transition-colors">
+                      <td className="px-4 py-4 text-xs font-bold text-slate-400">{idx + 1}</td>
+                      <td className="px-4 py-4">
+                        <p className="text-xs font-bold text-slate-800">{child.productName}</p>
+                      </td>
+                      <td className="px-4 py-4">
+                        <span className="text-[10px] font-mono bg-slate-100 px-1.5 py-0.5 rounded">{child.customerCode}</span>
+                      </td>
+                      <td className="px-4 py-4">
+                        <span className="text-xs font-black font-mono text-primary-600">{child.serialNumber}</span>
+                      </td>
+                      <td className="px-4 py-4 text-[10px] text-slate-500 max-w-[200px] truncate">
+                        {child.deliveryAddress || '—'}
+                      </td>
+                      <td className="px-4 py-4">
+                        <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${child.status === 'Activated' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                          {child.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-4 text-right">
+                        <div className="flex justify-end gap-2">
+                          <button onClick={() => { setQrModal(child); setProjectDetailModal(null); }} className="p-1.5 hover:bg-primary-50 text-primary-600 rounded-lg transition-all"><QrCode size={14} /></button>
+                          <button onClick={() => { handleEdit(child); setProjectDetailModal(null); }} className="p-1.5 hover:bg-blue-50 text-blue-600 rounded-lg transition-all"><Edit2 size={14} /></button>
+                        </div>
+                      </td>
+                    </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="px-8 py-4 bg-slate-50 border-top border-slate-100 flex justify-end">
+              <button
+                onClick={() => setProjectDetailModal(null)}
+                className="px-6 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/20"
+              >
+                Đóng
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
         {/* Bulk Actions */}
         <AnimatePresence>
           {selectedIds.length > 0 && (
@@ -538,12 +726,20 @@ const AdminDashboard = () => {
                 </div>
                 <p className="text-sm font-bold text-rose-700">bản ghi đang được chọn</p>
               </div>
-              <button
-                onClick={handleBulkDelete}
-                className="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-lg text-xs font-black flex items-center gap-2 transition-all shadow-md active:scale-95"
-              >
-                <Trash2 size={14} /> Xóa hàng loạt
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleBulkPrint}
+                  className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg text-xs font-black flex items-center gap-2 transition-all shadow-md active:scale-95"
+                >
+                  <Printer size={14} /> In mã QR ({selectedIds.length})
+                </button>
+                <button
+                  onClick={handleBulkDelete}
+                  className="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-lg text-xs font-black flex items-center gap-2 transition-all shadow-md active:scale-95"
+                >
+                  <Trash2 size={14} /> Xóa hàng loạt
+                </button>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -688,13 +884,48 @@ const AdminDashboard = () => {
                   (activeTab === 'Hardware' ? warranties : activeTab === 'Software' ? softwareList : repairRequests).map((item) => (
                     activeTab === 'Hardware' ? (
                       <WarrantyTableRow
-                        key={item._id}
+                        key={item._id || item.projectId}
                         warranty={item}
-                        isSelected={selectedIds.includes(item._id)}
-                        onToggleSelect={handleSelectItem}
+                        isSelected={item.isProjectHeader ? (item.children?.length > 0 && item.children.every(c => selectedIds.includes(c._id))) : selectedIds.includes(item._id)}
+                        onToggleSelect={(id) => {
+                          if (item.isProjectHeader && id === item.projectId) {
+                            if (!item.children) {
+                               // Auto-fetch if children not loaded
+                               toast.promise(projectApi.getDevices(item.projectId), {
+                                 loading: 'Đang tải danh sách thiết bị...',
+                                 success: (res) => {
+                                   const childDevices = res.data;
+                                   // Update the warranties state to include these children
+                                   setWarranties(prev => prev.map(w => 
+                                     w.projectId === item.projectId ? { ...w, children: childDevices } : w
+                                   ));
+                                   // Select all these new children
+                                   const childIds = childDevices.map(c => c._id);
+                                   setSelectedIds(prev => [...new Set([...prev, ...childIds])]);
+                                   return 'Đã chọn toàn bộ thiết bị trong dự án';
+                                 },
+                                 error: 'Không thể tải danh sách thiết bị'
+                               });
+                               return;
+                            }
+                            const allChildIds = item.children.map(c => c._id);
+                            const areAllSelected = allChildIds.every(cid => selectedIds.includes(cid));
+                            if (areAllSelected) {
+                              setSelectedIds(prev => prev.filter(cid => !allChildIds.includes(cid)));
+                            } else {
+                              setSelectedIds(prev => [...new Set([...prev, ...allChildIds])]);
+                            }
+                          } else {
+                            handleSelectItem(id);
+                          }
+                        }}
                         onEdit={handleEdit}
                         onDelete={handleDelete}
                         onShowQR={setQrModal}
+                        selectedIds={selectedIds}
+                        onToggleSingle={handleSelectItem}
+                        onViewProjectDetails={handleViewProjectDetails}
+                        onDeleteProject={handleDeleteProject}
                       />
                     ) : activeTab === 'Software' ? (
                       <SoftwareTableRow
@@ -1401,6 +1632,11 @@ const AdminDashboard = () => {
             </div>
           )}
         </AnimatePresence>
+        {bulkPrintItems && (
+          <div className="hidden print:block">
+            <BulkQRLabelPrint items={bulkPrintItems} />
+          </div>
+        )}
       </div>
     </div>
   );

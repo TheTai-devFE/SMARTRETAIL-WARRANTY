@@ -23,11 +23,13 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 const softwareRoutes = require('./routes/softwareRoutes');
 const searchRoutes = require('./routes/searchRoutes');
 const repairRoutes = require('./routes/repairRequestRoutes');
+const projectRoutes = require('./routes/projectRoutes');
 
 app.use('/api', warrantyRoutes);
 app.use('/api/software', softwareRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/repair-requests', repairRoutes);
+app.use('/api/projects', projectRoutes);
 
 // Database Connection
 const MONGODB_URI = process.env.MONGODB_URI;

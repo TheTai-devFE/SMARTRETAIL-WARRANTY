@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const api = axios.create({
   // baseURL: 'https://smartretail-warranty-efvg.vercel.app/api',
-  baseURL: 'https://smartretail-warranty.onrender.com/api'
+  baseURL: 'https://smartretail-warranty.onrender.com/api',
   // baseURL: 'http://localhost:5001/api',
 });
 
@@ -49,6 +49,12 @@ export const repairApi = {
   updateStatus: (id, status, warrantyDuration) => api.put(`/repair-requests/${id}`, { status, warrantyDuration }),
   delete: (id) => api.delete(`/repair-requests/${id}`),
   search: (data) => api.post('/repair-requests/search', data)
+};
+
+export const projectApi = {
+  getAll: (params) => api.get('/projects', { params }),
+  getDevices: (id) => api.get(`/projects/${id}/devices`),
+  delete: (id) => api.delete(`/projects/${id}`),
 };
 
 export default api;

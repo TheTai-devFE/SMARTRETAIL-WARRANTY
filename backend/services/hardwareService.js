@@ -417,6 +417,33 @@ const getAllWarranties = async (filters) => {
   };
 };
 
+const getAllProjects = async (filters) => {
+  const { companyName, customerPhone, page = 1, limit = 10 } = filters;
+  let query = {};
+  if (companyName) query.companyName = { $regex: companyName, $options: 'i' };
+  if (customerPhone) query.customerPhone = { $regex: customerPhone, $options: 'i' };
+
+  const skip = (parseInt(page) - 1) * parseInt(limit);
+  const [projects, total] = await Promise.all([
+    Project.find(query).sort({ createdAt: -1 }).skip(skip).limit(parseInt(limit)),
+    Project.countDocuments(query)
+  ]);
+
+  return { projects, total, page: parseInt(page), pages: Math.ceil(total / limit) };
+};
+
+const getDevicesByProject = async (projectId) => {
+  return await Hardware.find({ projectId }).sort({ createdAt: 1 });
+};
+
+const deleteProject = async (projectId) => {
+  // Delete project header
+  await Project.findByIdAndDelete(projectId);
+  // Delete all hardware associated with this project
+  await Hardware.deleteMany({ projectId });
+  return { message: 'Project and all associated devices deleted successfully' };
+};
+
 module.exports = {
   createWarranty,
   updateWarranty,
@@ -425,5 +452,8 @@ module.exports = {
   activateWarranty,
   importWarranties,
   getAllWarranties,
-  getHardwareStatus
+  getHardwareStatus,
+  getAllProjects,
+  getDevicesByProject,
+  deleteProject
 };
