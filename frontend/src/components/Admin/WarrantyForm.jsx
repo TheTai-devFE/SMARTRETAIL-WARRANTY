@@ -116,9 +116,10 @@ const WarrantyForm = ({ formData, setFormData, editingId, productItems = [], set
     }
 
     const prefix = `${companyCode.toUpperCase()}-${projectName.toUpperCase().replace(/\s/g, '')}-`;
+    const padLength = Math.max(2, quantity.toString().length);
     const generated = [];
     for (let i = 1; i <= quantity; i++) {
-      generated.push(`${prefix}${i.toString().padStart(4, '0')}`);
+      generated.push(`${prefix}${i.toString().padStart(padLength, '0')}`);
     }
 
     if (formData.customerType === 'Project') {

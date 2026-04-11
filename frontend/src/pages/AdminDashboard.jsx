@@ -467,6 +467,13 @@ const AdminDashboard = () => {
       return;
     }
 
+    // Sort by serial number (natural/numeric order: 0001 → 0002 → ... → 0400)
+    itemsToPrint.sort((a, b) => {
+      const snA = Array.isArray(a.serialNumber) ? a.serialNumber[0] : (a.serialNumber || '');
+      const snB = Array.isArray(b.serialNumber) ? b.serialNumber[0] : (b.serialNumber || '');
+      return snA.localeCompare(snB, undefined, { numeric: true, sensitivity: 'base' });
+    });
+
     try {
       toast.loading('Đang tạo mã QR...', { id: 'bulk-print' });
       await printLabels(itemsToPrint);
