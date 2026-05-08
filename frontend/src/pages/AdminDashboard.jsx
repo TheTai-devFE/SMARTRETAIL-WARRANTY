@@ -1,5 +1,4 @@
 import { format } from "date-fns";
-// eslint-disable-next-line no-unused-vars
 import { AnimatePresence, motion } from "framer-motion";
 import {
   AppWindow,
