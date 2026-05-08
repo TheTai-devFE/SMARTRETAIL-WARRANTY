@@ -1,5 +1,6 @@
 import { format } from "date-fns";
-import { AnimatePresence } from "framer-motion";
+// eslint-disable-next-line no-unused-vars
+import { AnimatePresence, motion } from "framer-motion";
 import {
   AppWindow,
   Building,
@@ -116,7 +117,7 @@ const AdminDashboard = () => {
 
   const [productItems, setProductItems] = useState([]); // List for Retail Batch
 
-  const [bulkPrintItems, setBulkPrintItems] = useState(null);
+  const [bulkPrintItems] = useState(null);
 
   const fetchData = useCallback(async () => {
     try {
@@ -359,7 +360,7 @@ const AdminDashboard = () => {
         });
         fetchData();
       }
-    } catch (err) {
+    } catch {
       toast.error("Lỗi import file", { id: loadingToast });
     }
     e.target.value = "";
@@ -441,7 +442,7 @@ const AdminDashboard = () => {
           }
           toast.success("Đã xóa bản ghi", { id: loadingToast });
           fetchData();
-        } catch (err) {
+        } catch {
           toast.error("Không thể xóa bản ghi", { id: loadingToast });
         }
       },
@@ -469,7 +470,7 @@ const AdminDashboard = () => {
       await repairApi.updateStatus(id, status, warrantyDuration);
       toast.success("Cập nhật trạng thái thành công", { id: loadingToast });
       fetchData();
-    } catch (error) {
+    } catch {
       toast.error("Lỗi cập nhật trạng thái", { id: loadingToast });
     }
   };
@@ -590,7 +591,7 @@ const AdminDashboard = () => {
           setSelectedIds([]);
           toast.success("Đã xóa các bản ghi được chọn", { id: loadingToast });
           fetchData();
-        } catch (err) {
+        } catch {
           toast.error("Lỗi khi xóa hàng loạt", { id: loadingToast });
         }
       },
@@ -642,7 +643,7 @@ const AdminDashboard = () => {
           project._id || project.projectId,
         );
         setProjectDetailModal((prev) => ({ ...prev, children: res.data }));
-      } catch (err) {
+      } catch {
         toast.error("Không thể tải danh sách thiết bị");
       }
     }
@@ -657,7 +658,7 @@ const AdminDashboard = () => {
         await projectApi.delete(id);
         toast.success("Đã xóa dự án và toàn bộ thiết bị liên quan");
         fetchData();
-      } catch (err) {
+      } catch {
         toast.error("Lỗi khi xóa dự án");
       }
     }
