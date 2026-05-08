@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import {
   AppWindow,
   Building,
@@ -21,7 +21,7 @@ import {
   X,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 import { projectApi, repairApi, softwareApi, warrantyApi } from "../api";
@@ -118,7 +118,7 @@ const AdminDashboard = () => {
 
   const [bulkPrintItems, setBulkPrintItems] = useState(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       const cleanFilters = Object.keys(filters).reduce((acc, key) => {
@@ -189,7 +189,7 @@ const AdminDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, activeTab]);
 
   // Create rounded logo on mount
   useEffect(() => {
@@ -208,7 +208,7 @@ const AdminDashboard = () => {
       fetchData();
     }, 500);
     return () => clearTimeout(delayDebounce);
-  }, [filters, activeTab]);
+  }, [filters, activeTab, fetchData]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
