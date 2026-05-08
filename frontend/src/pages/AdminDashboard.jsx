@@ -1,85 +1,113 @@
-import { format } from 'date-fns';
-import { AnimatePresence, motion } from 'framer-motion';
-import { AppWindow, Building, ChevronRight, Copy, Edit2, Fingerprint, HardDrive, Package, Phone, Plus, Printer, QrCode, Search, Trash2, Upload, Wrench, X } from 'lucide-react';
-import { QRCodeSVG } from 'qrcode.react';
-import { useEffect, useRef, useState } from 'react';
-import toast from 'react-hot-toast';
-import { Link } from 'react-router-dom';
-import { repairApi, softwareApi, warrantyApi, projectApi } from '../api';
-import logoPrint from '../assets/LOGO SR.png';
-import logoSR from '../assets/logo-white.png';
-import logoQR from '../assets/logo.jpg';
-import RepairTableRow from '../components/Admin/RepairTableRow';
-import SoftwareForm from '../components/Admin/SoftwareForm';
-import SoftwareTableRow from '../components/Admin/SoftwareTableRow';
-import WarrantyForm from '../components/Admin/WarrantyForm';
-import WarrantyTableRow from '../components/Admin/WarrantyTableRow';
-import BulkQRLabelPrint from '../components/BulkQRLabelPrint';
-import QRLabelPrint from '../components/QRLabelPrint';
-import RepairReceiptPrint from '../components/RepairReceiptPrint';
-import ConfirmModal from '../components/Shared/ConfirmModal';
-import { convertImageToBase64, createRoundedLogoDataURL } from '../utils/qrLogo';
-import { printLabels } from '../utils/printLabels';
+import { format } from "date-fns";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  AppWindow,
+  Building,
+  ChevronRight,
+  Copy,
+  Edit2,
+  Fingerprint,
+  HardDrive,
+  Package,
+  Phone,
+  Plus,
+  Printer,
+  QrCode,
+  Search,
+  ShieldCheck,
+  Trash2,
+  Upload,
+  Wrench,
+  X,
+} from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
+import { useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
+import { Link } from "react-router-dom";
+import { projectApi, repairApi, softwareApi, warrantyApi } from "../api";
+import logoPrint from "../assets/LOGO SR.png";
+import logoSR from "../assets/logo-white.png";
+import logoQR from "../assets/logo.jpg";
+import RepairTableRow from "../components/Admin/RepairTableRow";
+import SoftwareForm from "../components/Admin/SoftwareForm";
+import SoftwareTableRow from "../components/Admin/SoftwareTableRow";
+import WarrantyForm from "../components/Admin/WarrantyForm";
+import WarrantyTableRow from "../components/Admin/WarrantyTableRow";
+import BulkQRLabelPrint from "../components/BulkQRLabelPrint";
+import QRLabelPrint from "../components/QRLabelPrint";
+import RepairReceiptPrint from "../components/RepairReceiptPrint";
+import ConfirmModal from "../components/Shared/ConfirmModal";
+import { printLabels } from "../utils/printLabels";
+import {
+  convertImageToBase64,
+  createRoundedLogoDataURL,
+} from "../utils/qrLogo";
 
 const AdminDashboard = () => {
   const [projectDetailModal, setProjectDetailModal] = useState(null);
-  const [activeTab, setActiveTab] = useState('Hardware'); // 'Hardware' | 'Software'
+  const [activeTab, setActiveTab] = useState("Hardware"); // 'Hardware' | 'Software'
   const [warranties, setWarranties] = useState([]);
   const [softwareList, setSoftwareList] = useState([]);
   const [repairRequests, setRepairRequests] = useState([]);
   const [loading, setLoading] = useState(false);
   const [printReceipt, setPrintReceipt] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [confirmConfig, setConfirmConfig] = useState({ isOpen: false, title: '', message: '', onConfirm: () => { }, type: 'danger' });
+  const [confirmConfig, setConfirmConfig] = useState({
+    isOpen: false,
+    title: "",
+    message: "",
+    onConfirm: () => {},
+    type: "danger",
+  });
   const [qrModal, setQrModal] = useState(null);
   const [roundedLogo, setRoundedLogo] = useState(null);
   const [printLogoBase64, setPrintLogoBase64] = useState(null);
   const [pagination, setPagination] = useState({
     page: 1,
     totalPages: 1,
-    total: 0
+    total: 0,
   });
 
   // Shared filters structure
   const [filters, setFilters] = useState({
-    serialNumber: '',
-    customerPhone: '',
-    taxCode: '',
-    companyName: '',
-    customerType: 'Retail',
-    customerCode: '', // New
-    productName: '', // For software
-    page: 1
+    serialNumber: "",
+    customerPhone: "",
+    taxCode: "",
+    companyName: "",
+    customerType: "Retail",
+    customerCode: "", // New
+    productName: "", // For software
+    page: 1,
   });
 
   // Shared Form Data
   const [formData, setFormData] = useState({
     // Common
-    customerCode: '',
-    companyName: '',
-    taxCode: '',
-    customerPhone: '',
-    productName: '',
+    customerCode: "",
+    companyName: "",
+    taxCode: "",
+    customerPhone: "",
+    productName: "",
 
     // Hardware
-    productCode: '',
-    serialNumber: '',
-    customerType: 'Retail',
+    productCode: "",
+    serialNumber: "",
+    customerType: "Retail",
     warrantyPeriod: 24,
-    startDate: format(new Date(), 'yyyy-MM-dd'),
-    deliveryAddress: '',
+    startDate: format(new Date(), "yyyy-MM-dd"),
+    deliveryAddress: "",
     hasSoftware: false,
 
     // Software
-    softwareAccount: '',
-    softwarePassword: '',
-    playerId: '',
-    licenseType: '1_Year',
-    licenseStatus: 'Pending',
+    softwareAccount: "",
+    softwarePassword: "",
+    playerId: "",
+    licenseType: "1_Year",
+    licenseStatus: "Pending",
     deviceLimit: 1,
 
-    status: 'Pending',
-    activationDate: '',
+    status: "Pending",
+    activationDate: "",
   });
 
   const [selectedIds, setSelectedIds] = useState([]);
@@ -94,26 +122,27 @@ const AdminDashboard = () => {
     try {
       setLoading(true);
       const cleanFilters = Object.keys(filters).reduce((acc, key) => {
-        acc[key] = typeof filters[key] === 'string' ? filters[key].trim() : filters[key];
+        acc[key] =
+          typeof filters[key] === "string" ? filters[key].trim() : filters[key];
         return acc;
       }, {});
 
-      if (activeTab === 'Hardware') {
-        if (cleanFilters.customerType === 'Project') {
+      if (activeTab === "Hardware") {
+        if (cleanFilters.customerType === "Project") {
           // OPTIMIZED: Fetch projects directly if filtering by project
           const res = await projectApi.getAll(cleanFilters);
-          const projectListData = res.data.projects.map(p => ({
+          const projectListData = res.data.projects.map((p) => ({
             ...p,
             isProjectHeader: true,
             projectId: p._id,
-            children: null // Loaded on-demand
+            children: null, // Loaded on-demand
           }));
           setWarranties(projectListData);
           setPagination({
             total: res.data.total,
             page: res.data.page,
             totalPages: res.data.pages,
-            limit: cleanFilters.limit || 10
+            limit: cleanFilters.limit || 10,
           });
         } else {
           // Standard fetch for Retail/Dealer or combined
@@ -124,13 +153,13 @@ const AdminDashboard = () => {
             // Mixed view: Group in-memory for the current page only
             const grouped = [];
             const projectMap = new Map();
-            data.forEach(item => {
-              if (item.customerType === 'Project' && item.projectId) {
+            data.forEach((item) => {
+              if (item.customerType === "Project" && item.projectId) {
                 if (!projectMap.has(item.projectId)) {
                   projectMap.set(item.projectId, {
                     ...item,
                     isProjectHeader: true,
-                    children: []
+                    children: [],
                   });
                   grouped.push(projectMap.get(item.projectId));
                 }
@@ -145,18 +174,18 @@ const AdminDashboard = () => {
           }
           setPagination(res.data.pagination);
         }
-      } else if (activeTab === 'Software') {
+      } else if (activeTab === "Software") {
         const res = await softwareApi.getAll(cleanFilters);
         setSoftwareList(res.data.data);
         setPagination(res.data.pagination);
-      } else if (activeTab === 'Repair') {
+      } else if (activeTab === "Repair") {
         const res = await repairApi.getAll();
         setRepairRequests(res.data);
         setPagination({ total: res.data.length, page: 1, totalPages: 1 });
       }
     } catch (err) {
       console.error(err);
-      toast.error('Lỗi tải dữ liệu');
+      toast.error("Lỗi tải dữ liệu");
     } finally {
       setLoading(false);
     }
@@ -170,7 +199,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     // Reset page on tab change
-    setFilters(prev => ({ ...prev, page: 1 }));
+    setFilters((prev) => ({ ...prev, page: 1 }));
     setSelectedIds([]);
   }, [activeTab]);
 
@@ -183,14 +212,21 @@ const AdminDashboard = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const loadingToast = toast.loading(editingId ? 'Đang cập nhật...' : 'Đang tạo mới...');
+    const loadingToast = toast.loading(
+      editingId ? "Đang cập nhật..." : "Đang tạo mới...",
+    );
     try {
-      if (activeTab === 'Hardware') {
+      if (activeTab === "Hardware") {
         // DETECT BATCH MODE (Retail + Items in List OR Retail + current form has product data)
         let finalProductItems = [...productItems];
 
         // Auto-add current form product if it has data (user might not have clicked "Add to list")
-        if (!editingId && formData.customerType === 'Retail' && formData.productName && formData.serialNumber) {
+        if (
+          !editingId &&
+          formData.customerType === "Retail" &&
+          formData.productName &&
+          formData.serialNumber
+        ) {
           const currentFormProduct = {
             id: Date.now(),
             productName: formData.productName,
@@ -199,17 +235,22 @@ const AdminDashboard = () => {
             startDate: formData.startDate,
             warrantyPeriod: formData.warrantyPeriod,
             hasSoftware: formData.hasSoftware,
-            softwareInfo: formData.hasSoftware ? {
-              softwareAccount: formData.softwareAccount,
-              softwarePassword: formData.softwarePassword,
-              playerId: formData.playerId,
-              licenseType: formData.licenseType
-            } : null
+            softwareInfo: formData.hasSoftware
+              ? {
+                  softwareAccount: formData.softwareAccount,
+                  softwarePassword: formData.softwarePassword,
+                  playerId: formData.playerId,
+                  licenseType: formData.licenseType,
+                }
+              : null,
           };
           finalProductItems.push(currentFormProduct);
         }
 
-        const isBatchMode = !editingId && formData.customerType === 'Retail' && finalProductItems.length > 0;
+        const isBatchMode =
+          !editingId &&
+          formData.customerType === "Retail" &&
+          finalProductItems.length > 0;
 
         if (isBatchMode) {
           // Batch Creation Payload
@@ -217,36 +258,52 @@ const AdminDashboard = () => {
             companyName: formData.companyName,
             taxCode: formData.taxCode,
             customerPhone: formData.customerPhone,
-            customerType: 'Retail',
+            customerType: "Retail",
             deliveryAddress: formData.deliveryAddress,
-            customerCode: formData.customerCode
+            customerCode: formData.customerCode,
           };
 
           // Transform finalProductItems to include serialNumbers array for backend
-          const transformedProducts = finalProductItems.map(item => ({
+          const transformedProducts = finalProductItems.map((item) => ({
             ...item,
-            serialNumbers: [item.serialNumber] // Backend expects serialNumbers array
+            serialNumbers: [item.serialNumber], // Backend expects serialNumbers array
           }));
 
           const payload = {
             batch: true,
             customerData,
-            products: transformedProducts
+            products: transformedProducts,
           };
 
           await warrantyApi.create(payload);
         } else {
           // Normal Single/Project Creation
-          const { serialNumber, softwareAccount, softwarePassword, playerId, licenseType, ...rest } = formData;
+          const {
+            serialNumber,
+            softwareAccount,
+            softwarePassword,
+            playerId,
+            licenseType,
+            ...rest
+          } = formData;
           const payload = {
             ...rest,
-            serialNumbers: formData.customerType === 'Project'
-              ? serialNumber.split('\n').map(s => s.trim()).filter(Boolean)
-              : [serialNumber.trim()],
+            serialNumbers:
+              formData.customerType === "Project"
+                ? serialNumber
+                    .split("\n")
+                    .map((s) => s.trim())
+                    .filter(Boolean)
+                : [serialNumber.trim()],
             hasSoftware: formData.hasSoftware,
-            softwareInfo: formData.hasSoftware ? {
-              softwareAccount, softwarePassword, playerId, licenseType
-            } : null
+            softwareInfo: formData.hasSoftware
+              ? {
+                  softwareAccount,
+                  softwarePassword,
+                  playerId,
+                  licenseType,
+                }
+              : null,
           };
 
           if (editingId) {
@@ -264,12 +321,17 @@ const AdminDashboard = () => {
         }
       }
 
-      toast.success(editingId ? 'Cập nhật thành công!' : 'Tạo mới thành công!', { id: loadingToast });
+      toast.success(
+        editingId ? "Cập nhật thành công!" : "Tạo mới thành công!",
+        { id: loadingToast },
+      );
       setIsModalOpen(false);
       resetForm();
       fetchData();
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Có lỗi xảy ra', { id: loadingToast });
+      toast.error(err.response?.data?.message || "Có lỗi xảy ra", {
+        id: loadingToast,
+      });
     }
   };
 
@@ -281,72 +343,81 @@ const AdminDashboard = () => {
     if (!file) return;
 
     const importData = new FormData();
-    importData.append('file', file);
-    const loadingToast = toast.loading('Đang xử lý file...');
+    importData.append("file", file);
+    const loadingToast = toast.loading("Đang xử lý file...");
 
     try {
       const res = await warrantyApi.import(importData);
       if (res.data.errors && res.data.errors.length > 0) {
-        toast.error(`Có lỗi khi import: ${res.data.errors.length} bản ghi thất bại`, { id: loadingToast });
+        toast.error(
+          `Có lỗi khi import: ${res.data.errors.length} bản ghi thất bại`,
+          { id: loadingToast },
+        );
       } else {
-        toast.success(`Import thành công ${res.data.success} bản ghi!`, { id: loadingToast });
+        toast.success(`Import thành công ${res.data.success} bản ghi!`, {
+          id: loadingToast,
+        });
         fetchData();
       }
     } catch (err) {
-      toast.error('Lỗi import file', { id: loadingToast });
+      toast.error("Lỗi import file", { id: loadingToast });
     }
-    e.target.value = '';
+    e.target.value = "";
   };
 
   const handleEdit = async (item) => {
     try {
-      if (activeTab === 'Hardware') {
+      if (activeTab === "Hardware") {
         // Fetch full details (including Project/Master software linking logic)
         const res = await warrantyApi.getById(item._id);
         const fullItem = res.data;
 
         setFormData({
-          companyName: fullItem.companyName || '',
-          taxCode: fullItem.taxCode || '',
+          companyName: fullItem.companyName || "",
+          taxCode: fullItem.taxCode || "",
           customerPhone: fullItem.customerPhone,
           productCode: fullItem.productCode,
           productName: fullItem.productName,
-          serialNumber: Array.isArray(fullItem.serialNumber) ? fullItem.serialNumber.join('\n') : fullItem.serialNumber,
-          customerType: fullItem.customerType || 'Retail',
+          serialNumber: Array.isArray(fullItem.serialNumber)
+            ? fullItem.serialNumber.join("\n")
+            : fullItem.serialNumber,
+          customerType: fullItem.customerType || "Retail",
           warrantyPeriod: fullItem.warrantyPeriod || 24,
-          startDate: format(new Date(fullItem.startDate), 'yyyy-MM-dd'),
-          activationDate: fullItem.activationDate ? format(new Date(fullItem.activationDate), 'yyyy-MM-dd') : '',
-          status: fullItem.status || 'Pending',
-          deliveryAddress: fullItem.deliveryAddress || '',
+          startDate: format(new Date(fullItem.startDate), "yyyy-MM-dd"),
+          activationDate: fullItem.activationDate
+            ? format(new Date(fullItem.activationDate), "yyyy-MM-dd")
+            : "",
+          status: fullItem.status || "Pending",
+          deliveryAddress: fullItem.deliveryAddress || "",
           // Use hasSoftware from fullItem (computed by backend for Projects)
           hasSoftware: fullItem.hasSoftware || false,
           // Keep legacy mapping
-          customerCode: fullItem.customerCode || '',
-          softwareAccount: fullItem.softwareInfo?.softwareAccount || '',
-          softwarePassword: fullItem.softwareInfo?.softwarePassword || '',
-          playerId: fullItem.softwareInfo?.playerId || '',
-          licenseType: fullItem.softwareInfo?.licenseType || '1_Year',
+          customerCode: fullItem.customerCode || "",
+          softwareAccount: fullItem.softwareInfo?.softwareAccount || "",
+          softwarePassword: fullItem.softwareInfo?.softwarePassword || "",
+          playerId: fullItem.softwareInfo?.playerId || "",
+          licenseType: fullItem.softwareInfo?.licenseType || "1_Year",
         });
       } else {
         // Software (already full details in list usually, but safer to use item)
         setFormData({
-          customerCode: item.customerCode || '',
-          companyName: item.companyName || '',
-          taxCode: item.taxCode || '',
-          customerPhone: item.customerPhone || '',
-          productName: item.productName || '',
-          softwareAccount: item.softwareAccount || '',
-          softwarePassword: item.softwarePassword || '',
-          playerId: item.playerId || '',
-          licenseType: item.licenseType || '1_Year',
-          licenseStatus: item.licenseStatus || 'Pending',
+          customerCode: item.customerCode || "",
+          companyName: item.companyName || "",
+          taxCode: item.taxCode || "",
+          customerPhone: item.customerPhone || "",
+          productName: item.productName || "",
+          softwareAccount: item.softwareAccount || "",
+          softwarePassword: item.softwarePassword || "",
+          playerId: item.playerId || "",
+          licenseType: item.licenseType || "1_Year",
+          licenseStatus: item.licenseStatus || "Pending",
           deviceLimit: item.deviceLimit || 1,
         });
       }
       setEditingId(item._id);
       setIsModalOpen(true);
     } catch (error) {
-      toast.error('Không thể tải chi tiết bản ghi');
+      toast.error("Không thể tải chi tiết bản ghi");
       console.error(error);
     }
   };
@@ -355,45 +426,51 @@ const AdminDashboard = () => {
     setConfirmConfig({
       isOpen: true,
       title: "Xóa bản ghi",
-      message: "Bạn có chắc chắn muốn xóa bản ghi này không? Hành động này không thể hoàn tác.",
+      message:
+        "Bạn có chắc chắn muốn xóa bản ghi này không? Hành động này không thể hoàn tác.",
       type: "danger",
       onConfirm: async () => {
-        const loadingToast = toast.loading('Đang xóa...');
+        const loadingToast = toast.loading("Đang xóa...");
         try {
-          if (activeTab === 'Hardware') {
+          if (activeTab === "Hardware") {
             await warrantyApi.delete(id);
-          } else if (activeTab === 'Software') {
+          } else if (activeTab === "Software") {
             await softwareApi.delete(id);
           } else {
             await repairApi.delete(id);
           }
-          toast.success('Đã xóa bản ghi', { id: loadingToast });
+          toast.success("Đã xóa bản ghi", { id: loadingToast });
           fetchData();
         } catch (err) {
-          toast.error('Không thể xóa bản ghi', { id: loadingToast });
+          toast.error("Không thể xóa bản ghi", { id: loadingToast });
         }
-      }
+      },
     });
   };
 
-  const [statusUpdate, setStatusUpdate] = useState({ id: null, status: '', showModal: false, duration: '0' });
+  const [statusUpdate, setStatusUpdate] = useState({
+    id: null,
+    status: "",
+    showModal: false,
+    duration: "0",
+  });
 
   const handleUpdateRepairStatus = async (id, status) => {
-    if (status === 'completed') {
-      setStatusUpdate({ id, status, showModal: true, duration: '0' });
+    if (status === "completed") {
+      setStatusUpdate({ id, status, showModal: true, duration: "0" });
     } else {
       await updateStatusAPI(id, status);
     }
   };
 
   const updateStatusAPI = async (id, status, warrantyDuration) => {
-    const loadingToast = toast.loading('Đang cập nhật...');
+    const loadingToast = toast.loading("Đang cập nhật...");
     try {
       await repairApi.updateStatus(id, status, warrantyDuration);
-      toast.success('Cập nhật trạng thái thành công', { id: loadingToast });
+      toast.success("Cập nhật trạng thái thành công", { id: loadingToast });
       fetchData();
     } catch (error) {
-      toast.error('Lỗi cập nhật trạng thái', { id: loadingToast });
+      toast.error("Lỗi cập nhật trạng thái", { id: loadingToast });
     }
   };
 
@@ -405,31 +482,31 @@ const AdminDashboard = () => {
   };
 
   const handlePageChange = (newPage) => {
-    setFilters(prev => ({ ...prev, page: newPage }));
+    setFilters((prev) => ({ ...prev, page: newPage }));
   };
 
   const resetForm = () => {
     setFormData({
-      companyName: '',
-      taxCode: '',
-      customerPhone: '',
-      productCode: '',
-      productName: '',
-      serialNumber: '',
-      customerType: 'Retail',
+      companyName: "",
+      taxCode: "",
+      customerPhone: "",
+      productCode: "",
+      productName: "",
+      serialNumber: "",
+      customerType: "Retail",
       warrantyPeriod: 24,
-      startDate: format(new Date(), 'yyyy-MM-dd'),
-      deliveryAddress: '',
+      startDate: format(new Date(), "yyyy-MM-dd"),
+      deliveryAddress: "",
       hasSoftware: false,
-      softwareAccount: '',
-      softwarePassword: '',
-      playerId: '',
-      licenseType: '1_Year',
-      status: 'Pending',
-      activationDate: '',
-      customerCode: '',
-      licenseStatus: 'Pending',
-      deviceLimit: 1
+      softwareAccount: "",
+      softwarePassword: "",
+      playerId: "",
+      licenseType: "1_Year",
+      status: "Pending",
+      activationDate: "",
+      customerCode: "",
+      licenseStatus: "Pending",
+      deviceLimit: 1,
     });
     setEditingId(null);
     setProductItems([]);
@@ -437,49 +514,58 @@ const AdminDashboard = () => {
 
   const handleSelectAll = (e) => {
     let list = [];
-    if (activeTab === 'Hardware') list = warranties;
-    else if (activeTab === 'Software') list = softwareList;
+    if (activeTab === "Hardware") list = warranties;
+    else if (activeTab === "Software") list = softwareList;
     else list = repairRequests;
 
     if (e.target.checked) {
-      setSelectedIds(list.map(w => w._id));
+      setSelectedIds(list.map((w) => w._id));
     } else {
       setSelectedIds([]);
     }
   };
 
   const handleSelectItem = (id) => {
-    setSelectedIds(prev =>
-      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
     );
   };
 
   const handleBulkPrint = async () => {
-    const itemsToPrint = warranties.flatMap(w => {
+    const itemsToPrint = warranties.flatMap((w) => {
       if (w.isProjectHeader) {
-        return (w.children || []).filter(c => selectedIds.includes(c._id));
+        return (w.children || []).filter((c) => selectedIds.includes(c._id));
       }
       return selectedIds.includes(w._id) ? [w] : [];
     });
 
     if (itemsToPrint.length === 0) {
-      toast.error('Vui lòng chọn ít nhất 1 thiết bị. Lưu ý: Cần "Xem chi tiết" dự án để tải danh sách máy trước khi in hàng loạt.');
+      toast.error(
+        'Vui lòng chọn ít nhất 1 thiết bị. Lưu ý: Cần "Xem chi tiết" dự án để tải danh sách máy trước khi in hàng loạt.',
+      );
       return;
     }
 
     // Sort by serial number (natural/numeric order: 0001 → 0002 → ... → 0400)
     itemsToPrint.sort((a, b) => {
-      const snA = Array.isArray(a.serialNumber) ? a.serialNumber[0] : (a.serialNumber || '');
-      const snB = Array.isArray(b.serialNumber) ? b.serialNumber[0] : (b.serialNumber || '');
-      return snA.localeCompare(snB, undefined, { numeric: true, sensitivity: 'base' });
+      const snA = Array.isArray(a.serialNumber)
+        ? a.serialNumber[0]
+        : a.serialNumber || "";
+      const snB = Array.isArray(b.serialNumber)
+        ? b.serialNumber[0]
+        : b.serialNumber || "";
+      return snA.localeCompare(snB, undefined, {
+        numeric: true,
+        sensitivity: "base",
+      });
     });
 
     try {
-      toast.loading('Đang tạo mã QR...', { id: 'bulk-print' });
+      toast.loading("Đang tạo mã QR...", { id: "bulk-print" });
       await printLabels(itemsToPrint);
-      toast.dismiss('bulk-print');
+      toast.dismiss("bulk-print");
     } catch (err) {
-      toast.error('Lỗi khi tạo tem in: ' + err.message, { id: 'bulk-print' });
+      toast.error("Lỗi khi tạo tem in: " + err.message, { id: "bulk-print" });
     }
   };
 
@@ -490,22 +576,61 @@ const AdminDashboard = () => {
       message: `Bạn có chắc muốn xóa ${selectedIds.length} bản ghi đã chọn không?`,
       type: "danger",
       onConfirm: async () => {
-        const loadingToast = toast.loading(`Đang xóa ${selectedIds.length} bản ghi...`);
+        const loadingToast = toast.loading(
+          `Đang xóa ${selectedIds.length} bản ghi...`,
+        );
         try {
-          if (activeTab === 'Hardware') {
+          if (activeTab === "Hardware") {
             await warrantyApi.bulkDelete(selectedIds);
-          } else if (activeTab === 'Software') {
+          } else if (activeTab === "Software") {
             await softwareApi.bulkDelete(selectedIds);
           } else {
-            await Promise.all(selectedIds.map(id => repairApi.delete(id)));
+            await Promise.all(selectedIds.map((id) => repairApi.delete(id)));
           }
           setSelectedIds([]);
-          toast.success('Đã xóa các bản ghi được chọn', { id: loadingToast });
+          toast.success("Đã xóa các bản ghi được chọn", { id: loadingToast });
           fetchData();
         } catch (err) {
-          toast.error('Lỗi khi xóa hàng loạt', { id: loadingToast });
+          toast.error("Lỗi khi xóa hàng loạt", { id: loadingToast });
         }
-      }
+      },
+    });
+  };
+
+  const handleBulkActivate = () => {
+    if (selectedIds.length === 0) return;
+
+    setConfirmConfig({
+      isOpen: true,
+      title: "Xác nhận kích hoạt hàng loạt",
+      message: `Bạn sẽ kích hoạt ${selectedIds.length} sản phẩm. Đồng thời phần mềm liên kết (nếu có) cũng sẽ được kích hoạt.`,
+      type: "warning",
+      onConfirm: async () => {
+        const loadingToast = toast.loading(
+          `Đang kích hoạt ${selectedIds.length} sản phẩm...`,
+        );
+        try {
+          const result = await warrantyApi.bulkActivate(selectedIds);
+          const successMsg = `Đã kích hoạt thành công ${result.successCount}/${selectedIds.length} sản phẩm`;
+          const errorMsg =
+            result.errorCount > 0 ? ` (${result.errorCount} lỗi)` : "";
+
+          setSelectedIds([]);
+          toast.success(successMsg + errorMsg, { id: loadingToast });
+
+          // Log errors if any
+          if (result.errors && result.errors.length > 0) {
+            console.warn("Bulk activate errors:", result.errors);
+          }
+
+          fetchData();
+        } catch (err) {
+          toast.error(
+            err.response?.data?.message || "Lỗi khi kích hoạt hàng loạt",
+            { id: loadingToast },
+          );
+        }
+      },
     });
   };
 
@@ -513,21 +638,27 @@ const AdminDashboard = () => {
     setProjectDetailModal(project);
     if (!project.children) {
       try {
-        const res = await projectApi.getDevices(project._id || project.projectId);
-        setProjectDetailModal(prev => ({ ...prev, children: res.data }));
+        const res = await projectApi.getDevices(
+          project._id || project.projectId,
+        );
+        setProjectDetailModal((prev) => ({ ...prev, children: res.data }));
       } catch (err) {
-        toast.error('Không thể tải danh sách thiết bị');
+        toast.error("Không thể tải danh sách thiết bị");
       }
     }
   };
   const handleDeleteProject = async (id) => {
-    if (window.confirm('CẢNH BÁO: Xóa dự án này sẽ xóa TOÀNBỘ các máy con liên quan. Hành động này không thể hoàn tác. Bạn có chắc chắn muốn xóa?')) {
+    if (
+      window.confirm(
+        "CẢNH BÁO: Xóa dự án này sẽ xóa TOÀNBỘ các máy con liên quan. Hành động này không thể hoàn tác. Bạn có chắc chắn muốn xóa?",
+      )
+    ) {
       try {
         await projectApi.delete(id);
-        toast.success('Đã xóa dự án và toàn bộ thiết bị liên quan');
+        toast.success("Đã xóa dự án và toàn bộ thiết bị liên quan");
         fetchData();
       } catch (err) {
-        toast.error('Lỗi khi xóa dự án');
+        toast.error("Lỗi khi xóa dự án");
       }
     }
   };
@@ -542,21 +673,33 @@ const AdminDashboard = () => {
       {/* Animated background elements */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-linear-to-b from-primary-50/50 via-accent-50/30 to-transparent -z-10 blur-3xl opacity-60 animate-pulse"></div>
       <div className="absolute top-40 right-0 w-96 h-96 bg-linear-to-l from-accent-100/40 to-transparent -z-10 blur-3xl rounded-full float-animation"></div>
-      <div className="absolute bottom-40 left-0 w-96 h-96 bg-linear-to-r from-primary-100/40 to-transparent -z-10 blur-3xl rounded-full float-animation" style={{ animationDelay: '1s' }}></div>
+      <div
+        className="absolute bottom-40 left-0 w-96 h-96 bg-linear-to-r from-primary-100/40 to-transparent -z-10 blur-3xl rounded-full float-animation"
+        style={{ animationDelay: "1s" }}></div>
 
       <nav className="bg-slate-900 text-white sticky top-0 z-50 mb-8">
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <Link to="/" className="flex items-center gap-2 font-black text-2xl tracking-tighter group transition-transform active:scale-95">
-              <img src={logoSR} alt="Smart Retail Logo" className="h-8 md:h-10 w-auto" />
+            <Link
+              to="/"
+              className="flex items-center gap-2 font-black text-2xl tracking-tighter group transition-transform active:scale-95">
+              <img
+                src={logoSR}
+                alt="Smart Retail Logo"
+                className="h-8 md:h-10 w-auto"
+              />
             </Link>
             <span className="h-6 w-px bg-slate-700"></span>
-            <span className="text-xs font-black uppercase tracking-[0.2em] text-primary-400">Technician Portal</span>
+            <span className="text-xs font-black uppercase tracking-[0.2em] text-primary-400">
+              Technician Portal
+            </span>
           </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 px-3 py-1 bg-slate-800 rounded-full border border-slate-700">
               <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300">System Online</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-300">
+                System Online
+              </span>
             </div>
           </div>
         </div>
@@ -565,10 +708,12 @@ const AdminDashboard = () => {
       <div className="container mx-auto px-4 space-y-6">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-extrabold text-slate-900">Quản lý <span className="text-primary-600">bảo hành</span></h1>
+            <h1 className="text-3xl font-extrabold text-slate-900">
+              Quản lý <span className="text-primary-600">bảo hành</span>
+            </h1>
           </div>
           <div className="flex flex-wrap gap-3">
-            {activeTab === 'Hardware' && (
+            {activeTab === "Hardware" && (
               <>
                 <input
                   type="file"
@@ -579,18 +724,20 @@ const AdminDashboard = () => {
                 />
                 <button
                   onClick={() => fileInputRef.current.click()}
-                  className="bg-white hover:bg-slate-50 text-slate-700 font-bold py-3 px-6 rounded-xl border border-slate-200 transition-all flex items-center gap-2 shadow-sm"
-                >
+                  className="bg-white hover:bg-slate-50 text-slate-700 font-bold py-3 px-6 rounded-xl border border-slate-200 transition-all flex items-center gap-2 shadow-sm">
                   <Upload size={18} /> Nhập Excel
                 </button>
               </>
             )}
-            {activeTab !== 'Repair' && (
+            {activeTab !== "Repair" && (
               <button
-                onClick={() => { resetForm(); setIsModalOpen(true); }}
-                className="bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-all flex items-center gap-2"
-              >
-                <Plus size={20} /> Thêm {activeTab === 'Hardware' ? 'Phần Cứng' : 'Phần Mềm'}
+                onClick={() => {
+                  resetForm();
+                  setIsModalOpen(true);
+                }}
+                className="bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition-all flex items-center gap-2">
+                <Plus size={20} /> Thêm{" "}
+                {activeTab === "Hardware" ? "Phần Cứng" : "Phần Mềm"}
               </button>
             )}
           </div>
@@ -599,124 +746,177 @@ const AdminDashboard = () => {
         {/* TABS */}
         <div className="flex p-1 bg-slate-200 rounded-2xl w-fit">
           <button
-            onClick={() => setActiveTab('Hardware')}
-            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === 'Hardware' ? 'bg-white text-slate-900 shadow-md' : 'text-slate-500 hover:text-slate-700'
-              }`}
-          >
+            onClick={() => setActiveTab("Hardware")}
+            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all ${
+              activeTab === "Hardware"
+                ? "bg-white text-slate-900 shadow-md"
+                : "text-slate-500 hover:text-slate-700"
+            }`}>
             <HardDrive size={18} /> Phần cứng
           </button>
           <button
-            onClick={() => setActiveTab('Software')}
-            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === 'Software' ? 'bg-white text-slate-900 shadow-md' : 'text-slate-500 hover:text-slate-700'
-              }`}
-          >
+            onClick={() => setActiveTab("Software")}
+            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all ${
+              activeTab === "Software"
+                ? "bg-white text-slate-900 shadow-md"
+                : "text-slate-500 hover:text-slate-700"
+            }`}>
             <AppWindow size={18} /> Phần mềm
           </button>
           <button
-            onClick={() => setActiveTab('Repair')}
-            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all ${activeTab === 'Repair' ? 'bg-white text-slate-900 shadow-md' : 'text-slate-500 hover:text-slate-700'
-              }`}
-          >
+            onClick={() => setActiveTab("Repair")}
+            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all ${
+              activeTab === "Repair"
+                ? "bg-white text-slate-900 shadow-md"
+                : "text-slate-500 hover:text-slate-700"
+            }`}>
             <Wrench size={18} /> Sửa chữa
           </button>
         </div>
 
         {/* Project Detail Modal */}
-      {projectDetailModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-          <motion.div
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="bg-white rounded-3xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col"
-          >
-            <div className="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-              <div>
-                <h3 className="text-xl font-black text-slate-800 flex items-center gap-3">
-                  <div className="p-2 bg-primary-100 text-primary-600 rounded-xl"><Package size={20} /></div>
-                  Chi tiết Dự án: {projectDetailModal.companyName}
-                </h3>
-                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">
-                  {projectDetailModal.productName} • {projectDetailModal.children?.length || 0} Thiết bị
-                </p>
+        {projectDetailModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="bg-white rounded-3xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
+              <div className="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <div>
+                  <h3 className="text-xl font-black text-slate-800 flex items-center gap-3">
+                    <div className="p-2 bg-primary-100 text-primary-600 rounded-xl">
+                      <Package size={20} />
+                    </div>
+                    Chi tiết Dự án: {projectDetailModal.companyName}
+                  </h3>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">
+                    {projectDetailModal.productName} •{" "}
+                    {projectDetailModal.children?.length || 0} Thiết bị
+                  </p>
+                </div>
+                <button
+                  onClick={() => setProjectDetailModal(null)}
+                  className="p-2 hover:bg-white text-slate-400 hover:text-slate-600 rounded-xl transition-all shadow-sm">
+                  <X size={20} />
+                </button>
               </div>
-              <button
-                onClick={() => setProjectDetailModal(null)}
-                className="p-2 hover:bg-white text-slate-400 hover:text-slate-600 rounded-xl transition-all shadow-sm"
-              >
-                <X size={20} />
-              </button>
-            </div>
 
-            <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
-              <table className="w-full text-left">
-                <thead className="bg-slate-50 text-[10px] font-black text-slate-500 uppercase tracking-widest">
-                  <tr>
-                    <th className="px-4 py-3 border-b border-slate-100">STT</th>
-                    <th className="px-4 py-3 border-b border-slate-100">Sản phẩm</th>
-                    <th className="px-4 py-3 border-b border-slate-100">Mã KH</th>
-                    <th className="px-4 py-3 border-b border-slate-100">Serial Number</th>
-                    <th className="px-4 py-3 border-b border-slate-100">Địa chỉ giao</th>
-                    <th className="px-4 py-3 border-b border-slate-100">Trạng thái</th>
-                    <th className="px-4 py-3 border-b border-slate-100 text-right">In / Sửa</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-50">
-                  {!projectDetailModal.children ? (
+              <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+                <table className="w-full text-left">
+                  <thead className="bg-slate-50 text-[10px] font-black text-slate-500 uppercase tracking-widest">
                     <tr>
-                      <td colSpan="7" className="px-4 py-20 text-center">
-                        <div className="flex flex-col items-center gap-3">
-                          <div className="w-8 h-8 border-4 border-primary-100 border-t-primary-600 rounded-full animate-spin"></div>
-                          <p className="text-xs font-bold text-slate-400">Đang tải danh sách thiết bị...</p>
-                        </div>
-                      </td>
+                      <th className="px-4 py-3 border-b border-slate-100">
+                        STT
+                      </th>
+                      <th className="px-4 py-3 border-b border-slate-100">
+                        Sản phẩm
+                      </th>
+                      <th className="px-4 py-3 border-b border-slate-100">
+                        Mã KH
+                      </th>
+                      <th className="px-4 py-3 border-b border-slate-100">
+                        Serial Number
+                      </th>
+                      <th className="px-4 py-3 border-b border-slate-100">
+                        Địa chỉ giao
+                      </th>
+                      <th className="px-4 py-3 border-b border-slate-100">
+                        Trạng thái
+                      </th>
+                      <th className="px-4 py-3 border-b border-slate-100 text-right">
+                        In / Sửa
+                      </th>
                     </tr>
-                  ) : projectDetailModal.children.length === 0 ? (
-                    <tr><td colSpan="7" className="px-4 py-20 text-center text-slate-400">Không có thiết bị nào trong dự án này.</td></tr>
-                  ) : (
-                    projectDetailModal.children.map((child, idx) => (
-                      <tr key={child._id} className="hover:bg-slate-50/50 transition-colors">
-                      <td className="px-4 py-4 text-xs font-bold text-slate-400">{idx + 1}</td>
-                      <td className="px-4 py-4">
-                        <p className="text-xs font-bold text-slate-800">{child.productName}</p>
-                      </td>
-                      <td className="px-4 py-4">
-                        <span className="text-[10px] font-mono bg-slate-100 px-1.5 py-0.5 rounded">{child.customerCode}</span>
-                      </td>
-                      <td className="px-4 py-4">
-                        <span className="text-xs font-black font-mono text-primary-600">{child.serialNumber}</span>
-                      </td>
-                      <td className="px-4 py-4 text-[10px] text-slate-500 max-w-[200px] truncate">
-                        {child.deliveryAddress || '—'}
-                      </td>
-                      <td className="px-4 py-4">
-                        <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${child.status === 'Activated' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
-                          {child.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-4 text-right">
-                        <div className="flex justify-end gap-2">
-                          <button onClick={() => { setQrModal(child); setProjectDetailModal(null); }} className="p-1.5 hover:bg-primary-50 text-primary-600 rounded-lg transition-all"><QrCode size={14} /></button>
-                          <button onClick={() => { handleEdit(child); setProjectDetailModal(null); }} className="p-1.5 hover:bg-blue-50 text-blue-600 rounded-lg transition-all"><Edit2 size={14} /></button>
-                        </div>
-                      </td>
-                    </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-slate-50">
+                    {!projectDetailModal.children ? (
+                      <tr>
+                        <td colSpan="7" className="px-4 py-20 text-center">
+                          <div className="flex flex-col items-center gap-3">
+                            <div className="w-8 h-8 border-4 border-primary-100 border-t-primary-600 rounded-full animate-spin"></div>
+                            <p className="text-xs font-bold text-slate-400">
+                              Đang tải danh sách thiết bị...
+                            </p>
+                          </div>
+                        </td>
+                      </tr>
+                    ) : projectDetailModal.children.length === 0 ? (
+                      <tr>
+                        <td
+                          colSpan="7"
+                          className="px-4 py-20 text-center text-slate-400">
+                          Không có thiết bị nào trong dự án này.
+                        </td>
+                      </tr>
+                    ) : (
+                      projectDetailModal.children.map((child, idx) => (
+                        <tr
+                          key={child._id}
+                          className="hover:bg-slate-50/50 transition-colors">
+                          <td className="px-4 py-4 text-xs font-bold text-slate-400">
+                            {idx + 1}
+                          </td>
+                          <td className="px-4 py-4">
+                            <p className="text-xs font-bold text-slate-800">
+                              {child.productName}
+                            </p>
+                          </td>
+                          <td className="px-4 py-4">
+                            <span className="text-[10px] font-mono bg-slate-100 px-1.5 py-0.5 rounded">
+                              {child.customerCode}
+                            </span>
+                          </td>
+                          <td className="px-4 py-4">
+                            <span className="text-xs font-black font-mono text-primary-600">
+                              {child.serialNumber}
+                            </span>
+                          </td>
+                          <td className="px-4 py-4 text-[10px] text-slate-500 max-w-[200px] truncate">
+                            {child.deliveryAddress || "—"}
+                          </td>
+                          <td className="px-4 py-4">
+                            <span
+                              className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${child.status === "Activated" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}>
+                              {child.status}
+                            </span>
+                          </td>
+                          <td className="px-4 py-4 text-right">
+                            <div className="flex justify-end gap-2">
+                              <button
+                                onClick={() => {
+                                  setQrModal(child);
+                                  setProjectDetailModal(null);
+                                }}
+                                className="p-1.5 hover:bg-primary-50 text-primary-600 rounded-lg transition-all">
+                                <QrCode size={14} />
+                              </button>
+                              <button
+                                onClick={() => {
+                                  handleEdit(child);
+                                  setProjectDetailModal(null);
+                                }}
+                                className="p-1.5 hover:bg-blue-50 text-blue-600 rounded-lg transition-all">
+                                <Edit2 size={14} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
 
-            <div className="px-8 py-4 bg-slate-50 border-top border-slate-100 flex justify-end">
-              <button
-                onClick={() => setProjectDetailModal(null)}
-                className="px-6 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/20"
-              >
-                Đóng
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      )}
+              <div className="px-8 py-4 bg-slate-50 border-top border-slate-100 flex justify-end">
+                <button
+                  onClick={() => setProjectDetailModal(null)}
+                  className="px-6 py-2 bg-slate-900 text-white rounded-xl text-xs font-bold uppercase tracking-widest hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/20">
+                  Đóng
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
 
         {/* Bulk Actions */}
         <AnimatePresence>
@@ -725,25 +925,31 @@ const AdminDashboard = () => {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className="bg-rose-50 border border-rose-100 p-4 rounded-xl flex items-center justify-between shadow-sm"
-            >
+              className="bg-rose-50 border border-rose-100 p-4 rounded-xl flex items-center justify-between shadow-sm">
               <div className="flex items-center gap-3">
                 <div className="bg-rose-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-black">
                   {selectedIds.length}
                 </div>
-                <p className="text-sm font-bold text-rose-700">bản ghi đang được chọn</p>
+                <p className="text-sm font-bold text-rose-700">
+                  bản ghi đang được chọn
+                </p>
               </div>
               <div className="flex gap-2">
                 <button
                   onClick={handleBulkPrint}
-                  className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg text-xs font-black flex items-center gap-2 transition-all shadow-md active:scale-95"
-                >
+                  className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg text-xs font-black flex items-center gap-2 transition-all shadow-md active:scale-95">
                   <Printer size={14} /> In mã QR ({selectedIds.length})
                 </button>
+                {activeTab === "Hardware" && (
+                  <button
+                    onClick={handleBulkActivate}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-xs font-black flex items-center gap-2 transition-all shadow-md active:scale-95">
+                    <ShieldCheck size={14} /> Kích hoạt ({selectedIds.length})
+                  </button>
+                )}
                 <button
                   onClick={handleBulkDelete}
-                  className="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-lg text-xs font-black flex items-center gap-2 transition-all shadow-md active:scale-95"
-                >
+                  className="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-lg text-xs font-black flex items-center gap-2 transition-all shadow-md active:scale-95">
                   <Trash2 size={14} /> Xóa hàng loạt
                 </button>
               </div>
@@ -754,90 +960,153 @@ const AdminDashboard = () => {
         {/* Filters */}
         <div className="flex flex-col md:flex-row gap-3 items-stretch">
           <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-3 w-full">
-            {activeTab === 'Hardware' ? (
+            {activeTab === "Hardware" ? (
               // Hardware Filters
               <div className="relative group">
-                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors" />
+                <Search
+                  size={16}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors"
+                />
                 <input
                   type="text"
                   placeholder="Serial Number..."
                   className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 text-sm outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500 transition-all font-bold bg-white placeholder:text-slate-300"
                   value={filters.serialNumber}
-                  onChange={(e) => setFilters({ ...filters, serialNumber: e.target.value.toUpperCase(), page: 1 })}
+                  onChange={(e) =>
+                    setFilters({
+                      ...filters,
+                      serialNumber: e.target.value.toUpperCase(),
+                      page: 1,
+                    })
+                  }
                 />
               </div>
-            ) : activeTab === 'Software' ? (
+            ) : activeTab === "Software" ? (
               // Software Filters
               <div className="relative group">
-                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors" />
+                <Search
+                  size={16}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors"
+                />
                 <input
                   type="text"
                   placeholder="Mã Khách Hàng / Tên PM..."
                   className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 text-sm outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500 transition-all font-bold bg-white placeholder:text-slate-300"
                   value={filters.customerCode}
-                  onChange={(e) => setFilters({ ...filters, customerCode: e.target.value, page: 1 })}
+                  onChange={(e) =>
+                    setFilters({
+                      ...filters,
+                      customerCode: e.target.value,
+                      page: 1,
+                    })
+                  }
                 />
               </div>
             ) : null}
 
-            {activeTab !== 'Repair' && (
+            {activeTab !== "Repair" && (
               <>
                 <div className="relative group">
-                  <Phone size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors" />
+                  <Phone
+                    size={16}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors"
+                  />
                   <input
                     type="text"
                     placeholder="Số điện thoại..."
                     className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 text-sm outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500 transition-all font-medium bg-white placeholder:text-slate-300"
                     value={filters.customerPhone}
-                    onChange={(e) => setFilters({ ...filters, customerPhone: e.target.value, page: 1 })}
+                    onChange={(e) =>
+                      setFilters({
+                        ...filters,
+                        customerPhone: e.target.value,
+                        page: 1,
+                      })
+                    }
                   />
                 </div>
                 <div className="relative group">
-                  <Fingerprint size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors" />
+                  <Fingerprint
+                    size={16}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors"
+                  />
                   <input
                     type="text"
                     placeholder="Mã số thuế..."
                     className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 text-sm outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500 transition-all font-mono font-bold bg-white placeholder:text-slate-300"
                     value={filters.taxCode}
-                    onChange={(e) => setFilters({ ...filters, taxCode: e.target.value, page: 1 })}
+                    onChange={(e) =>
+                      setFilters({
+                        ...filters,
+                        taxCode: e.target.value,
+                        page: 1,
+                      })
+                    }
                   />
                 </div>
                 <div className="relative group">
-                  <Building size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors" />
+                  <Building
+                    size={16}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary-500 transition-colors"
+                  />
                   <input
                     type="text"
                     placeholder="Tên khách hàng..."
                     className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-200 text-sm outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500 transition-all font-medium bg-white placeholder:text-slate-300"
                     value={filters.companyName}
-                    onChange={(e) => setFilters({ ...filters, companyName: e.target.value, page: 1 })}
+                    onChange={(e) =>
+                      setFilters({
+                        ...filters,
+                        companyName: e.target.value,
+                        page: 1,
+                      })
+                    }
                   />
                 </div>
               </>
             )}
           </div>
 
-          {activeTab === 'Hardware' && (
+          {activeTab === "Hardware" && (
             <div className="flex gap-1.5 bg-slate-100 p-1 rounded-2xl w-full md:w-auto shrink-0">
-              {['', 'Retail', 'Dealer', 'Project'].map((type) => (
+              {["", "Retail", "Dealer", "Project"].map((type) => (
                 <button
                   key={type}
-                  onClick={() => setFilters({ ...filters, customerType: type, page: 1 })}
-                  className={`px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${filters.customerType === type
-                    ? 'bg-white text-primary-600 shadow-sm'
-                    : 'text-slate-500 hover:text-slate-700'
-                    }`}
-                >
-                  {type === '' ? 'Tất cả' : type === 'Retail' ? 'Bán lẻ' : type === 'Dealer' ? 'Đại lý' : 'Dự án'}
+                  onClick={() =>
+                    setFilters({ ...filters, customerType: type, page: 1 })
+                  }
+                  className={`px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                    filters.customerType === type
+                      ? "bg-white text-primary-600 shadow-sm"
+                      : "text-slate-500 hover:text-slate-700"
+                  }`}>
+                  {type === ""
+                    ? "Tất cả"
+                    : type === "Retail"
+                      ? "Bán lẻ"
+                      : type === "Dealer"
+                        ? "Đại lý"
+                        : "Dự án"}
                 </button>
               ))}
             </div>
           )}
 
           <button
-            onClick={() => setFilters({ serialNumber: '', customerPhone: '', taxCode: '', companyName: '', customerType: '', customerCode: '', productName: '', page: 1 })}
+            onClick={() =>
+              setFilters({
+                serialNumber: "",
+                customerPhone: "",
+                taxCode: "",
+                companyName: "",
+                customerType: "",
+                customerCode: "",
+                productName: "",
+                page: 1,
+              })
+            }
             className="p-3 text-slate-400 hover:text-rose-500 transition-colors rounded-2xl hover:bg-rose-50 border border-transparent hover:border-rose-100"
-            title="Xóa bộ lọc"
-          >
+            title="Xóa bộ lọc">
             <X size={20} />
           </button>
         </div>
@@ -853,10 +1122,24 @@ const AdminDashboard = () => {
                       type="checkbox"
                       className="rounded border-slate-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
                       onChange={handleSelectAll}
-                      checked={((activeTab === 'Hardware' ? warranties : activeTab === 'Software' ? softwareList : repairRequests).length > 0) && (selectedIds.length === (activeTab === 'Hardware' ? warranties : activeTab === 'Software' ? softwareList : repairRequests).length)}
+                      checked={
+                        (activeTab === "Hardware"
+                          ? warranties
+                          : activeTab === "Software"
+                            ? softwareList
+                            : repairRequests
+                        ).length > 0 &&
+                        selectedIds.length ===
+                          (activeTab === "Hardware"
+                            ? warranties
+                            : activeTab === "Software"
+                              ? softwareList
+                              : repairRequests
+                          ).length
+                      }
                     />
                   </th>
-                  {activeTab === 'Repair' ? (
+                  {activeTab === "Repair" ? (
                     <>
                       <th className="px-6 py-4">Sản phẩm</th>
                       <th className="px-6 py-4">Khách hàng</th>
@@ -866,16 +1149,28 @@ const AdminDashboard = () => {
                     </>
                   ) : (
                     <>
-                      <th className="px-6 py-4 whitespace-nowrap">Sản phẩm / {activeTab === 'Hardware' ? 'Model' : 'Mã KH'}</th>
+                      <th className="px-6 py-4 whitespace-nowrap">
+                        Sản phẩm /{" "}
+                        {activeTab === "Hardware" ? "Model" : "Mã KH"}
+                      </th>
                       <th
-                        className={`px-6 py-4 whitespace-nowrap ${activeTab === 'Hardware' ? '' : 'hidden'}`}
-                      >
+                        className={`px-6 py-4 whitespace-nowrap ${activeTab === "Hardware" ? "" : "hidden"}`}>
                         Mã KH
                       </th>
-                      <th className="px-6 py-4 whitespace-nowrap">{activeTab === 'Hardware' ? 'Serial' : 'Loại License'}</th>
-                      {activeTab === 'Software' && <th className="px-6 py-4 whitespace-nowrap">Số lượng</th>}
-                      <th className="px-6 py-4 whitespace-nowrap">Khách hàng</th>
-                      <th className="px-6 py-4 whitespace-nowrap">Trạng thái</th>
+                      <th className="px-6 py-4 whitespace-nowrap">
+                        {activeTab === "Hardware" ? "Serial" : "Loại License"}
+                      </th>
+                      {activeTab === "Software" && (
+                        <th className="px-6 py-4 whitespace-nowrap">
+                          Số lượng
+                        </th>
+                      )}
+                      <th className="px-6 py-4 whitespace-nowrap">
+                        Khách hàng
+                      </th>
+                      <th className="px-6 py-4 whitespace-nowrap">
+                        Trạng thái
+                      </th>
                       <th className="px-6 py-4 whitespace-nowrap">Thời hạn</th>
                     </>
                   )}
@@ -884,43 +1179,103 @@ const AdminDashboard = () => {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {loading ? (
-                  <tr><td colSpan={activeTab === 'Hardware' ? "7" : activeTab === 'Software' ? "8" : "7"} className="px-6 py-20 text-center text-slate-400">Đang tải dữ liệu...</td></tr>
-                ) : (activeTab === 'Hardware' ? warranties : activeTab === 'Software' ? softwareList : repairRequests).length === 0 ? (
-                  <tr><td colSpan={activeTab === 'Hardware' ? "7" : activeTab === 'Software' ? "8" : "7"} className="px-6 py-20 text-center text-slate-400 font-medium">Không tìm thấy bản ghi nào.</td></tr>
+                  <tr>
+                    <td
+                      colSpan={
+                        activeTab === "Hardware"
+                          ? "7"
+                          : activeTab === "Software"
+                            ? "8"
+                            : "7"
+                      }
+                      className="px-6 py-20 text-center text-slate-400">
+                      Đang tải dữ liệu...
+                    </td>
+                  </tr>
+                ) : (activeTab === "Hardware"
+                    ? warranties
+                    : activeTab === "Software"
+                      ? softwareList
+                      : repairRequests
+                  ).length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={
+                        activeTab === "Hardware"
+                          ? "7"
+                          : activeTab === "Software"
+                            ? "8"
+                            : "7"
+                      }
+                      className="px-6 py-20 text-center text-slate-400 font-medium">
+                      Không tìm thấy bản ghi nào.
+                    </td>
+                  </tr>
                 ) : (
-                  (activeTab === 'Hardware' ? warranties : activeTab === 'Software' ? softwareList : repairRequests).map((item) => (
-                    activeTab === 'Hardware' ? (
+                  (activeTab === "Hardware"
+                    ? warranties
+                    : activeTab === "Software"
+                      ? softwareList
+                      : repairRequests
+                  ).map((item) =>
+                    activeTab === "Hardware" ? (
                       <WarrantyTableRow
                         key={item._id || item.projectId}
                         warranty={item}
-                        isSelected={item.isProjectHeader ? (item.children?.length > 0 && item.children.every(c => selectedIds.includes(c._id))) : selectedIds.includes(item._id)}
+                        isSelected={
+                          item.isProjectHeader
+                            ? item.children?.length > 0 &&
+                              item.children.every((c) =>
+                                selectedIds.includes(c._id),
+                              )
+                            : selectedIds.includes(item._id)
+                        }
                         onToggleSelect={(id) => {
                           if (item.isProjectHeader && id === item.projectId) {
                             if (!item.children) {
-                               // Auto-fetch if children not loaded
-                               toast.promise(projectApi.getDevices(item.projectId), {
-                                 loading: 'Đang tải danh sách thiết bị...',
-                                 success: (res) => {
-                                   const childDevices = res.data;
-                                   // Update the warranties state to include these children
-                                   setWarranties(prev => prev.map(w => 
-                                     w.projectId === item.projectId ? { ...w, children: childDevices } : w
-                                   ));
-                                   // Select all these new children
-                                   const childIds = childDevices.map(c => c._id);
-                                   setSelectedIds(prev => [...new Set([...prev, ...childIds])]);
-                                   return 'Đã chọn toàn bộ thiết bị trong dự án';
-                                 },
-                                 error: 'Không thể tải danh sách thiết bị'
-                               });
-                               return;
+                              // Auto-fetch if children not loaded
+                              toast.promise(
+                                projectApi.getDevices(item.projectId),
+                                {
+                                  loading: "Đang tải danh sách thiết bị...",
+                                  success: (res) => {
+                                    const childDevices = res.data;
+                                    // Update the warranties state to include these children
+                                    setWarranties((prev) =>
+                                      prev.map((w) =>
+                                        w.projectId === item.projectId
+                                          ? { ...w, children: childDevices }
+                                          : w,
+                                      ),
+                                    );
+                                    // Select all these new children
+                                    const childIds = childDevices.map(
+                                      (c) => c._id,
+                                    );
+                                    setSelectedIds((prev) => [
+                                      ...new Set([...prev, ...childIds]),
+                                    ]);
+                                    return "Đã chọn toàn bộ thiết bị trong dự án";
+                                  },
+                                  error: "Không thể tải danh sách thiết bị",
+                                },
+                              );
+                              return;
                             }
-                            const allChildIds = item.children.map(c => c._id);
-                            const areAllSelected = allChildIds.every(cid => selectedIds.includes(cid));
+                            const allChildIds = item.children.map((c) => c._id);
+                            const areAllSelected = allChildIds.every((cid) =>
+                              selectedIds.includes(cid),
+                            );
                             if (areAllSelected) {
-                              setSelectedIds(prev => prev.filter(cid => !allChildIds.includes(cid)));
+                              setSelectedIds((prev) =>
+                                prev.filter(
+                                  (cid) => !allChildIds.includes(cid),
+                                ),
+                              );
                             } else {
-                              setSelectedIds(prev => [...new Set([...prev, ...allChildIds])]);
+                              setSelectedIds((prev) => [
+                                ...new Set([...prev, ...allChildIds]),
+                              ]);
                             }
                           } else {
                             handleSelectItem(id);
@@ -934,7 +1289,7 @@ const AdminDashboard = () => {
                         onViewProjectDetails={handleViewProjectDetails}
                         onDeleteProject={handleDeleteProject}
                       />
-                    ) : activeTab === 'Software' ? (
+                    ) : activeTab === "Software" ? (
                       <SoftwareTableRow
                         key={item._id}
                         software={item}
@@ -951,8 +1306,8 @@ const AdminDashboard = () => {
                         onUpdateStatus={handleUpdateRepairStatus}
                         onPrint={(req) => setPrintReceipt(req)}
                       />
-                    )
-                  ))
+                    ),
+                  )
                 )}
               </tbody>
             </table>
@@ -961,14 +1316,22 @@ const AdminDashboard = () => {
           {/* Pagination */}
           <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
             <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">
-              Hiển thị {(activeTab === 'Hardware' ? warranties : activeTab === 'Software' ? softwareList : repairRequests).length} của {pagination.total} bản ghi
+              Hiển thị{" "}
+              {
+                (activeTab === "Hardware"
+                  ? warranties
+                  : activeTab === "Software"
+                    ? softwareList
+                    : repairRequests
+                ).length
+              }{" "}
+              của {pagination.total} bản ghi
             </p>
             <div className="flex gap-2">
               <button
                 disabled={pagination.page <= 1}
                 onClick={() => handlePageChange(pagination.page - 1)}
-                className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-bold text-slate-600 hover:bg-white disabled:opacity-50 disabled:hover:bg-transparent transition-all"
-              >
+                className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-bold text-slate-600 hover:bg-white disabled:opacity-50 disabled:hover:bg-transparent transition-all">
                 Trước
               </button>
               <div className="flex gap-1">
@@ -976,11 +1339,11 @@ const AdminDashboard = () => {
                   <button
                     key={i + 1}
                     onClick={() => handlePageChange(i + 1)}
-                    className={`w-8 h-8 rounded-lg text-xs font-bold transition-all ${pagination.page === i + 1
-                      ? 'bg-primary-600 text-white shadow-md shadow-primary-500/20'
-                      : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
-                      }`}
-                  >
+                    className={`w-8 h-8 rounded-lg text-xs font-bold transition-all ${
+                      pagination.page === i + 1
+                        ? "bg-primary-600 text-white shadow-md shadow-primary-500/20"
+                        : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
+                    }`}>
                     {i + 1}
                   </button>
                 ))}
@@ -988,8 +1351,7 @@ const AdminDashboard = () => {
               <button
                 disabled={pagination.page >= pagination.totalPages}
                 onClick={() => handlePageChange(pagination.page + 1)}
-                className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-bold text-slate-600 hover:bg-white disabled:opacity-50 disabled:hover:bg-transparent transition-all"
-              >
+                className="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-bold text-slate-600 hover:bg-white disabled:opacity-50 disabled:hover:bg-transparent transition-all">
                 Sau
               </button>
             </div>
@@ -1001,23 +1363,28 @@ const AdminDashboard = () => {
           {qrModal && (
             <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
               <motion.div
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"
-                onClick={() => setQrModal(null)}
-              ></motion.div>
+                onClick={() => setQrModal(null)}></motion.div>
               <motion.div
                 initial={{ scale: 0.9, opacity: 0, y: 20 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
                 exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                className="bg-white rounded-3xl shadow-2xl p-8 max-w-sm w-full relative z-10 text-center"
-              >
+                className="bg-white rounded-3xl shadow-2xl p-8 max-w-sm w-full relative z-10 text-center">
                 {/* QR Content */}
                 <div className="mb-6">
                   <div className="bg-primary-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <QrCode className="text-primary-600" size={32} />
                   </div>
-                  <h3 className="text-xl font-black text-slate-900 leading-tight">Mã QR kích hoạt</h3>
-                  <p className="text-slate-500 text-sm mt-2">Dán mã này lên thiết bị để khách hàng quét và tự kích hoạt bảo hành.</p>
+                  <h3 className="text-xl font-black text-slate-900 leading-tight">
+                    Mã QR kích hoạt
+                  </h3>
+                  <p className="text-slate-500 text-sm mt-2">
+                    Dán mã này lên thiết bị để khách hàng quét và tự kích hoạt
+                    bảo hành.
+                  </p>
                 </div>
 
                 <div className="bg-white p-6 rounded-2xl border-2 border-slate-100 shadow-inner inline-block mb-6">
@@ -1046,17 +1413,22 @@ const AdminDashboard = () => {
                   <div className="grid grid-cols-2 gap-3">
                     <button
                       onClick={() => {
-                        navigator.clipboard.writeText(getActivationUrl(qrModal._id));
-                        toast.success('Đã sao chép link kích hoạt!');
+                        navigator.clipboard.writeText(
+                          getActivationUrl(qrModal._id),
+                        );
+                        toast.success("Đã sao chép link kích hoạt!");
                       }}
-                      className="bg-slate-900 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-slate-800 transition-all"
-                    >
+                      className="bg-slate-900 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-slate-800 transition-all">
                       <Copy size={18} /> Sao chép
                     </button>
                     <button
                       onClick={() => {
                         // Open new window for printing QR label
-                        const printWindow = window.open('', '_blank', 'width=full ,height=full');
+                        const printWindow = window.open(
+                          "",
+                          "_blank",
+                          "width=full ,height=full",
+                        );
                         const labelHTML = `
                           <!DOCTYPE html>
                           <html>
@@ -1210,21 +1582,19 @@ const AdminDashboard = () => {
                         printWindow.document.write(labelHTML);
                         printWindow.document.close();
                       }}
-                      className="bg-primary-600 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-primary-700 transition-all"
-                    >
+                      className="bg-primary-600 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-primary-700 transition-all">
                       <Printer size={18} /> In tem
                     </button>
                   </div>
                   <button
                     onClick={() => setQrModal(null)}
-                    className="w-full py-3 font-bold text-slate-500 hover:text-slate-700 transition-all"
-                  >
+                    className="w-full py-3 font-bold text-slate-500 hover:text-slate-700 transition-all">
                     Đóng
                   </button>
                 </div>
 
                 {/* Hidden Print Component - Only visible when printing */}
-                <div style={{ display: 'none' }} className="print-only-label">
+                <div style={{ display: "none" }} className="print-only-label">
                   <QRLabelPrint
                     activationUrl={getActivationUrl(qrModal._id)}
                     productName={qrModal.productName}
@@ -1240,38 +1610,41 @@ const AdminDashboard = () => {
           {isModalOpen && (
             <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
               <motion.div
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 className="fixed inset-0 bg-slate-900/60 backdrop-blur-md"
-                onClick={() => setIsModalOpen(false)}
-              ></motion.div>
+                onClick={() => setIsModalOpen(false)}></motion.div>
               <motion.div
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                className="bg-white rounded-3xl md:rounded-[32px] shadow-2xl w-full max-w-4xl relative z-10 flex flex-col max-h-[90vh] overflow-hidden border border-slate-100"
-              >
+                className="bg-white rounded-3xl md:rounded-[32px] shadow-2xl w-full max-w-4xl relative z-10 flex flex-col max-h-[90vh] overflow-hidden border border-slate-100">
                 {/* Modal Header */}
                 <div className="px-8 py-6 border-b bg-linear-to-r from-slate-50 to-white flex justify-between items-center shrink-0">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <span className="w-2 h-2 rounded-full bg-primary-500 animate-pulse"></span>
                       <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">
-                        {editingId ? 'Chỉnh sửa' : 'Tạo mới'} {activeTab === 'Hardware' ? 'Bảo hành' : 'Phần mềm'}
+                        {editingId ? "Chỉnh sửa" : "Tạo mới"}{" "}
+                        {activeTab === "Hardware" ? "Bảo hành" : "Phần mềm"}
                       </h2>
                     </div>
                   </div>
                   <button
                     onClick={() => setIsModalOpen(false)}
-                    className="p-3 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-2xl transition-all border border-transparent hover:border-rose-100"
-                  >
+                    className="p-3 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-2xl transition-all border border-transparent hover:border-rose-100">
                     <X size={20} />
                   </button>
                 </div>
 
                 {/* Form Body - Scrollable */}
                 <div className="flex-1 overflow-y-auto custom-scrollbar p-8">
-                  <form id="warrantyForm" onSubmit={handleSubmit} className="space-y-10">
-                    {activeTab === 'Hardware' ? (
+                  <form
+                    id="warrantyForm"
+                    onSubmit={handleSubmit}
+                    className="space-y-10">
+                    {activeTab === "Hardware" ? (
                       <WarrantyForm
                         formData={formData}
                         setFormData={setFormData}
@@ -1294,19 +1667,29 @@ const AdminDashboard = () => {
                   <button
                     form="warrantyForm"
                     type="submit"
-                    className="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-black py-4 rounded-2xl transition-all shadow-xl shadow-primary-500/30 uppercase tracking-widest text-xs flex items-center justify-center gap-2 group"
-                  >
+                    className="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-black py-4 rounded-2xl transition-all shadow-xl shadow-primary-500/30 uppercase tracking-widest text-xs flex items-center justify-center gap-2 group">
                     {editingId ? (
-                      <>Cập nhật hệ thống <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" /></>
+                      <>
+                        Cập nhật hệ thống{" "}
+                        <ChevronRight
+                          size={16}
+                          className="group-hover:translate-x-1 transition-transform"
+                        />
+                      </>
                     ) : (
-                      <>Tạo mới dữ liệu <ChevronRight size={16} className="group-hover:translate-x-1 transition-transform" /></>
+                      <>
+                        Tạo mới dữ liệu{" "}
+                        <ChevronRight
+                          size={16}
+                          className="group-hover:translate-x-1 transition-transform"
+                        />
+                      </>
                     )}
                   </button>
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="px-10 py-4 font-black text-slate-500 hover:bg-white rounded-2xl transition-all border border-slate-200 shadow-sm hover:shadow-md uppercase tracking-widest text-[10px]"
-                  >
+                    className="px-10 py-4 font-black text-slate-500 hover:bg-white rounded-2xl transition-all border border-slate-200 shadow-sm hover:shadow-md uppercase tracking-widest text-[10px]">
                     Hủy bỏ
                   </button>
                 </div>
@@ -1320,44 +1703,56 @@ const AdminDashboard = () => {
           {statusUpdate.showModal && (
             <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
               <motion.div
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"
-                onClick={() => setStatusUpdate({ ...statusUpdate, showModal: false })}
-              ></motion.div>
+                onClick={() =>
+                  setStatusUpdate({ ...statusUpdate, showModal: false })
+                }></motion.div>
               <motion.div
                 initial={{ scale: 0.9, opacity: 0, y: 20 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
                 exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                className="bg-white rounded-3xl shadow-2xl p-8 max-w-sm w-full relative z-10"
-              >
-                <h3 className="text-xl font-black text-slate-900 mb-4">Bảo Hành Sau Sửa Chữa</h3>
+                className="bg-white rounded-3xl shadow-2xl p-8 max-w-sm w-full relative z-10">
+                <h3 className="text-xl font-black text-slate-900 mb-4">
+                  Bảo Hành Sau Sửa Chữa
+                </h3>
                 <p className="text-slate-500 text-sm mb-6">
-                  Vui lòng nhập thời gian bảo hành (tháng) cho thiết bị sau khi hoàn tất sửa chữa.
+                  Vui lòng nhập thời gian bảo hành (tháng) cho thiết bị sau khi
+                  hoàn tất sửa chữa.
                 </p>
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-xs font-bold text-slate-700 uppercase mb-1">Thời gian (Tháng)</label>
+                    <label className="block text-xs font-bold text-slate-700 uppercase mb-1">
+                      Thời gian (Tháng)
+                    </label>
                     <input
                       type="number"
                       min="0"
                       className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500 font-bold text-slate-900"
                       value={statusUpdate.duration}
-                      onChange={(e) => setStatusUpdate({ ...statusUpdate, duration: e.target.value })}
+                      onChange={(e) =>
+                        setStatusUpdate({
+                          ...statusUpdate,
+                          duration: e.target.value,
+                        })
+                      }
                     />
                   </div>
 
                   <div className="flex gap-3 pt-2">
                     <button
-                      onClick={() => setStatusUpdate({ ...statusUpdate, showModal: false })}
-                      className="flex-1 py-3 font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-50 rounded-xl transition-all"
-                    >
+                      onClick={() =>
+                        setStatusUpdate({ ...statusUpdate, showModal: false })
+                      }
+                      className="flex-1 py-3 font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-50 rounded-xl transition-all">
                       Hủy
                     </button>
                     <button
                       onClick={confirmWarrantyUpdate}
-                      className="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-primary-500/30 transition-all"
-                    >
+                      className="flex-1 bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 rounded-xl shadow-lg shadow-primary-500/30 transition-all">
                       Xác Nhận
                     </button>
                   </div>
@@ -1381,21 +1776,25 @@ const AdminDashboard = () => {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"
-                onClick={() => setPrintReceipt(null)}
-              ></motion.div>
+                onClick={() => setPrintReceipt(null)}></motion.div>
               <motion.div
                 initial={{ scale: 0.9, opacity: 0, y: 20 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
                 exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                className="bg-white rounded-3xl shadow-2xl p-8 max-w-2xl w-full relative z-10 max-h-[90vh] overflow-y-auto"
-              >
+                className="bg-white rounded-3xl shadow-2xl p-8 max-w-2xl w-full relative z-10 max-h-[90vh] overflow-y-auto">
                 <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xl font-black text-slate-900">Phiếu Nhận Hàng</h3>
+                  <h3 className="text-xl font-black text-slate-900">
+                    Phiếu Nhận Hàng
+                  </h3>
                   <div className="flex gap-2">
                     <button
                       onClick={() => {
                         // Open new window for printing
-                        const printWindow = window.open('', '_blank', 'width=600,height=800');
+                        const printWindow = window.open(
+                          "",
+                          "_blank",
+                          "width=600,height=800",
+                        );
                         const receiptHTML = `
                           <!DOCTYPE html>
                           <html>
@@ -1540,7 +1939,7 @@ const AdminDashboard = () => {
                               <div class="receipt-title">
                                 <h2>PHIẾU NHẬN HÀNG SỬA CHỮA</h2>
                                 <p class="receipt-code">Mã phiếu: <strong>${printReceipt.code}</strong></p>
-                                <p class="receipt-date">Ngày: ${format(new Date(printReceipt.createdAt), 'dd/MM/yyyy HH:mm')}</p>
+                                <p class="receipt-date">Ngày: ${format(new Date(printReceipt.createdAt), "dd/MM/yyyy HH:mm")}</p>
                               </div>
                             </div>
                             
@@ -1551,15 +1950,15 @@ const AdminDashboard = () => {
                                   <td class="label">Họ và tên:</td>
                                   <td class="value">${printReceipt.customerName}</td>
                                 </tr>
-                                ${printReceipt.companyName ? `<tr><td class="label">Công ty:</td><td class="value">${printReceipt.companyName}</td></tr>` : ''}
+                                ${printReceipt.companyName ? `<tr><td class="label">Công ty:</td><td class="value">${printReceipt.companyName}</td></tr>` : ""}
                                 <tr>
                                   <td class="label">Số điện thoại:</td>
                                   <td class="value">${printReceipt.phoneNumber}</td>
                                 </tr>
-                                ${printReceipt.email ? `<tr><td class="label">Email:</td><td class="value">${printReceipt.email}</td></tr>` : ''}
+                                ${printReceipt.email ? `<tr><td class="label">Email:</td><td class="value">${printReceipt.email}</td></tr>` : ""}
                                 <tr>
                                   <td class="label">Địa chỉ:</td>
-                                  <td class="value">${printReceipt.address || ''}</td>
+                                  <td class="value">${printReceipt.address || ""}</td>
                                 </tr>
                               </table>
                             </div>
@@ -1573,7 +1972,7 @@ const AdminDashboard = () => {
                                 </tr>
                                 <tr>
                                   <td class="label">Số Serial:</td>
-                                  <td class="value">${printReceipt.serialNumber || 'Không có'}</td>
+                                  <td class="value">${printReceipt.serialNumber || "Không có"}</td>
                                 </tr>
                                 <tr>
                                   <td class="label">Mô tả sự cố:</td>
@@ -1585,8 +1984,16 @@ const AdminDashboard = () => {
                             <div class="section">
                               <h3>TRẠNG THÁI</h3>
                               <p class="status-text">
-                                Trạng thái hiện tại: <strong class="status-badge">${{ pending: 'Chờ xử lý', contacted: 'Đã liên hệ', received: 'Đã nhận máy', in_progress: 'Đang sửa chữa', completed: 'Hoàn thành', cancelled: 'Đã hủy' }[printReceipt.status] || printReceipt.status
-                          }</strong>
+                                Trạng thái hiện tại: <strong class="status-badge">${
+                                  {
+                                    pending: "Chờ xử lý",
+                                    contacted: "Đã liên hệ",
+                                    received: "Đã nhận máy",
+                                    in_progress: "Đang sửa chữa",
+                                    completed: "Hoàn thành",
+                                    cancelled: "Đã hủy",
+                                  }[printReceipt.status] || printReceipt.status
+                                }</strong>
                               </p>
                             </div>
                             
@@ -1618,14 +2025,12 @@ const AdminDashboard = () => {
                           printWindow.print();
                         }, 250);
                       }}
-                      className="bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded-xl flex items-center gap-2 transition-all"
-                    >
+                      className="bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded-xl flex items-center gap-2 transition-all">
                       <Printer size={16} /> In phiếu
                     </button>
                     <button
                       onClick={() => setPrintReceipt(null)}
-                      className="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all"
-                    >
+                      className="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all">
                       <X size={20} />
                     </button>
                   </div>
