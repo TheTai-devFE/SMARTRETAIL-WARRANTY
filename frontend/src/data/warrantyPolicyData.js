@@ -42,7 +42,7 @@ export const warrantyPolicyData = {
           },
           {
             name: "Chân đứng ngoài trời",
-            period: "32 tháng",
+            period: "24 tháng",
             scope: "Thay thế, sữa chữa linh kiện ",
             coverage: "Lỗi do nhà sản xuất",
           },
@@ -60,7 +60,7 @@ export const warrantyPolicyData = {
           },
           {
             name: "Treo tường ngoài trời",
-            period: "32 tháng",
+            period: "24 tháng",
             scope: "Thay thế, sữa chữa linh kiện ",
             coverage: "Lỗi do nhà sản xuất",
           },
@@ -84,31 +84,31 @@ export const warrantyPolicyData = {
           },
           {
             name: "Màn hình chân quỳ",
-            period: "10 tháng",
+            period: "24 tháng",
             scope: "Thay thế, sữa chữa linh kiện ",
             coverage: "Lỗi do nhà sản xuất",
           },
           {
             name: "Chân quỳ nguyên khối",
-            period: "20 tháng",
+            period: "24 tháng",
             scope: "Thay thế, sữa chữa linh kiện ",
             coverage: "Lỗi do nhà sản xuất",
           },
           {
             name: "Smart LCD Move360",
-            period: "20 tháng",
+            period: "24 tháng",
             scope: "Thay thế, sữa chữa linh kiện ",
             coverage: "Lỗi do nhà sản xuất",
           },
           {
             name: "Kiosk tự phục vụ",
-            period: "20 tháng",
+            period: "24 tháng",
             scope: "Thay thế, sữa chữa linh kiện ",
             coverage: "Lỗi do nhà sản xuất",
           },
           {
             name: "Màn hình menu để bàn",
-            period: "20 tháng",
+            period: "24 tháng",
             scope: "Thay thế, sữa chữa linh kiện ",
             coverage: "Lỗi do nhà sản xuất",
           },
@@ -130,7 +130,6 @@ export const warrantyPolicyData = {
             scope: "Thay thế, sữa chữa linh kiện ",
             coverage: "Lỗi do nhà sản xuất",
           },
-
         ],
       },
       {
@@ -145,13 +144,13 @@ export const warrantyPolicyData = {
           },
           {
             name: "Tương tác thế hệ mới",
-            period: "60 tháng",
+            period: "24 tháng",
             scope: "Thay thế, sữa chữa linh kiện ",
             coverage: "Lỗi do nhà sản xuất",
           },
           {
             name: "Màn hình ghép",
-            period: "11 tháng",
+            period: "24 tháng",
             scope: "Thay thế, sữa chữa linh kiện ",
             coverage: "Lỗi do nhà sản xuất",
           },
@@ -161,7 +160,6 @@ export const warrantyPolicyData = {
             scope: "Thay thế, sữa chữa linh kiện ",
             coverage: "Lỗi do nhà sản xuất",
           },
-
         ],
       },
       {
@@ -170,7 +168,7 @@ export const warrantyPolicyData = {
         items: [
           {
             name: "Bút tương tác",
-            period: "06 Tháng",
+            period: "24 tháng",
             scope: "Lỗi cảm ứng, không nhận tín hiệu",
             coverage: "Đổi mới sản phẩm",
           },
@@ -182,7 +180,7 @@ export const warrantyPolicyData = {
           },
           {
             name: "Cáp kết nối",
-            period: "03 Tháng",
+            period: "24 tháng",
             scope: "Đứt ngầm, không truyền dữ liệu",
             coverage: "Đổi mới sản phẩm",
           },
@@ -245,16 +243,16 @@ export const warrantyPolicyData = {
       icon: "PhoneCall",
       contacts: [
         { label: "0935 888 489", link: "tel:0935888489" },
-        { label: "0967 049 018", link: "tel:0967049018" }
-      ]
+        { label: "0967 049 018", link: "tel:0967049018" },
+      ],
     },
     {
       title: "Hỗ trợ kỹ thuật (24/7)",
       icon: "MessageSquare",
       contacts: [
         { label: "0909 045 663", link: "https://zalo.me/0909045663" },
-        { label: "0936 817 781", link: "https://zalo.me/0936817781" }
-      ]
+        { label: "0936 817 781", link: "https://zalo.me/0936817781" },
+      ],
     },
     {
       title: "Yêu cầu bảo hành",
